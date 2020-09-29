@@ -1,4 +1,4 @@
-package com.imptt.v2.ui.main
+package com.imptt.v2.view.main
 
 import android.os.Bundle
 import android.view.LayoutInflater

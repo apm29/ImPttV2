@@ -1,4 +1,4 @@
-package com.imptt.v2.struct
+package com.imptt.v2.core.struct
 
 import android.content.Context
 import android.content.Intent

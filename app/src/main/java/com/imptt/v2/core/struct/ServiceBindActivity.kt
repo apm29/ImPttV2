@@ -1,11 +1,10 @@
-package com.imptt.v2.struct
+package com.imptt.v2.core.struct
 
 import android.content.ComponentName
 import android.content.ServiceConnection
-import android.os.Bundle
-import android.os.IBinder
+import android.os.*
 import androidx.appcompat.app.AppCompatActivity
-import com.imptt.v2.core.binder.ServicePushToTalk
+import com.imptt.v2.core.messenger.view.ViewMessenger
 
 /**
  *  author : ciih
@@ -14,22 +13,22 @@ import com.imptt.v2.core.binder.ServicePushToTalk
  */
 open class ServiceBindActivity : AppCompatActivity(), ServiceConnection {
 
-    private val proxy:ServiceBinderProxy by lazy {
-        ServiceBinderProxy(this,this)
+    private val serviceBinderProxy: ServiceBinderProxy by lazy {
+        ServiceBinderProxy(this, this)
     }
-
-    private var mBinder:ServicePushToTalk? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        proxy.ensureCreated()
+        serviceBinderProxy.ensureCreated()
     }
 
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-        this.mBinder = service as? ServicePushToTalk
+        //this.pttService = service as ImService.ServicePushToTalk?
+        ViewMessenger.bindMessenger(service)
     }
 
     override fun onServiceDisconnected(name: ComponentName?) {
-        this.mBinder = null
+        //this.pttService = null
+        ViewMessenger.unbind()
     }
 }

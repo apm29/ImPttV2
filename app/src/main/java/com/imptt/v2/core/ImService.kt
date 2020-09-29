@@ -2,15 +2,17 @@ package com.imptt.v2.core
 
 import android.app.Service
 import android.content.Intent
-import android.os.IBinder
+import android.os.*
 import android.text.TextUtils
 import android.view.KeyEvent
 import android.widget.Toast
+import com.imptt.v2.IServicePushToTalk
 import com.imptt.v2.core.media.MediaSessionHandler
-import com.imptt.v2.core.binder.ServicePushToTalk
+import com.imptt.v2.core.messenger.service.ServiceMessenger
 import com.imptt.v2.core.notification.NotificationFactory
 
 /**
+
  *  ptt对讲服务总Service
  *  author : ciih
  *  date : 2020/9/29 4:28 PM
@@ -71,11 +73,13 @@ class ImService:Service() {
 
     override fun onBind(intent: Intent?): IBinder? {
         println("ImService.onBind")
-        return ServicePushToTalk()
+       // return ServicePushToTalk()
+        return ServiceMessenger.bindMessenger()
     }
 
     override fun onUnbind(intent: Intent?): Boolean {
         println("ImService.onUnbind")
+        ServiceMessenger.unbind()
         return super.onUnbind(intent)
     }
 

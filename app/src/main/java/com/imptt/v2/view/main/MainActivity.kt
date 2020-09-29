@@ -1,14 +1,16 @@
-package com.imptt.v2.ui.main
+package com.imptt.v2.view.main
 
 import android.os.Bundle
+import android.os.Message
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.imptt.v2.R
-import com.imptt.v2.struct.ServiceBindActivity
+import com.imptt.v2.core.messenger.view.ViewMessenger
+import com.imptt.v2.core.struct.ServiceBindActivity
 
 class MainActivity : ServiceBindActivity() {
 
@@ -25,5 +27,12 @@ class MainActivity : ServiceBindActivity() {
         ))
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
+        findViewById<FloatingActionButton>(R.id.fabHome).setOnClickListener {
+            ViewMessenger.send(Message().apply {
+                this.what = 666
+                this.obj = Bundle()
+                this.replyTo = ViewMessenger.myself()
+            })
+        }
     }
 }
