@@ -8,4 +8,6 @@
      * 通过为Message添加replyTo来传递Messenger对象到另一进程，可参考Android Developer的模式将主进程的Messenger`注册`到ptt进程，ptt可在需要时通知（发送Message）主进程
      * 定义好Message.what
 
+## DI
+使用(Hilt)[https://developer.android.google.cn/training/dependency-injection/hilt-android#hilt-modules]
      

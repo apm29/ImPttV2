@@ -11,7 +11,9 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.imptt.v2.R
 import com.imptt.v2.core.messenger.view.ViewMessenger
 import com.imptt.v2.core.struct.ServiceBindActivity
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ServiceBindActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
