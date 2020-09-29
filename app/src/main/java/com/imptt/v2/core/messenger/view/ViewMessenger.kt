@@ -1,9 +1,10 @@
 package com.imptt.v2.core.messenger.view
 
 import android.os.*
+import android.util.Log
 
 object ViewMessenger {
-
+    private val TAG = ViewMessenger::class.java.canonicalName
     //messenger
     private var mServiceMessenger:Messenger? = null
     private val mServiceRequestHandler = Handler(Looper.getMainLooper()){
@@ -13,7 +14,7 @@ object ViewMessenger {
     val boundToService
         get() = mServiceMessenger != null
 
-    fun bindMessenger(service: IBinder?) {
+    fun bindService(service: IBinder?) {
         this.mServiceMessenger =  Messenger(service)
     }
 
@@ -22,7 +23,7 @@ object ViewMessenger {
     }
 
     fun send(message: Message) {
-        mViewMessenger.send(message)
+        mServiceMessenger?.send(message)?: Log.e(TAG, "Service Messenger is not bind to ViewMessenger")
     }
 
     fun myself()= mViewMessenger

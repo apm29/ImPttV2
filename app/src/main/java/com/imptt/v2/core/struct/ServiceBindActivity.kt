@@ -24,7 +24,7 @@ open class ServiceBindActivity : AppCompatActivity(), ServiceConnection {
 
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
         //this.pttService = service as ImService.ServicePushToTalk?
-        ViewMessenger.bindMessenger(service)
+        ViewMessenger.bindService(service)
     }
 
     override fun onServiceDisconnected(name: ComponentName?) {
