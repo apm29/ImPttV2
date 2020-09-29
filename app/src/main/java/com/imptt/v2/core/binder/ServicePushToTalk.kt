@@ -1,4 +1,4 @@
-package com.imptt.v2.service.binder
+package com.imptt.v2.core.binder
 
 import com.imptt.v2.IServicePushToTalk
 

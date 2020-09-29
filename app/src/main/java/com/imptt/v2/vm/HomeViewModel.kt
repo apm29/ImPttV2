@@ -1,4 +1,4 @@
-package com.imptt.v2.ui.home
+package com.imptt.v2.vm
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

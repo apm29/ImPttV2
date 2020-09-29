@@ -5,14 +5,14 @@ import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
 import androidx.appcompat.app.AppCompatActivity
-import com.imptt.v2.service.binder.ServicePushToTalk
+import com.imptt.v2.core.binder.ServicePushToTalk
 
 /**
  *  author : ciih
  *  date : 2020/9/29 4:22 PM
  *  description :
  */
-class ServiceBindActivity : AppCompatActivity(), ServiceConnection {
+open class ServiceBindActivity : AppCompatActivity(), ServiceConnection {
 
     private val proxy:ServiceBinderProxy by lazy {
         ServiceBinderProxy(this,this)
@@ -26,7 +26,7 @@ class ServiceBindActivity : AppCompatActivity(), ServiceConnection {
     }
 
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-        this.mBinder = service as ServicePushToTalk?
+        this.mBinder = service as? ServicePushToTalk
     }
 
     override fun onServiceDisconnected(name: ComponentName?) {

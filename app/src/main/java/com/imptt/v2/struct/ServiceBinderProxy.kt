@@ -7,7 +7,7 @@ import androidx.activity.ComponentActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
-import com.imptt.v2.service.ImService
+import com.imptt.v2.core.ImService
 
 /**
  *  author : ciih
