@@ -84,4 +84,11 @@ dependencies {
     implementation "com.google.dagger:hilt-android:$rootProject.hiltVersion"
     implementation "androidx.hilt:hilt-lifecycle-viewmodel:$rootProject.hiltViewModelVersion"
 
+    //koin
+    // Koin AndroidX Scope feature
+    implementation "org.koin:koin-androidx-scope:$rootProject.koinVersion"
+    // Koin AndroidX ViewModel feature
+    implementation "org.koin:koin-androidx-viewmodel:$rootProject.koinVersion"
+    // Koin AndroidX Fragment Factory
+    implementation "org.koin:koin-androidx-fragment:$rootProject.koinVersion"
 }
