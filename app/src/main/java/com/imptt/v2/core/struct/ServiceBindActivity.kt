@@ -18,8 +18,8 @@ open class ServiceBindActivity : AppCompatActivity(), ServiceConnection {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
         serviceBinderProxy.ensureCreated()
+        super.onCreate(savedInstanceState)
     }
 
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {

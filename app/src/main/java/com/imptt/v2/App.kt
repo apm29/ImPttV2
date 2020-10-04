@@ -1,6 +1,8 @@
 package com.imptt.v2
 
 import android.app.Application
+import android.content.Intent
+import com.imptt.v2.core.ImService
 import com.imptt.v2.di.serviceModule
 import dagger.hilt.android.HiltAndroidApp
 import org.koin.android.ext.koin.androidContext
@@ -18,5 +20,6 @@ class App:Application() {
             androidContext(this@App)
             modules(serviceModule)
         }
+        startService(Intent(this,ImService::class.java))
     }
 }

@@ -11,6 +11,11 @@ import com.imptt.v2.IServicePushToTalk
 import com.imptt.v2.core.media.MediaSessionHandler
 import com.imptt.v2.core.messenger.service.ServiceMessenger
 import com.imptt.v2.core.notification.NotificationFactory
+import com.imptt.v2.core.websocket.SignalServerConnection
+import com.imptt.v2.data.model.UserInfo
+import okhttp3.WebSocket
+import org.koin.android.ext.android.inject
+import org.koin.core.parameter.parametersOf
 
 /**
 
@@ -26,10 +31,18 @@ class ImService:Service() {
         const val NOTIFICATION_CHANNEL_NAME = "ImPttV2网络对讲服务"
     }
 
+    private val mWebSocket:WebSocket by inject{
+        parametersOf(UserInfo("123"))
+    }
+    private val mSignalServerConnection:SignalServerConnection by inject()
+
     override fun onCreate() {
         println("ImService.onCreate")
         super.onCreate()
+        mSignalServerConnection.send(666,mWebSocket)
     }
+
+
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         println("ImService.onStartCommand")
