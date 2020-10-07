@@ -13,8 +13,12 @@ import com.imptt.v2.core.messenger.service.ServiceMessenger
 import com.imptt.v2.core.notification.NotificationFactory
 import com.imptt.v2.core.websocket.SignalServerConnection
 import com.imptt.v2.data.model.UserInfo
+import com.imptt.v2.di.serviceModule
 import okhttp3.WebSocket
 import org.koin.android.ext.android.inject
+import org.koin.android.ext.koin.androidContext
+import org.koin.android.ext.koin.androidLogger
+import org.koin.core.context.startKoin
 import org.koin.core.parameter.parametersOf
 
 /**
@@ -25,6 +29,7 @@ import org.koin.core.parameter.parametersOf
  *  description :
  */
 class ImService:Service() {
+
     companion object {
         const val NOTIFICATION_ID = 4310
         const val NOTIFICATION_CHANNEL_ID = "ImPttV2网络对讲服务"
@@ -37,8 +42,9 @@ class ImService:Service() {
     private val mSignalServerConnection:SignalServerConnection by inject()
 
     override fun onCreate() {
-        println("ImService.onCreate")
+
         super.onCreate()
+        println("ImService.onCreate")
         mSignalServerConnection.send(666,mWebSocket)
     }
 

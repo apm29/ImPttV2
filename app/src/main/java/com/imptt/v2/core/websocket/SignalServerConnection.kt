@@ -2,11 +2,15 @@ package com.imptt.v2.core.websocket
 
 import android.util.Log
 import com.google.gson.Gson
+import com.imptt.v2.di.ParserGson
+import com.imptt.v2.di.PrettyPrintGson
 import okhttp3.Response
 import okhttp3.WebSocket
 import okhttp3.WebSocketListener
 import okio.ByteString
 import org.json.JSONObject
+import org.koin.core.qualifier.StringQualifier
+import org.koin.java.KoinJavaComponent.inject
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
@@ -48,9 +52,9 @@ class SignalServerConnection : WebSocketListener() {
     override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
         super.onFailure(webSocket, t, response)
         val message: String? = sentMessageMap[lastMessageUUID]
-            failListeners.forEach { callback ->
-                webSocket.callback(message, t)
-            }
+        failListeners.forEach { callback ->
+            webSocket.callback(message, t)
+        }
     }
 
     /** Invoked when a text (type `0x1`) message has been received. */
@@ -90,10 +94,12 @@ class SignalServerConnection : WebSocketListener() {
     private val openListeners: ArrayList<WebSocketOpenCallback> = arrayListOf()
     private val closeListeners: ArrayList<WebSocketCloseCallback> = arrayListOf()
     private val failListeners: ArrayList<WebSocketFailCallback> = arrayListOf()
-    private val sentMessageMap:LinkedHashMap<UUID,String> = LinkedHashMap()
-    private val gson:Gson = Gson()
+    private val sentMessageMap: LinkedHashMap<UUID, String> = LinkedHashMap()
+    private val gson: Gson  by inject(Gson::class.java,qualifier = StringQualifier(ParserGson))
+    private val printerGson:Gson by inject(Gson::class.java,qualifier = StringQualifier(PrettyPrintGson))
+
     @Volatile
-    private var lastMessageUUID:UUID = UUID.randomUUID()
+    private var lastMessageUUID: UUID = UUID.randomUUID()
     fun on(type: String, callback: WebSocketMessageCallback): SignalServerConnection {
         val listeners = textMessageListenerMap[type] ?: arrayListOf()
         listeners.add(callback)
@@ -115,16 +121,21 @@ class SignalServerConnection : WebSocketListener() {
         return this
     }
 
-    fun sendTextMessage(message:String,webSocket: WebSocket,id:UUID = UUID.randomUUID()){
-        if(webSocket.send(message)) synchronized(webSocket){
+    fun sendTextMessage(message: String, webSocket: WebSocket, id: UUID = UUID.randomUUID()) {
+        if (webSocket.send(message)) synchronized(webSocket) {
             lastMessageUUID = id
             sentMessageMap[id] = message
+            logSend(message)
         }
     }
 
-    fun<T> send(message:T,webSocket: WebSocket,id: UUID = UUID.randomUUID()){
+    fun <T> send(message: T, webSocket: WebSocket, id: UUID = UUID.randomUUID()) {
         val textMessage = gson.toJson(message)
-        sendTextMessage(textMessage,webSocket,id)
+        sendTextMessage(textMessage, webSocket, id)
+    }
+
+    private fun logSend(message: String){
+        Log.d(TAG,"WebSocket客户端发送:${printerGson.toJson(message)}")
     }
 }
 

@@ -1,5 +1,6 @@
 package com.imptt.v2.di
 
+import com.google.gson.GsonBuilder
 import com.imptt.v2.core.websocket.SignalServerConnection
 import com.imptt.v2.data.model.UserInfo
 import okhttp3.OkHttpClient
@@ -18,26 +19,35 @@ import java.util.concurrent.TimeUnit
  *  description :
  */
 const val WebSocketOkHttp = "websocket-okhttpclient"
+const val PrettyPrintGson = "pretty_print"
+const val ParserGson = "parser"
 
 var serviceModule = module {
-    single<OkHttpClient>(named(WebSocketOkHttp)) {
+    single(named(WebSocketOkHttp)) {
         provideOkHttpClient()
     }
 
-    single<Retrofit> {
+    single {
         provideRetrofit(get(named(WebSocketOkHttp)))
     }
 
+    single(named(PrettyPrintGson)){
+        GsonBuilder().setPrettyPrinting().create()
+    }
+    single(named(ParserGson)){
+        GsonBuilder().create()
+    }
+
     //websocket listener
-    single<WebSocketListener> {
+    single {
         SignalServerConnection()
     }
 
     single<WebSocket> { (user: UserInfo) ->
         createWebSocket(
-            get<OkHttpClient>(named(WebSocketOkHttp)),
+            get(named(WebSocketOkHttp)),
             user,
-            get<WebSocketListener>()
+            get<SignalServerConnection>()
         )
     }
 }

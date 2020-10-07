@@ -1,5 +1,6 @@
 package com.imptt.v2.view.main
 
+import android.content.Intent
 import android.os.Bundle
 import android.os.Message
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -9,6 +10,8 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.imptt.v2.R
+import com.imptt.v2.core.ImService
+import com.imptt.v2.core.messenger.connections.MESSAGE_TYPE_ECHO_TEST
 import com.imptt.v2.core.messenger.view.ViewMessenger
 import com.imptt.v2.core.struct.ServiceBindActivity
 import dagger.hilt.android.AndroidEntryPoint
@@ -31,8 +34,10 @@ class MainActivity : ServiceBindActivity() {
         navView.setupWithNavController(navController)
         findViewById<FloatingActionButton>(R.id.fabHome).setOnClickListener {
             ViewMessenger.send(Message().apply {
-                this.what = 666
-                this.obj = Bundle()
+                this.what = MESSAGE_TYPE_ECHO_TEST
+                this.obj = Bundle().apply {
+                    putString("TEST","Toast from View")
+                }
                 this.replyTo = ViewMessenger.myself()
             })
         }

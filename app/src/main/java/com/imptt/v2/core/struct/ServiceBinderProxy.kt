@@ -37,6 +37,7 @@ class ServiceBinderProxy(
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     fun onCreate() {
         println("ServiceBinderProxy.onCreate")
+        println("lifecycleOwner = $lifecycleOwner")
         lifecycleOwner.startService(serviceIntent)
     }
 
