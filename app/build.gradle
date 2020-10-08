@@ -91,4 +91,7 @@ dependencies {
     implementation "org.koin:koin-androidx-viewmodel:$rootProject.koinVersion"
     // Koin AndroidX Fragment Factory
     implementation "org.koin:koin-androidx-fragment:$rootProject.koinVersion"
+
+    //webrtc-google
+    implementation 'org.webrtc:google-webrtc:1.0.32006'
 }
