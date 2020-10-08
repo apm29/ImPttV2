@@ -103,6 +103,7 @@ class SignalServerConnection : WebSocketListener() {
     fun on(type: String, callback: WebSocketMessageCallback): SignalServerConnection {
         val listeners = textMessageListenerMap[type] ?: arrayListOf()
         listeners.add(callback)
+        textMessageListenerMap[type] = listeners
         return this
     }
 

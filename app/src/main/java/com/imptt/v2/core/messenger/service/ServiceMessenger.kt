@@ -2,10 +2,8 @@ package com.imptt.v2.core.messenger.service
 
 import android.os.*
 import android.util.Log
-import com.imptt.v2.core.messenger.connections.MESSAGE_TYPE_ECHO_TEST
-import com.imptt.v2.core.messenger.connections.MESSAGE_TYPE_REGISTER_VIEW
-import com.imptt.v2.core.messenger.connections.MESSAGE_TYPE_UNREGISTER_VIEW
-import com.imptt.v2.core.messenger.connections.MessageFactory
+import com.imptt.v2.core.messenger.connections.*
+import com.imptt.v2.core.messenger.view.ViewMessenger
 
 object ServiceMessenger {
 
@@ -19,7 +17,7 @@ object ServiceMessenger {
     private val mViewMessengers:HashSet<Messenger> = HashSet(1)
 
     private var activityBound = false
-
+    private val messageCallbacks = HashMap<Int,ArrayList<ViewMessageCallback>>()
     fun bindMessenger(): IBinder? {
         activityBound = true
         return mMessenger.binder
@@ -43,7 +41,30 @@ object ServiceMessenger {
         MessageFactory.log(message,"PTT服务进程收到消息")
     }
 
+    fun on(type:Int,callback: ViewMessageCallback): ServiceMessenger {
+        val callbacks = messageCallbacks[type]?: arrayListOf()
+        callbacks.add(callback)
+        messageCallbacks[type] = callbacks
+        return this
+    }
+
+    fun offAll(type: Int){
+       messageCallbacks[type]?.clear()
+    }
+
+    fun off(type: Int,callback: ServiceMessageCallback):ServiceMessenger{
+       messageCallbacks[type]?.remove(callback)
+        return this
+    }
+
     private fun handleMessage(message: Message):Boolean{
+        messageCallbacks[message.what]?.forEach { callback ->
+            try {
+                callback.invoke(message)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
         when(message.what){
             MESSAGE_TYPE_REGISTER_VIEW->{
                 if(mViewMessengers.add(message.replyTo)){
