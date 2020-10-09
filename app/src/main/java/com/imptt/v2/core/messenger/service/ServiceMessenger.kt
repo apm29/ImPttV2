@@ -8,16 +8,17 @@ import com.imptt.v2.core.messenger.view.ViewMessenger
 object ServiceMessenger {
 
     private val TAG = ServiceMessenger::class.java.canonicalName
+
     //messenger
-    private val mViewRequestHandler = Handler(Looper.getMainLooper()){ message ->
+    private val mViewRequestHandler = Handler(Looper.getMainLooper()) { message ->
         logReceive(message)
         handleMessage(message)
     }
-    private val mMessenger:Messenger =  Messenger(mViewRequestHandler)
-    private val mViewMessengers:HashSet<Messenger> = HashSet(1)
+    private val mMessenger: Messenger = Messenger(mViewRequestHandler)
+    private val mViewMessengers: HashSet<Messenger> = HashSet(1)
 
     private var activityBound = false
-    private val messageCallbacks = HashMap<Int,ArrayList<ViewMessageCallback>>()
+    private val messageCallbacks = HashMap<Int, ArrayList<ViewMessageCallback>>()
     fun bindMessenger(): IBinder? {
         activityBound = true
         return mMessenger.binder
@@ -27,37 +28,31 @@ object ServiceMessenger {
         activityBound = false
     }
 
-    fun sendMessage(message: Message){
+    fun sendMessage(message: Message) {
         logSend(message)
-        mViewMessengers.forEach {
+        //倒序发送消息
+        mViewMessengers.reversed().forEach {
             it.send(message)
         }
     }
 
-    private fun logSend(message: Message){
-        MessageFactory.log(message,"PTT服务进程发送消息")
-    }
-    private fun logReceive(message: Message){
-        MessageFactory.log(message,"PTT服务进程收到消息")
-    }
-
-    fun on(type:Int,callback: ViewMessageCallback): ServiceMessenger {
-        val callbacks = messageCallbacks[type]?: arrayListOf()
+    fun on(type: Int, callback: ViewMessageCallback): ServiceMessenger {
+        val callbacks = messageCallbacks[type] ?: arrayListOf()
         callbacks.add(callback)
         messageCallbacks[type] = callbacks
         return this
     }
 
-    fun offAll(type: Int){
-       messageCallbacks[type]?.clear()
+    fun offAll(type: Int) {
+        messageCallbacks[type]?.clear()
     }
 
-    fun off(type: Int,callback: ServiceMessageCallback):ServiceMessenger{
-       messageCallbacks[type]?.remove(callback)
+    fun off(type: Int, callback: ServiceMessageCallback): ServiceMessenger {
+        messageCallbacks[type]?.remove(callback)
         return this
     }
 
-    private fun handleMessage(message: Message):Boolean{
+    private fun handleMessage(message: Message): Boolean {
         messageCallbacks[message.what]?.forEach { callback ->
             try {
                 callback.invoke(message)
@@ -65,29 +60,41 @@ object ServiceMessenger {
                 e.printStackTrace()
             }
         }
-        when(message.what){
-            MESSAGE_TYPE_REGISTER_VIEW->{
-                if(mViewMessengers.add(message.replyTo)){
-                    Log.d(TAG,"新增ViewMessenger")
-                }else{
-                    Log.d(TAG,"ViewMessenger已存在:注册失败")
+        when (message.what) {
+            MESSAGE_TYPE_REGISTER_VIEW -> {
+                if (mViewMessengers.add(message.replyTo)) {
+                    Log.d(TAG, "新增ViewMessenger")
+                } else {
+                    Log.d(TAG, "ViewMessenger已存在:无需注册")
                 }
             }
-            MESSAGE_TYPE_UNREGISTER_VIEW->{
-                if(mViewMessengers.remove(message.replyTo)){
-                    Log.d(TAG,"移除ViewMessenger")
-                }else{
-                    Log.d(TAG,"ViewMessenger不存在:注销失败")
+            MESSAGE_TYPE_UNREGISTER_VIEW -> {
+                if (mViewMessengers.remove(message.replyTo)) {
+                    Log.d(TAG, "移除ViewMessenger")
+                } else {
+                    Log.d(TAG, "ViewMessenger不存在:注销失败")
                 }
             }
-            MESSAGE_TYPE_ECHO_TEST->{
+            MESSAGE_TYPE_ECHO_TEST -> {
                 sendMessage(message)
             }
-            else->{
+            else -> {
                 //其他
             }
         }
         return true
+    }
+
+    fun myself(): Messenger = mMessenger
+
+    fun handler(): Handler = mViewRequestHandler
+
+    private fun logSend(message: Message) {
+        MessageFactory.log(message, "PTT服务进程发送消息")
+    }
+
+    private fun logReceive(message: Message) {
+        MessageFactory.log(message, "PTT服务进程收到消息")
     }
 
 }

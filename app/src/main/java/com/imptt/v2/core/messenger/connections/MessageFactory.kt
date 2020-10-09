@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.os.Message
 import android.util.Log
 import com.google.gson.Gson
+import com.imptt.v2.core.messenger.service.ServiceMessenger
 import com.imptt.v2.core.messenger.view.ViewMessenger
 import com.imptt.v2.core.websocket.Group
 import com.imptt.v2.di.PrettyPrintGson
@@ -31,7 +32,20 @@ object MessageFactory {
         }
     }
 
+    private fun createServiceSideMessage(
+        type: Int,
+        objData: Any? = null,
+        bundleData: Bundle = Bundle.EMPTY
+    ): Message {
+        return Message.obtain(ServiceMessenger.handler()).apply {
+            what = type
+            obj = objData
+            data = bundleData
+            replyTo = ServiceMessenger.myself()
+        }
+    }
 
+    /******************************************View侧调用********************************************/
     //View进程注册反注册Messenger
     fun createViewRegisterMessage(): Message {
         return createViewSideMessage(MESSAGE_TYPE_REGISTER_VIEW)
@@ -40,10 +54,10 @@ object MessageFactory {
     fun createViewUnregisterMessage(): Message {
         return createViewSideMessage(MESSAGE_TYPE_UNREGISTER_VIEW)
     }
-
-
+    /******************************************Service侧调用********************************************/
+    //ptt进程获取群组信息后发送给view
     fun createWsRegisterSuccessMessage(groups:List<Group>):Message{
-        return  createViewSideMessage(
+        return  createServiceSideMessage(
             MESSAGE_TYPE_GROUP_LIST,
             bundleData = Bundle().apply {
                 putParcelableArrayList(MESSAGE_DATA_KEY_GROUP_LIST, ArrayList(groups))
@@ -51,7 +65,7 @@ object MessageFactory {
         )
     }
 
-
+    /******************************************Log相关********************************************/
     private fun log(message: Message) {
         this.log(message, tag = "创建消息")
     }
