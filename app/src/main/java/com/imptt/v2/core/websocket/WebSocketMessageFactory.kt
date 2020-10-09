@@ -33,11 +33,23 @@ class WebSocketMessageFactory private constructor(private val user: UserInfo) {
     fun createRegister(): SignalMessage.RegisterToSignalServer {
         return SignalMessage.RegisterToSignalServer()
     }
+
+    fun createOffer(groupId: String, sdp: SessionDescription): SignalMessage.CreateOffer {
+        return SignalMessage.CreateOffer(groupId, user.userId, sdp)
+    }
+
+    fun createAnswer(groupId: String, sdp: SessionDescription): SignalMessage.CreateAnswer {
+        return SignalMessage.CreateAnswer(groupId, user.userId, sdp)
+    }
+
+    fun createCandidate(groupId: String, candidate: IceCandidate): SignalMessage {
+        return SignalMessage.CreateCandidate(groupId, user.userId, candidate)
+    }
 }
 
 data class Group @JvmOverloads constructor(
     val groupId: String? = null
-):Parcelable {
+) : Parcelable {
 
     constructor(parcel: Parcel) : this(parcel.readString())
 
@@ -75,7 +87,8 @@ open class SignalMessage(
     val groupId: String? = null,
     val candidate: IceCandidate? = null,
     val sdp: SessionDescription? = null,
-    val info: ImPttInfo? = null
+    val info: ImPttInfo? = null,
+    val groupUsers:List<String> = arrayListOf()
 ) {
 
     /**
@@ -100,6 +113,36 @@ open class SignalMessage(
         groupId = groupId,
         from = userId
     )
+
+    /**
+     * 创建Offer
+     */
+    class CreateOffer(groupId: String, userId: String, sdp: SessionDescription) : SignalMessage(
+        type = WebSocketTypes.Offer.type,
+        groupId = groupId,
+        from = userId,
+        sdp = sdp
+    )
+
+    /**
+     * 创建Answer
+     */
+    class CreateAnswer(groupId: String, userId: String, sdp: SessionDescription) : SignalMessage(
+        type = WebSocketTypes.Answer.type,
+        groupId = groupId,
+        from = userId,
+        sdp = sdp
+    )
+
+    /**
+     * 创建Candidate
+     */
+    class CreateCandidate(groupId: String, userId: String, candidate: IceCandidate) : SignalMessage(
+        type = WebSocketTypes.Answer.type,
+        groupId = groupId,
+        from = userId,
+        candidate = candidate
+    )
 }
 
 //WebSocket 消息类型
@@ -110,6 +153,7 @@ sealed class WebSocketTypes(val type: String) {
     object Offer : WebSocketTypes("offer")
     object Answer : WebSocketTypes("answer")
     object Call : WebSocketTypes("call")
+    object Joined : WebSocketTypes("joined")
     object InCall : WebSocketTypes("in_call")
     object Candidate : WebSocketTypes("candidate")
 }

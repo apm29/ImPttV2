@@ -49,7 +49,8 @@ class ImService : Service(), CoroutineScope {
                 val baseResp = mSignalServerApi.login("yjw")
                 if (baseResp.success && baseResp.hasData) {
                     mSignalServiceConnector = SignalServiceConnector(
-                        baseResp.data!!
+                        baseResp.data!!,
+                        this@ImService
                     )
                     startForeground(
                         NOTIFICATION_ID, NotificationFactory.createNotification(
