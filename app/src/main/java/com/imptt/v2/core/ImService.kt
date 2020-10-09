@@ -6,20 +6,14 @@ import android.os.*
 import android.text.TextUtils
 import android.view.KeyEvent
 import android.widget.Toast
-import androidx.lifecycle.ViewModelProviders
-import com.imptt.v2.IServicePushToTalk
 import com.imptt.v2.core.media.MediaSessionHandler
 import com.imptt.v2.core.messenger.service.ServiceMessenger
 import com.imptt.v2.core.notification.NotificationFactory
-import com.imptt.v2.core.websocket.SignalServerConnection
-import com.imptt.v2.data.model.UserInfo
-import com.imptt.v2.di.serviceModule
-import okhttp3.WebSocket
+import com.imptt.v2.core.websocket.SignalServiceConnector
+import com.imptt.v2.data.api.SignalServerApi
+import kotlinx.coroutines.*
 import org.koin.android.ext.android.inject
-import org.koin.android.ext.koin.androidContext
-import org.koin.android.ext.koin.androidLogger
-import org.koin.core.context.startKoin
-import org.koin.core.parameter.parametersOf
+import kotlin.coroutines.CoroutineContext
 
 /**
 
@@ -28,7 +22,12 @@ import org.koin.core.parameter.parametersOf
  *  date : 2020/9/29 4:28 PM
  *  description :
  */
-class ImService:Service() {
+class ImService : Service(), CoroutineScope {
+
+    override val coroutineContext: CoroutineContext
+        get() = Dispatchers.Main
+    private val ioContext: CoroutineContext
+        get() = Dispatchers.IO
 
     companion object {
         const val NOTIFICATION_ID = 4310
@@ -36,24 +35,51 @@ class ImService:Service() {
         const val NOTIFICATION_CHANNEL_NAME = "ImPttV2网络对讲服务"
     }
 
-    private val mWebSocket:WebSocket by inject{
-        parametersOf(UserInfo("123"))
-    }
-    private val mSignalServerConnection:SignalServerConnection by inject()
-
+    private val mSignalServerApi: SignalServerApi by inject()
+    private var mSignalServiceConnector: SignalServiceConnector? = null
     override fun onCreate() {
-
         super.onCreate()
         println("ImService.onCreate")
-        mSignalServerConnection.send(666,mWebSocket)
+        loginAsUser()
     }
 
+    private fun loginAsUser() {
+        launch(ioContext) {
+            try {
+                val baseResp = mSignalServerApi.login("yjw")
+                if (baseResp.success && baseResp.hasData) {
+                    mSignalServiceConnector = SignalServiceConnector(
+                        baseResp.data!!
+                    )
+                    startForeground(
+                        NOTIFICATION_ID, NotificationFactory.createNotification(
+                            this@ImService,
+                            NOTIFICATION_CHANNEL_ID,
+                            NOTIFICATION_CHANNEL_NAME,
+                            "已登录"
+                        )
+                    )
+                } else {
+                    startForeground(
+                        NOTIFICATION_ID, NotificationFactory.createNotification(
+                            this@ImService,
+                            NOTIFICATION_CHANNEL_ID,
+                            NOTIFICATION_CHANNEL_NAME,
+                            "登录失败"
+                        )
+                    )
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
 
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         println("ImService.onStartCommand")
         //监听媒体按键
-        MediaSessionHandler.handle(packageName,intent,this){
+        MediaSessionHandler.handle(packageName, intent, this) {
             val action = intent?.action
             if (action != null) {
                 if (TextUtils.equals(action, Intent.ACTION_MEDIA_BUTTON)) {
@@ -85,7 +111,8 @@ class ImService:Service() {
             NOTIFICATION_ID, NotificationFactory.createNotification(
                 this,
                 NOTIFICATION_CHANNEL_ID,
-                NOTIFICATION_CHANNEL_NAME
+                NOTIFICATION_CHANNEL_NAME,
+                "未登录"
             )
         )
         return super.onStartCommand(intent, flags, startId)
@@ -93,7 +120,7 @@ class ImService:Service() {
 
     override fun onBind(intent: Intent?): IBinder? {
         println("ImService.onBind")
-       // return ServicePushToTalk()
+        // return ServicePushToTalk()
         return ServiceMessenger.bindMessenger()
     }
 

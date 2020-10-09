@@ -34,10 +34,10 @@ var serviceModule = module {
         provideWebSocketRetrofit(get(named(WebSocketRelated)))
     }
 
-    single(named(PrettyPrintGson)){
+    single(named(PrettyPrintGson)) {
         GsonBuilder().setPrettyPrinting().create()
     }
-    single(named(ParserGson)){
+    single(named(ParserGson)) {
         GsonBuilder().create()
     }
 
@@ -46,7 +46,8 @@ var serviceModule = module {
         SignalServerConnection()
     }
 
-    single { (user: UserInfo) ->
+    //websocket不是单例，需要时再从okhttp新建相同实例
+    factory { (user: UserInfo) ->
         createWebSocket(
             get(named(WebSocketRelated)),
             user,
@@ -54,18 +55,19 @@ var serviceModule = module {
         )
     }
 
+
     //api
     single(named(HttpApiRelated)) {
         provideHttpOkHttpClient()
     }
     single(named(HttpApiRelated)) {
         provideHttpRetrofit(
-                get(named(HttpApiRelated))
+            get(named(HttpApiRelated))
         )
     }
     single {
         createServerApi(
-                get(named(HttpApiRelated))
+            get(named(HttpApiRelated))
         )
     }
 }
@@ -77,10 +79,10 @@ fun provideWebSocketOkHttpClient() = OkHttpClient.Builder()
     .build()
 
 fun provideHttpOkHttpClient() = OkHttpClient.Builder()
-        .connectTimeout(150000L, TimeUnit.MILLISECONDS)
-        .readTimeout(150000L, TimeUnit.MILLISECONDS)
-        .addInterceptor( HttpLoggingInterceptor())
-        .build()
+    .connectTimeout(150000L, TimeUnit.MILLISECONDS)
+    .readTimeout(150000L, TimeUnit.MILLISECONDS)
+    .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
+    .build()
 
 fun provideWebSocketRetrofit(okHttpClient: OkHttpClient): Retrofit = Retrofit.Builder()
     .client(okHttpClient)
@@ -88,9 +90,10 @@ fun provideWebSocketRetrofit(okHttpClient: OkHttpClient): Retrofit = Retrofit.Bu
     .build()
 
 fun provideHttpRetrofit(okHttpClient: OkHttpClient): Retrofit = Retrofit.Builder()
-        .client(okHttpClient)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
+    .client(okHttpClient)
+    .baseUrl("http://192.168.10.102:8080/")
+    .addConverterFactory(GsonConverterFactory.create())
+    .build()
 
 fun createWebSocket(
     okHttpClient: OkHttpClient,
@@ -98,13 +101,13 @@ fun createWebSocket(
     listener: WebSocketListener
 ): WebSocket {
     val request = Request.Builder()
-        .url("ws://192.168.10.185:8080/talk/websocket/${userInfo.userId}")
+        .url("ws://192.168.10.102:8080/talk/websocket/v2/${userInfo.userId}")
         .build()
     return okHttpClient.newWebSocket(request, listener)
 }
 
 fun createServerApi(
-        retrofit: Retrofit
-):SignalServerApi{
+    retrofit: Retrofit
+): SignalServerApi {
     return retrofit.create(SignalServerApi::class.java)
 }

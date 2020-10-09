@@ -1,17 +1,17 @@
 package com.imptt.v2.core.websocket
 
+import android.os.Message
 import android.util.Log
 import com.google.gson.Gson
+import com.imptt.v2.core.messenger.connections.MessageFactory
 import com.imptt.v2.di.ParserGson
 import com.imptt.v2.di.PrettyPrintGson
 import okhttp3.Response
 import okhttp3.WebSocket
 import okhttp3.WebSocketListener
 import okio.ByteString
-import org.json.JSONObject
 import org.koin.core.qualifier.StringQualifier
 import org.koin.java.KoinJavaComponent.inject
-import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import kotlin.collections.LinkedHashMap
@@ -32,6 +32,7 @@ class SignalServerConnection : WebSocketListener() {
      */
     override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
         super.onClosed(webSocket, code, reason)
+        println("SignalServerConnection.onClosed")
         closeListeners.forEach { callback ->
             webSocket.callback(reason)
         }
@@ -41,6 +42,7 @@ class SignalServerConnection : WebSocketListener() {
      * Invoked when the remote peer has indicated that no more incoming messages will be transmitted.
      */
     override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
+        println("SignalServerConnection.onClosing")
         super.onClosing(webSocket, code, reason)
     }
 
@@ -50,8 +52,13 @@ class SignalServerConnection : WebSocketListener() {
      * listener will be made.
      */
     override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
+        println("SignalServerConnection.onFailure")
+        println("webSocket = [${webSocket}], t = [${t}], response = [${response}]")
         super.onFailure(webSocket, t, response)
-        val message: String? = sentMessageMap[lastMessageUUID]
+        //筛选出已发送未接受的消息
+        val message: Collection<String>? = sentMessageMap.filter {
+            queuedMessagesId.contains(it.key)
+        }.values
         failListeners.forEach { callback ->
             webSocket.callback(message, t)
         }
@@ -59,16 +66,27 @@ class SignalServerConnection : WebSocketListener() {
 
     /** Invoked when a text (type `0x1`) message has been received. */
     override fun onMessage(webSocket: WebSocket, text: String) {
+        println("SignalServerConnection.onMessage")
+        logReceive(text)
         super.onMessage(webSocket, text)
-        val json = try {
-            JSONObject(text)
+        //尝试解析为SignalMessage
+        val signalMessage = try {
+            parserGson.fromJson(text,SignalMessage::class.java)
         } catch (e: Exception) {
             Log.e(TAG, "WebSocket消息序列化失败:message:$text")
-            JSONObject()
+            e.printStackTrace()
+            SignalMessage.Fail()
         }
-        val type = json.getString("type")
+        //已发送列表中移除有消息的id
+        queuedMessagesId.remove(signalMessage.id)
+        val type = signalMessage.type
         textMessageListenerMap[type]?.forEach { callback ->
-            webSocket.callback(text)
+            try {
+                //回调signalMessage和原始String
+                webSocket.callback(signalMessage,text)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
     }
 
@@ -82,29 +100,43 @@ class SignalServerConnection : WebSocketListener() {
      * messages.
      */
     override fun onOpen(webSocket: WebSocket, response: Response) {
+        println("SignalServerConnection.onOpen")
         super.onOpen(webSocket, response)
-        openListeners.forEach {
-            it.invoke(webSocket, response)
+        openListeners.forEach { callback ->
+            try {
+                callback.invoke(webSocket, response)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
     }
 
 
+    //消息类型监听
     private val textMessageListenerMap: HashMap<String, ArrayList<WebSocketMessageCallback>> =
         hashMapOf()
+    //ws开启监听
     private val openListeners: ArrayList<WebSocketOpenCallback> = arrayListOf()
+    //ws关闭监听
     private val closeListeners: ArrayList<WebSocketCloseCallback> = arrayListOf()
+    //ws消息发送失败监听
     private val failListeners: ArrayList<WebSocketFailCallback> = arrayListOf()
-    private val sentMessageMap: LinkedHashMap<UUID, String> = LinkedHashMap()
-    private val gson: Gson  by inject(Gson::class.java,qualifier = StringQualifier(ParserGson))
+    //已发送的消息 类型-> 消息内容 map
+    private val sentMessageMap: LinkedHashMap<String, String> = LinkedHashMap()
+    private val parserGson: Gson  by inject(Gson::class.java,qualifier = StringQualifier(ParserGson))
     private val printerGson:Gson by inject(Gson::class.java,qualifier = StringQualifier(PrettyPrintGson))
+    //已发送但信令服务器未响应的消息id集合
+    private val queuedMessagesId:ArrayList<String> = arrayListOf()
 
-    @Volatile
-    private var lastMessageUUID: UUID = UUID.randomUUID()
     fun on(type: String, callback: WebSocketMessageCallback): SignalServerConnection {
         val listeners = textMessageListenerMap[type] ?: arrayListOf()
         listeners.add(callback)
         textMessageListenerMap[type] = listeners
         return this
+    }
+
+    fun on(type:WebSocketTypes,callback: WebSocketMessageCallback): SignalServerConnection{
+        return this.on(type.type,callback)
     }
 
     fun whenOpen(callback: WebSocketOpenCallback): SignalServerConnection {
@@ -122,25 +154,40 @@ class SignalServerConnection : WebSocketListener() {
         return this
     }
 
-    fun sendTextMessage(message: String, webSocket: WebSocket, id: UUID = UUID.randomUUID()) {
+    /**
+     * 去掉所有事件监听
+     */
+    fun offAll(){
+        textMessageListenerMap.clear()
+        openListeners.clear()
+        failListeners.clear()
+        closeListeners.clear()
+    }
+
+    private fun sendTextMessage(message: String, webSocket: WebSocket, id: String) {
         if (webSocket.send(message)) synchronized(webSocket) {
-            lastMessageUUID = id
+            queuedMessagesId.add(id)
             sentMessageMap[id] = message
             logSend(message)
         }
     }
 
-    fun <T> send(message: T, webSocket: WebSocket, id: UUID = UUID.randomUUID()) {
-        val textMessage = gson.toJson(message)
+    fun  send(message: SignalMessage, webSocket: WebSocket, id: String = message.id) {
+        val textMessage = parserGson.toJson(message)
         sendTextMessage(textMessage, webSocket, id)
     }
 
     private fun logSend(message: String){
-        Log.d(TAG,"WebSocket客户端发送:${printerGson.toJson(message)}")
+        Log.d(TAG,"WebSocket客户端发送:$message")
+    }
+
+    private fun logReceive(message: String){
+        Log.d(TAG,"WebSocket客户端接收:$message")
     }
 }
 
-typealias WebSocketMessageCallback = WebSocket.(String) -> Unit
+typealias WebSocketMessageCallback = WebSocket.(SignalMessage,String) -> Unit
 typealias WebSocketOpenCallback = WebSocket.(Response) -> Unit
 typealias WebSocketCloseCallback = WebSocket.(String) -> Unit
-typealias WebSocketFailCallback = WebSocket.(String?, Throwable) -> Unit
+//参数一，截止目前未发送成功（服务端无响应的）消息，参数二：错误信息
+typealias WebSocketFailCallback = WebSocket.(Collection<String>?, Throwable) -> Unit

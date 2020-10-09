@@ -12,10 +12,10 @@ import com.imptt.v2.R
  *  description :
  */
 object NotificationFactory {
-    fun createNotification(context: Context, channelId: String, channelName: String): Notification {
-        return builder(context, channelId, channelName)
-            .setContentTitle(channelName)
-            .setContentText(channelName)
+    fun createNotification(context: Context, channelId: String, channelTitle: String,channelContent: String): Notification {
+        return builder(context, channelId, channelTitle)
+            .setContentTitle(channelTitle)
+            .setContentText(channelContent)
             .setSmallIcon(R.mipmap.ic_launcher)
             .setWhen(System.currentTimeMillis())
             .build()

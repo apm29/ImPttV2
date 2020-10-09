@@ -10,6 +10,9 @@ const val MESSAGE_TYPE_START_P2P = 2012
 const val MESSAGE_TYPE_CHANGE_NOTIFICATION_TEXT = 2013
 const val MESSAGE_TYPE_CHANGE_NOTIFICATION_TITLE = 2014
 const val MESSAGE_TYPE_ECHO_TEST = 2015
+//ws register成功后返回group列表，发送到View
+const val MESSAGE_TYPE_GROUP_LIST = 2016
+const val MESSAGE_DATA_KEY_GROUP_LIST = "group" //data key 群组列表
 
 
 typealias ServiceMessageCallback = (message: Message) -> Unit
