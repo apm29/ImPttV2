@@ -88,6 +88,7 @@ open class SignalMessage(
     val candidate: IceCandidate? = null,
     val sdp: SessionDescription? = null,
     val info: ImPttInfo? = null,
+    val error:String? = null,
     val groupUsers:List<String> = arrayListOf()
 ) {
 
