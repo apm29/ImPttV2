@@ -11,6 +11,7 @@ import com.imptt.v2.core.messenger.service.ServiceMessenger
 import com.imptt.v2.core.notification.NotificationFactory
 import com.imptt.v2.core.websocket.SignalServiceConnector
 import com.imptt.v2.data.api.SignalServerApi
+import com.imptt.v2.utils.LocalStorage
 import kotlinx.coroutines.*
 import org.koin.android.ext.android.inject
 import kotlin.coroutines.CoroutineContext
@@ -46,7 +47,8 @@ class ImService : Service(), CoroutineScope {
     private fun loginAsUser() {
         launch(ioContext) {
             try {
-                val baseResp = mSignalServerApi.login("yjw")
+                val userId = LocalStorage.getInstance(this@ImService).getUserId()?:"yjw"
+                val baseResp = mSignalServerApi.login(userId)
                 if (baseResp.success && baseResp.hasData) {
                     mSignalServiceConnector = SignalServiceConnector(
                         baseResp.data!!,
@@ -57,7 +59,7 @@ class ImService : Service(), CoroutineScope {
                             this@ImService,
                             NOTIFICATION_CHANNEL_ID,
                             NOTIFICATION_CHANNEL_NAME,
-                            "已登录"
+                            "已登录:${baseResp.data.userId}"
                         )
                     )
                 } else {

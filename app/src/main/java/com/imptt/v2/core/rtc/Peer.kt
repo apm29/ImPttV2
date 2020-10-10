@@ -24,6 +24,8 @@ class Peer(
         const val AUDIO_TRACK_ID: String = "audio_track_id:"
     }
 
+
+
     private val peerConnection = try {
         factory.createPeerConnection(
             rtcConfiguration,
@@ -35,11 +37,16 @@ class Peer(
         null
     }
 
+    init {
+        Log.e(TAG,"创建PeerConnection:$peerConnection")
+        Log.e(TAG,"id = $id , groupId = $groupId ")
+    }
+
     /**SdpObserver是来回调sdp是否创建(offer,answer)成功，是否设置描述成功(local,remote）的接口**/
 
     //Create{Offer,Answer}成功回调
     override fun onCreateSuccess(sdp: SessionDescription) {
-        Log.d(TAG, "Peer.onCreateSuccess")
+        Log.d(TAG, "Peer-$id.onCreateSuccess:${sdp.type}")
         //设置本地LocalDescription
         peerConnection?.setLocalDescription(this, sdp)
         when (sdp.type) {
@@ -57,86 +64,106 @@ class Peer(
 
     //Set{Local,Remote}Description()成功回调
     override fun onSetSuccess() {
-
+        Log.d(TAG, "Peer-$id.onSetSuccess")
     }
 
     //Create{Offer,Answer}失败回调
-    override fun onCreateFailure(p0: String?) {
-
+    override fun onCreateFailure(reason: String?) {
+        Log.d(TAG, "Peer-$id.onCreateFailure : $reason" +
+                "\r\nlocalDescription:${peerConnection?.localDescription}" +
+                "\r\nremoteDescription:${peerConnection?.remoteDescription}" +
+                "\r\nconnectionState:${peerConnection?.connectionState()}" +
+                "\r\niceConnectionState:${peerConnection?.iceConnectionState()}"+
+                "\r\niceGatheringState:${peerConnection?.iceGatheringState()}"+
+                "\r\nsignalingState:${peerConnection?.signalingState()}"
+        )
     }
 
     //Set{Local,Remote}Description()失败回调
-    override fun onSetFailure(p0: String?) {
-
+    override fun onSetFailure(reason: String?) {
+        Log.d(TAG, "Peer-$id.onSetFailure : $reason" +
+                "\r\nlocalDescription:${peerConnection?.localDescription}" +
+                "\r\nremoteDescription:${peerConnection?.remoteDescription}" +
+                "\r\nconnectionState:${peerConnection?.connectionState()}" +
+                "\r\niceConnectionState:${peerConnection?.iceConnectionState()}"+
+                "\r\niceGatheringState:${peerConnection?.iceGatheringState()}"+
+                "\r\nsignalingState:${peerConnection?.signalingState()}"
+        )
     }
 
     /**SdpObserver是来回调sdp是否创建(offer,answer)成功，是否设置描述成功(local,remote）的接口**/
 
     //信令状态改变时候触发
     override fun onSignalingChange(state: PeerConnection.SignalingState?) {
-
+        Log.d(TAG, "Peer-$id.onSignalingChange : $state")
     }
 
     //IceConnectionState连接接收状态改变
     override fun onIceConnectionChange(state: PeerConnection.IceConnectionState?) {
-
+        Log.d(TAG, "Peer-$id.onIceConnectionChange : $state")
     }
 
     override fun onStandardizedIceConnectionChange(newState: PeerConnection.IceConnectionState?) {
         super.onStandardizedIceConnectionChange(newState)
+        Log.d(TAG, "Peer-$id.onStandardizedIceConnectionChange : $newState")
     }
 
     override fun onConnectionChange(newState: PeerConnection.PeerConnectionState?) {
         super.onConnectionChange(newState)
+        Log.d(TAG, "Peer-$id.onConnectionChange : $newState")
     }
 
-    override fun onIceConnectionReceivingChange(p0: Boolean) {
-
+    override fun onIceConnectionReceivingChange(receiving: Boolean) {
+        Log.d(TAG, "Peer-$id.onIceConnectionReceivingChange : $receiving")
     }
 
     //IceConnectionState网络信息获取状态改变
-    override fun onIceGatheringChange(p0: PeerConnection.IceGatheringState?) {
-
+    override fun onIceGatheringChange(state: PeerConnection.IceGatheringState?) {
+        Log.d(TAG, "Peer-$id.onIceGatheringChange : $state")
     }
 
     //新ice地址被找到触发
     override fun onIceCandidate(candidate: IceCandidate) {
+        Log.d(TAG, "Peer-$id.onIceCandidate : $candidate")
+        peerConnection?.addIceCandidate(candidate)
         signalServiceConnector.sendCandidate(
             groupId,
             candidate
         )
     }
 
-    override fun onIceCandidatesRemoved(p0: Array<out IceCandidate>?) {
-
+    override fun onIceCandidatesRemoved(candidates: Array<out IceCandidate>?) {
+        Log.d(TAG, "Peer-$id.onIceCandidatesRemoved : $candidates")
     }
 
     override fun onSelectedCandidatePairChanged(event: CandidatePairChangeEvent?) {
         super.onSelectedCandidatePairChanged(event)
+        Log.d(TAG, "Peer-$id.onSelectedCandidatePairChanged : $event")
     }
 
     override fun onAddStream(stream: MediaStream?) {
-
+        Log.d(TAG, "Peer-$id.onAddStream : $stream")
     }
 
     override fun onRemoveStream(stream: MediaStream?) {
-
+        Log.d(TAG, "Peer-$id.onRemoveStream : $stream")
     }
 
-    override fun onDataChannel(p0: DataChannel?) {
-
+    override fun onDataChannel(channel: DataChannel?) {
+        Log.d(TAG, "Peer-$id.onRemoveStream : $channel")
     }
 
     override fun onRenegotiationNeeded() {
-
+        Log.d(TAG, "Peer-$id.onRenegotiationNeeded")
     }
 
-    override fun onAddTrack(p0: RtpReceiver?, p1: Array<out MediaStream>?) {
-
+    override fun onAddTrack(reveiver: RtpReceiver?, streams: Array<out MediaStream>?) {
+        Log.d(TAG, "Peer-$id.onAddTrack : $reveiver $streams")
     }
 
     override fun onTrack(transceiver: RtpTransceiver?) {
         super.onTrack(transceiver)
+        Log.d(TAG, "Peer-$id.onTrack : $transceiver")
     }
 
     /*******************************peer公共方法*********************************************/
@@ -149,7 +176,14 @@ class Peer(
         peerConnection?.addIceCandidate(candidate)
     }
 
-    fun addLocalAudioTrack(factory: PeerConnectionFactory, streamList: ArrayList<String>) {
+    /**
+     * @param addLocalTrack 是否发送本地音频
+     */
+    fun addLocalAudioTrack(
+        factory: PeerConnectionFactory,
+        streamList: ArrayList<String>,
+        addLocalTrack: Boolean = true
+    ) {
         val audioConstraints = MediaConstraints()
         //回声消除
         audioConstraints.mandatory.add(
@@ -174,6 +208,25 @@ class Peer(
             factory.createAudioTrack("$AUDIO_TRACK_ID:${UUID.randomUUID()}", audioSource)
         val localMediaStream = factory.createLocalMediaStream(LOCAL_AUDIO_STREAM)
         localMediaStream.addTrack(audioTrack)
-        peerConnection?.addTrack(audioTrack, streamList)
+        audioTrack.setVolume(VOLUME)
+        if (addLocalTrack) {
+            try {
+                peerConnection?.addTrack(audioTrack, streamList)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    fun setRemoteDescription(sdp: SessionDescription) {
+        peerConnection?.setRemoteDescription(this, sdp)
+    }
+
+    fun createAnswer(sdpMediaConstraints: MediaConstraints) {
+        peerConnection?.createAnswer(this, sdpMediaConstraints)
+    }
+
+    fun close() {
+        peerConnection?.close()
     }
 }

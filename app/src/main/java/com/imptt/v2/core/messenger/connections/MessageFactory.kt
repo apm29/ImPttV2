@@ -3,6 +3,7 @@ package com.imptt.v2.core.messenger.connections
 import android.os.Bundle
 import android.os.Message
 import android.util.Log
+import androidx.core.os.bundleOf
 import com.google.gson.Gson
 import com.imptt.v2.core.messenger.service.ServiceMessenger
 import com.imptt.v2.core.messenger.view.ViewMessenger
@@ -45,25 +46,6 @@ object MessageFactory {
         }
     }
 
-    /******************************************View侧调用********************************************/
-    //View进程注册反注册Messenger
-    fun createViewRegisterMessage(): Message {
-        return createViewSideMessage(MESSAGE_TYPE_REGISTER_VIEW)
-    }
-
-    fun createViewUnregisterMessage(): Message {
-        return createViewSideMessage(MESSAGE_TYPE_UNREGISTER_VIEW)
-    }
-    /******************************************Service侧调用********************************************/
-    //ptt进程获取群组信息后发送给view
-    fun createWsRegisterSuccessMessage(groups:List<Group>):Message{
-        return  createServiceSideMessage(
-            MESSAGE_TYPE_GROUP_LIST,
-            bundleData = Bundle().apply {
-                putParcelableArrayList(MESSAGE_DATA_KEY_GROUP_LIST, ArrayList(groups))
-            }
-        )
-    }
 
     /******************************************Log相关********************************************/
     private fun log(message: Message) {
@@ -83,7 +65,7 @@ object MessageFactory {
         Log.d(TAG, "========================================================")
     }
 
-    private fun dataToString(data:Bundle):String{
+    private fun dataToString(data: Bundle): String {
         return try {
             data.classLoader = MessageFactory::class.java.classLoader
             data.keySet().joinToString("\r\n") {
@@ -93,4 +75,58 @@ object MessageFactory {
             "获取bundle数据失败"
         }
     }
+
+    /******************************************View侧调用********************************************/
+    //View进程注册反注册Messenger
+    fun createViewRegisterMessage(): Message {
+        return createViewSideMessage(MESSAGE_TYPE_REGISTER_VIEW)
+    }
+
+    fun createViewUnregisterMessage(): Message {
+        return createViewSideMessage(MESSAGE_TYPE_UNREGISTER_VIEW)
+    }
+
+    //开始呼叫
+    fun createCallMessage(groupId: String): Message {
+        return createViewSideMessage(
+            MESSAGE_TYPE_CALL, bundleData = bundleOf(
+                MESSAGE_DATA_KEY_GROUP_ID to groupId
+            )
+        )
+    }
+
+    fun createEndCallMessage(): Message {
+        return createViewSideMessage(MESSAGE_TYPE_END_CALL)
+    }
+
+    /******************************************Service侧调用********************************************/
+    //ptt进程获取群组信息后发送给view
+    fun createWsRegisterSuccessMessage(groups: List<Group>): Message {
+        return createServiceSideMessage(
+            MESSAGE_TYPE_GROUP_LIST,
+            bundleData = bundleOf(
+                MESSAGE_DATA_KEY_GROUP_LIST to ArrayList(groups)
+            )
+        )
+    }
+
+    fun createInCallMessage(from: String, groupId: String): Message {
+        return createServiceSideMessage(
+            MESSAGE_TYPE_IN_CALL,
+            bundleData = bundleOf(
+                MESSAGE_DATA_KEY_FROM_USER_ID to from,
+                MESSAGE_DATA_KEY_GROUP_ID to groupId
+            )
+        )
+    }
+
+    fun createToastMessage(message: String): Message {
+        return createViewSideMessage(
+            MESSAGE_TYPE_MESSAGE, bundleData = bundleOf(
+                MESSAGE_DATA_KEY_MESSAGE to message
+            )
+        )
+    }
+
+
 }

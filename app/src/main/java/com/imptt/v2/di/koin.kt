@@ -1,7 +1,7 @@
 package com.imptt.v2.di
 
 import com.google.gson.GsonBuilder
-import com.imptt.v2.core.websocket.SignalServerConnection
+import com.imptt.v2.core.websocket.WebSocketConnection
 import com.imptt.v2.data.api.SignalServerApi
 import com.imptt.v2.data.model.UserInfo
 import okhttp3.OkHttpClient
@@ -38,12 +38,12 @@ var serviceModule = module {
         GsonBuilder().setPrettyPrinting().create()
     }
     single(named(ParserGson)) {
-        GsonBuilder().create()
+        GsonBuilder().setPrettyPrinting().create()
     }
 
     //websocket listener
     single {
-        SignalServerConnection()
+        WebSocketConnection()
     }
 
     //websocket不是单例，需要时再从okhttp新建相同实例
@@ -51,7 +51,7 @@ var serviceModule = module {
         createWebSocket(
             get(named(WebSocketRelated)),
             user,
-            get<SignalServerConnection>()
+            get<WebSocketConnection>()
         )
     }
 

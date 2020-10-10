@@ -1,9 +1,7 @@
 package com.imptt.v2.core.websocket
 
-import android.os.Message
 import android.util.Log
 import com.google.gson.Gson
-import com.imptt.v2.core.messenger.connections.MessageFactory
 import com.imptt.v2.di.ParserGson
 import com.imptt.v2.di.PrettyPrintGson
 import okhttp3.Response
@@ -21,9 +19,9 @@ import kotlin.collections.LinkedHashMap
  *  date : 2020/9/30 10:12 AM
  *  description :
  */
-class SignalServerConnection : WebSocketListener() {
+class WebSocketConnection : WebSocketListener() {
     companion object {
-        val TAG = SignalServerConnection::class.java.canonicalName
+        val TAG = WebSocketConnection::class.java.canonicalName
     }
 
     /**
@@ -128,28 +126,28 @@ class SignalServerConnection : WebSocketListener() {
     //已发送但信令服务器未响应的消息id集合
     private val queuedMessagesId:ArrayList<String> = arrayListOf()
 
-    fun on(type: String, callback: WebSocketMessageCallback): SignalServerConnection {
+    fun on(type: String, callback: WebSocketMessageCallback): WebSocketConnection {
         val listeners = textMessageListenerMap[type] ?: arrayListOf()
         listeners.add(callback)
         textMessageListenerMap[type] = listeners
         return this
     }
 
-    fun on(type:WebSocketTypes,callback: WebSocketMessageCallback): SignalServerConnection{
+    fun on(type:WebSocketTypes,callback: WebSocketMessageCallback): WebSocketConnection{
         return this.on(type.type,callback)
     }
 
-    fun whenOpen(callback: WebSocketOpenCallback): SignalServerConnection {
+    fun whenOpen(callback: WebSocketOpenCallback): WebSocketConnection {
         openListeners.add(callback)
         return this
     }
 
-    fun whenClose(callback: WebSocketCloseCallback): SignalServerConnection {
+    fun whenClose(callback: WebSocketCloseCallback): WebSocketConnection {
         closeListeners.add(callback)
         return this
     }
 
-    fun whenFail(callback: WebSocketFailCallback): SignalServerConnection {
+    fun whenFail(callback: WebSocketFailCallback): WebSocketConnection {
         failListeners.add(callback)
         return this
     }
@@ -178,11 +176,13 @@ class SignalServerConnection : WebSocketListener() {
     }
 
     private fun logSend(message: String){
-        Log.d(TAG,"WebSocket客户端发送:$message")
+        Log.e(TAG,"=============================================>>>")
+        Log.i(TAG,"WebSocket客户端发送:$message")
     }
 
     private fun logReceive(message: String){
-        Log.d(TAG,"WebSocket客户端接收:$message")
+        Log.e(TAG,"<<<=============================================")
+        Log.v(TAG,"WebSocket客户端接收:$message")
     }
 }
 

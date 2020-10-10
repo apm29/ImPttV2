@@ -13,6 +13,15 @@ const val MESSAGE_TYPE_ECHO_TEST = 2015
 //ws register成功后返回group列表，发送到View
 const val MESSAGE_TYPE_GROUP_LIST = 2016
 const val MESSAGE_DATA_KEY_GROUP_LIST = "group" //data key 群组列表
+//ws 收到呼叫
+const val MESSAGE_TYPE_IN_CALL = 2017
+const val MESSAGE_DATA_KEY_GROUP_ID = "group_id"
+const val MESSAGE_DATA_KEY_MESSAGE = "message"
+const val MESSAGE_DATA_KEY_FROM_USER_ID = "from_user_id"
+// view 呼叫
+const val MESSAGE_TYPE_CALL = 2018
+const val MESSAGE_TYPE_END_CALL = 2019
+const val MESSAGE_TYPE_MESSAGE = 2020
 
 
 typealias ServiceMessageCallback = (message: Message) -> Unit

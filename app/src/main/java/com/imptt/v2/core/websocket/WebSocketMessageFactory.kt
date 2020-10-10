@@ -30,6 +30,10 @@ class WebSocketMessageFactory private constructor(private val user: UserInfo) {
         return SignalMessage.CreateOrJoinGroup(groupId, user.userId)
     }
 
+    fun createCall(groupId: String): SignalMessage.CreateCall {
+        return SignalMessage.CreateCall(groupId, user.userId)
+    }
+
     fun createRegister(): SignalMessage.RegisterToSignalServer {
         return SignalMessage.RegisterToSignalServer()
     }
@@ -107,6 +111,15 @@ open class SignalMessage(
     )
 
     /**
+     * 打电话
+     */
+    class CreateCall(groupId: String, userId: String) : SignalMessage(
+        type = WebSocketTypes.Call.type,
+        groupId = groupId,
+        from = userId
+    )
+
+    /**
      * 创建/加入群组
      */
     class CreateOrJoinGroup(groupId: String, userId: String) : SignalMessage(
@@ -139,7 +152,7 @@ open class SignalMessage(
      * 创建Candidate
      */
     class CreateCandidate(groupId: String, userId: String, candidate: IceCandidate) : SignalMessage(
-        type = WebSocketTypes.Answer.type,
+        type = WebSocketTypes.Candidate.type,
         groupId = groupId,
         from = userId,
         candidate = candidate

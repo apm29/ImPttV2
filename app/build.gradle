@@ -97,4 +97,7 @@ dependencies {
 
     //webrtc-google
     implementation 'org.webrtc:google-webrtc:1.0.32006'
+
+    //permission
+    implementation 'com.permissionx.guolindev:permissionx:1.4.0'
 }

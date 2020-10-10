@@ -1,8 +1,10 @@
 package com.imptt.v2.view.main
 
+import android.Manifest
 import android.content.Intent
 import android.os.Bundle
 import android.os.Message
+import android.util.Log
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -14,6 +16,7 @@ import com.imptt.v2.core.ImService
 import com.imptt.v2.core.messenger.connections.MESSAGE_TYPE_ECHO_TEST
 import com.imptt.v2.core.messenger.view.ViewMessenger
 import com.imptt.v2.core.struct.ServiceBindActivity
+import com.permissionx.guolindev.PermissionX
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -41,5 +44,45 @@ class MainActivity : ServiceBindActivity() {
                 this.replyTo = ViewMessenger.myself()
             })
         }
+
+        doRequestPermissions {
+            Log.e("MainActivity","权限获取成功")
+        }
+    }
+
+    private fun doRequestPermissions(
+        permissions: List<String> = arrayListOf(
+            Manifest.permission.RECORD_AUDIO,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+        ),
+        callback:(()->Unit)? = null
+    ) {
+        PermissionX.init(this).permissions(
+            permissions
+        )
+            .explainReasonBeforeRequest()
+            .onExplainRequestReason { scope, deniedList ->
+                scope.showRequestReasonDialog(
+                    deniedList,
+                    "App运行需要获取手机内部存储权限以及录音权限！",
+                    "好的",
+                    "取消"
+                )
+            }
+            .onForwardToSettings { scope, deniedList ->
+                scope.showForwardToSettingsDialog(
+                    deniedList,
+                    "请到设置中心打开所需的权限",
+                    "好的",
+                    "取消"
+                )
+            }
+            .request { allGranted, _, deniedList ->
+                if (allGranted) {
+                    callback?.invoke()
+                } else {
+                    doRequestPermissions(deniedList)
+                }
+            }
     }
 }

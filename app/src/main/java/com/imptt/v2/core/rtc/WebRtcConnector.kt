@@ -5,12 +5,9 @@ import android.util.Log
 import com.imptt.v2.BuildConfig
 import com.imptt.v2.core.websocket.SignalServiceConnector
 import com.imptt.v2.data.model.UserInfo
-import org.webrtc.IceCandidate
-import org.webrtc.MediaConstraints
-import org.webrtc.PeerConnection
+import org.webrtc.*
 import org.webrtc.PeerConnection.IceServer
 import org.webrtc.PeerConnection.RTCConfiguration
-import org.webrtc.PeerConnectionFactory
 import org.webrtc.audio.AudioDeviceModule
 import org.webrtc.audio.JavaAudioDeviceModule
 import org.webrtc.audio.JavaAudioDeviceModule.AudioRecordErrorCallback
@@ -50,10 +47,13 @@ class WebRtcConnector(
     private val streamList: ArrayList<String> = arrayListOf()
     val factory: PeerConnectionFactory
     private val rtcConfig: RTCConfiguration
+
     //PeerConnect 音频约束
     private val audioConstraints: MediaConstraints
+
     //PeerConnect sdp约束
     private val sdpMediaConstraints: MediaConstraints
+    private val eglBase: EglBase by lazy { EglBase.create() }
     init {
         //创建webRtc连接工厂类
         //音频模式
@@ -68,12 +68,28 @@ class WebRtcConnector(
         val options = PeerConnectionFactory.Options()
         factory = PeerConnectionFactory.builder()
             .setOptions(options)
+            .setVideoDecoderFactory(DefaultVideoDecoderFactory(eglBase.eglBaseContext))
+            .setVideoEncoderFactory(
+                DefaultVideoEncoderFactory(
+                    eglBase.eglBaseContext,
+                    true,
+                    true
+                )
+            )
             .setAudioDeviceModule(adm)
+            .setAudioDecoderFactoryFactory(
+                BuiltinAudioDecoderFactoryFactory()
+            )
             .createPeerConnectionFactory()
 
         //创建IceServers参数
-        iceServers.add(IceServer.builder("stun:stun.xten.com").createIceServer())
-
+        iceServers.add(
+            IceServer.builder("stun:stun2.1.google.com:19302").createIceServer()
+        )
+        iceServers.add(
+            IceServer.builder("turn:numb.viagenie.ca")
+                .setUsername("webrtc@live.com").setPassword("muazkh").createIceServer()
+        )
         //创建RTCConfiguration参数
         rtcConfig = RTCConfiguration(iceServers)
         // TCP candidates are only useful when connecting to a server that supports
@@ -82,7 +98,7 @@ class WebRtcConnector(
         rtcConfig.bundlePolicy = PeerConnection.BundlePolicy.MAXBUNDLE
         rtcConfig.rtcpMuxPolicy = PeerConnection.RtcpMuxPolicy.REQUIRE
         rtcConfig.continualGatheringPolicy =
-            PeerConnection.ContinualGatheringPolicy.GATHER_CONTINUALLY
+            PeerConnection.ContinualGatheringPolicy.GATHER_ONCE
         // Use ECDSA encryption.
         rtcConfig.keyType = PeerConnection.KeyType.ECDSA
         // Enable DTLS for normal calls and disable for loopback calls.
@@ -92,7 +108,7 @@ class WebRtcConnector(
         // 音频约束
         audioConstraints = MediaConstraints()
         // added for audio performance measurements
-        if(BuildConfig.AUDIO_PROCESS){
+        if (!BuildConfig.AUDIO_PROCESS) {
             Log.d(
                 TAG,
                 "Disabling audio processing"
@@ -127,17 +143,17 @@ class WebRtcConnector(
         sdpMediaConstraints.mandatory.add(
             MediaConstraints.KeyValuePair("OfferToReceiveAudio", "true")
         )
-        sdpMediaConstraints.mandatory.add(
-            MediaConstraints.KeyValuePair(
-                "OfferToReceiveVideo", "true"
-            )
-        )
-        sdpMediaConstraints.optional.add(
-            MediaConstraints.KeyValuePair(
-                "DtlsSrtpKeyAgreement",
-                "true"
-            )
-        )
+//        sdpMediaConstraints.mandatory.add(
+//            MediaConstraints.KeyValuePair(
+//                "OfferToReceiveVideo", "false"
+//            )
+//        )
+//        sdpMediaConstraints.optional.add(
+//            MediaConstraints.KeyValuePair(
+//                "DtlsSrtpKeyAgreement",
+//                "true"
+//            )
+//        )
     }
 
     //创建音频模式JavaAudioDevice
@@ -200,23 +216,25 @@ class WebRtcConnector(
     }
 
     //获取/新建peerConnection
-    private fun getOrCreatePeer(id:String, groupId: String): Peer {
-        return peers[id]?:Peer(id,groupId,factory,rtcConfig,signalServiceConnector).also {
+    private fun getOrCreatePeer(id: String, groupId: String): Peer {
+        return peers[id] ?: Peer(id, groupId, factory, rtcConfig, signalServiceConnector).also {
             peers[id] = it
         }
     }
 
     //添加本地音频track
     private fun Peer.addLocalAudioTrack() {
-        this.addLocalAudioTrack(factory,streamList)
+        this.addLocalAudioTrack(factory, streamList)
     }
 
 
     //创立对等连接s,添加音频
     fun createPeersByGroupUserIds(groupId: String, groupUsers: List<String>) {
+        println("WebRtcConnector.createPeersByGroupUserIds")
+        println("groupId = [${groupId}], groupUsers = [${groupUsers}]")
         peers.clear()
         groupUsers.forEach { id ->
-            getOrCreatePeer(id,groupId).also {
+            getOrCreatePeer(id, groupId).also {
                 it.createOffer(sdpMediaConstraints)
                 it.addLocalAudioTrack()
             }
@@ -225,15 +243,45 @@ class WebRtcConnector(
 
     //交换iceCandidate
     fun addIceCandidate(candidate: IceCandidate, from: String, groupId: String) {
-        getOrCreatePeer(from,groupId).addIceCandidate(candidate)
+        println("WebRtcConnector.addIceCandidate")
+        println("candidate = [${candidate}], from = [${from}], groupId = [${groupId}]")
+        getOrCreatePeer(from, groupId).addIceCandidate(candidate)
     }
 
     //p2p时有新的用户加入
-    fun createNewPeer(from: String, groupId: String) {
-        getOrCreatePeer(from,groupId)
+    fun createCalleeNewPeer(from: String, groupId: String) {
+        println("WebRtcConnector.createCalleeNewPeer")
+        println("from = [${from}], groupId = [${groupId}]")
+        val peer = getOrCreatePeer(from, groupId)
+        peer.addLocalAudioTrack(factory, streamList, false)
+        peer.createOffer(sdpMediaConstraints)
     }
 
+    fun setRemoteDescriptionAndCreateAnswer(
+        from: String,
+        groupId: String,
+        sdp: SessionDescription
+    ) {
+        println("WebRtcConnector.setRemoteDescriptionAndCreateAnswer")
+        println("from = [${from}], groupId = [${groupId}], sdp = [${sdp}]")
+        val peer = getOrCreatePeer(from, groupId)
+        peer.setRemoteDescription(sdp)
+        peer.createAnswer(sdpMediaConstraints)
+    }
 
+    fun setRemoteDescription(from: String, groupId: String, sdp: SessionDescription) {
+        println("WebRtcConnector.setRemoteDescription")
+        println("from = [${from}], groupId = [${groupId}], sdp = [${sdp}]")
+        val peer = getOrCreatePeer(from, groupId)
+        peer.setRemoteDescription(sdp)
+    }
 
+    fun endCall() {
+        println("WebRtcConnector.endCall")
+        peers.forEach {
+            it.value.close()
+        }
+        peers.clear()
+    }
 
 }
