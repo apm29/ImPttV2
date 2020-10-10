@@ -46,15 +46,20 @@ class Peer(
 
     //Create{Offer,Answer}成功回调
     override fun onCreateSuccess(sdp: SessionDescription) {
-        Log.d(TAG, "Peer-$id.onCreateSuccess:${sdp.type}")
+        Log.d(TAG, "Peer-$id.onCreateSuccess: SDP@${sdp.type}")
+
+        Log.e("STEP","CREATE XXX SUCCESS: SDP@${sdp.description.hashCode()}")
         //设置本地LocalDescription
+        Log.e("STEP","04-1: 应答端 SET LOCAL DESCRIPTION SDP@${sdp.description.hashCode()}")
         peerConnection?.setLocalDescription(this, sdp)
         when (sdp.type) {
             SessionDescription.Type.ANSWER -> {
-                signalServiceConnector.createAnswer(groupId, sdp)
+                Log.e("STEP","12: ANSWER CREATED")
+                signalServiceConnector.sendAnswerToPeers(groupId, sdp)
             }
             SessionDescription.Type.OFFER -> {
-                signalServiceConnector.createOffer(groupId, sdp)
+                Log.e("STEP","04: OFFER CREATED")
+                signalServiceConnector.sendOfferToPeers(groupId, sdp)
             }
             else -> {
 
@@ -65,10 +70,12 @@ class Peer(
     //Set{Local,Remote}Description()成功回调
     override fun onSetSuccess() {
         Log.d(TAG, "Peer-$id.onSetSuccess")
+        Log.e("STEP","SET XXX SUCCESS")
     }
 
     //Create{Offer,Answer}失败回调
     override fun onCreateFailure(reason: String?) {
+        Log.e("STEP","CREATE XXX FAIL:$reason")
         Log.d(TAG, "Peer-$id.onCreateFailure : $reason" +
                 "\r\nlocalDescription:${peerConnection?.localDescription}" +
                 "\r\nremoteDescription:${peerConnection?.remoteDescription}" +
@@ -81,6 +88,7 @@ class Peer(
 
     //Set{Local,Remote}Description()失败回调
     override fun onSetFailure(reason: String?) {
+        Log.e("STEP","SET XXX FAIL:$reason")
         Log.d(TAG, "Peer-$id.onSetFailure : $reason" +
                 "\r\nlocalDescription:${peerConnection?.localDescription}" +
                 "\r\nremoteDescription:${peerConnection?.remoteDescription}" +

@@ -235,6 +235,7 @@ class WebRtcConnector(
         peers.clear()
         groupUsers.forEach { id ->
             getOrCreatePeer(id, groupId).also {
+                Log.e("STEP","03: CREATE OFFER ${peers.size}")
                 it.createOffer(sdpMediaConstraints)
                 it.addLocalAudioTrack()
             }
@@ -254,6 +255,7 @@ class WebRtcConnector(
         println("from = [${from}], groupId = [${groupId}]")
         val peer = getOrCreatePeer(from, groupId)
         peer.addLocalAudioTrack(factory, streamList, false)
+        Log.e("STEP","02-2: 收到CALL,CREATE 应答端 OFFER ${peers.size}")
         peer.createOffer(sdpMediaConstraints)
     }
 
@@ -265,7 +267,9 @@ class WebRtcConnector(
         println("WebRtcConnector.setRemoteDescriptionAndCreateAnswer")
         println("from = [${from}], groupId = [${groupId}], sdp = [${sdp}]")
         val peer = getOrCreatePeer(from, groupId)
+        Log.e("STEP","07: 应答端 SET REMOTE DESCRIPTION ${peers.size}")
         peer.setRemoteDescription(sdp)
+        Log.e("STEP","08: 应答端 CREATE ANSWER ${peers.size}")
         peer.createAnswer(sdpMediaConstraints)
     }
 
@@ -273,6 +277,7 @@ class WebRtcConnector(
         println("WebRtcConnector.setRemoteDescription")
         println("from = [${from}], groupId = [${groupId}], sdp = [${sdp}]")
         val peer = getOrCreatePeer(from, groupId)
+        Log.e("STEP","10: SET REMOTE DESCRIPTION ${peers.size}")
         peer.setRemoteDescription(sdp)
     }
 
