@@ -4,7 +4,7 @@ import org.webrtc.SdpObserver
 import org.webrtc.SessionDescription
 
 /**
- *  author : ciih
+ *  author : apm29[ciih]
  *  date : 2020/10/12 8:46 AM
  *  description :
  */

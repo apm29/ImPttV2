@@ -10,7 +10,7 @@ import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
 /**
- *  author : ciih
+ *  author : apm29[ciih]
  *  date : 2020/10/9 3:22 PM
  *  description : 对等连接PeerConnection的包装类,N人的群组发送对讲时当前客户端应该有N-1个Peer
  */

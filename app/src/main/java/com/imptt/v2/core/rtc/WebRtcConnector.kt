@@ -15,7 +15,7 @@ import org.webrtc.audio.JavaAudioDeviceModule.AudioTrackErrorCallback
 import java.util.*
 
 /**
- *  author : ciih
+ *  author : apm29[ciih]
  *  date : 2020/10/9 3:30 PM
  *  description :
  */
@@ -40,6 +40,7 @@ class WebRtcConnector(
             "WebRTC-Audio-MinimizeResamplingOnMobile/Enabled/"
     }
 
+    //连接池,key为连接id(对方的userId),value为Peer
     private val peers: HashMap<String, Peer> = hashMapOf()
 
     //IceServer集合 用于构建PeerConnection
@@ -54,6 +55,7 @@ class WebRtcConnector(
     //PeerConnect sdp约束
     private val sdpMediaConstraints: MediaConstraints
     private val eglBase: EglBase by lazy { EglBase.create() }
+
     init {
         //创建webRtc连接工厂类
         //音频模式
@@ -69,17 +71,9 @@ class WebRtcConnector(
         factory = PeerConnectionFactory.builder()
             .setOptions(options)
             .setVideoDecoderFactory(DefaultVideoDecoderFactory(eglBase.eglBaseContext))
-            .setVideoEncoderFactory(
-                DefaultVideoEncoderFactory(
-                    eglBase.eglBaseContext,
-                    true,
-                    true
-                )
-            )
+            .setVideoEncoderFactory(DefaultVideoEncoderFactory(eglBase.eglBaseContext, true, true))
             .setAudioDeviceModule(adm)
-            .setAudioDecoderFactoryFactory(
-                BuiltinAudioDecoderFactoryFactory()
-            )
+            .setAudioDecoderFactoryFactory(BuiltinAudioDecoderFactoryFactory())
             .createPeerConnectionFactory()
 
         //创建IceServers参数

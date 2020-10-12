@@ -17,7 +17,7 @@ import org.webrtc.IceCandidate
 import org.webrtc.SessionDescription
 
 /**
- *  author : ciih
+ *  author : apm29[ciih]
  *  date : 2020/10/9 9:36 AM
  *  description :
  */

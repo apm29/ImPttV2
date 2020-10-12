@@ -10,7 +10,7 @@ import androidx.lifecycle.OnLifecycleEvent
 import com.imptt.v2.core.ImService
 
 /**
- *  author : ciih
+ *  author : apm29[ciih]
  *  date : 2020/9/29 4:26 PM
  *  description :
  */

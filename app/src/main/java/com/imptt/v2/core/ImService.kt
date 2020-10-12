@@ -19,7 +19,7 @@ import kotlin.coroutines.CoroutineContext
 /**
 
  *  ptt对讲服务总Service
- *  author : ciih
+ *  author : apm29[ciih]
  *  date : 2020/9/29 4:28 PM
  *  description :
  */
@@ -74,6 +74,14 @@ class ImService : Service(), CoroutineScope {
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
+                startForeground(
+                    NOTIFICATION_ID, NotificationFactory.createNotification(
+                        this@ImService,
+                        NOTIFICATION_CHANNEL_ID,
+                        NOTIFICATION_CHANNEL_NAME,
+                        "登录失败"
+                    )
+                )
             }
         }
     }
