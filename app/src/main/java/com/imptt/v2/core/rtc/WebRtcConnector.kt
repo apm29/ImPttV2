@@ -236,7 +236,7 @@ class WebRtcConnector(
         groupUsers.forEach { id ->
             getOrCreatePeer(id, groupId).also {
                 Log.e("STEP","03: CREATE OFFER ${peers.size}")
-                it.createOffer(sdpMediaConstraints)
+                //it.createOffer(sdpMediaConstraints)
                 it.addLocalAudioTrack()
             }
         }
