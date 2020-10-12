@@ -1,5 +1,6 @@
 package com.imptt.v2.view.main
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -22,23 +23,17 @@ class HomeFragment : Fragment() {
             //获取group列表
             val groups =
                 it.data.getParcelableArrayList<Group>(MESSAGE_DATA_KEY_GROUP_LIST) ?: arrayListOf()
-            Toast.makeText(requireContext(), "$groups", Toast.LENGTH_SHORT).show()
-            initialList(groups)
-        }
-
-        ViewMessenger.on(MESSAGE_TYPE_IN_CALL) {
+            if(this@HomeFragment.isAdded) {
+                Toast.makeText(requireContext(), "$groups", Toast.LENGTH_SHORT).show()
+                initialList(groups)
+            }
+        }.on(MESSAGE_TYPE_IN_CALL) {
             //获取group列表
             val groupId =
                 it.data.getString(MESSAGE_DATA_KEY_GROUP_ID)
             val from =
                 it.data.getString(MESSAGE_DATA_KEY_FROM_USER_ID)
             Toast.makeText(requireContext(), "收到 $from 在 $groupId 的呼叫", Toast.LENGTH_SHORT).show()
-        }.on(MESSAGE_TYPE_IN_CALL) {
-            Toast.makeText(
-                requireContext(),
-                it.data.getString(MESSAGE_DATA_KEY_MESSAGE),
-                Toast.LENGTH_SHORT
-            ).show()
         }.on(MESSAGE_TYPE_MESSAGE){
             Toast.makeText(
                 requireContext(),
@@ -46,6 +41,7 @@ class HomeFragment : Fragment() {
                 Toast.LENGTH_SHORT
             ).show()
         }
+
         toggleButtonCall.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
                 ViewMessenger.send(
@@ -70,6 +66,13 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initialList(arrayListOf())
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        ViewMessenger.send(
+            MessageFactory.createGetGroupsInfoMessage()
+        )
     }
 
     private fun initialList(groups: ArrayList<Group>) {

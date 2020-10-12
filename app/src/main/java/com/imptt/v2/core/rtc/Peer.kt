@@ -24,8 +24,6 @@ class Peer(
     companion object {
         private val TAG = Peer::class.java.canonicalName
         const val VOLUME: Double = 80.0
-        const val LOCAL_AUDIO_STREAM: String = "local_audio_stream"
-        const val AUDIO_TRACK_ID: String = "audio_track_id:"
     }
 
 
@@ -163,6 +161,7 @@ class Peer(
 
     override fun onRenegotiationNeeded() {
         Log.d(TAG, "Peer-$id.onRenegotiationNeeded")
+        createOffer(MediaConstraintFactory.getAudioMediaConstraint())
     }
 
     override fun onAddTrack(reveiver: RtpReceiver?, streams: Array<out MediaStream>?) {
@@ -189,6 +188,7 @@ class Peer(
                             override fun onCreateSuccess(sdp: SessionDescription?) {
                                 it.resume(true)
                             }
+
                             override fun onCreateFailure(reason: String?) {
                                 it.resume(false)
                             }
@@ -205,7 +205,7 @@ class Peer(
     }
 
     fun addIceCandidate(candidate: IceCandidate): Boolean {
-        return peerConnection?.addIceCandidate(candidate)?:false
+        return peerConnection?.addIceCandidate(candidate) ?: false
     }
 
     /**
@@ -236,14 +236,15 @@ class Peer(
             )
         )
         val audioSource = factory.createAudioSource(audioConstraints)
+        val localMediaStream = factory.createLocalMediaStream("ARDAMSa0")
         val audioTrack =
-            factory.createAudioTrack("$AUDIO_TRACK_ID:${UUID.randomUUID()}", audioSource)
-        val localMediaStream = factory.createLocalMediaStream(LOCAL_AUDIO_STREAM)
+            factory.createAudioTrack("ARDAMS", audioSource)
         localMediaStream.addTrack(audioTrack)
         audioTrack.setVolume(VOLUME)
+        audioTrack.setEnabled(true)
         if (addLocalTrack) {
             try {
-                peerConnection?.addTrack(audioTrack, streamList)
+                peerConnection?.addTrack(audioTrack)
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -263,6 +264,7 @@ class Peer(
                             override fun onSetSuccess() {
                                 it.resume(true)
                             }
+
                             override fun onSetFailure(reason: String?) {
                                 it.resume(false)
                             }
@@ -292,6 +294,7 @@ class Peer(
                             override fun onCreateSuccess(sdp: SessionDescription?) {
                                 it.resume(true)
                             }
+
                             override fun onCreateFailure(reason: String?) {
                                 it.resume(false)
                             }

@@ -31,9 +31,9 @@ class WebSocketConnection : WebSocketListener() {
     override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
         super.onClosed(webSocket, code, reason)
         println("SignalServerConnection.onClosed")
-        closeListeners.forEach { callback ->
-            webSocket.callback(reason)
-        }
+//        closingListeners.forEach { callback ->
+//            webSocket.callback(reason)
+//        }
     }
 
     /**
@@ -42,6 +42,9 @@ class WebSocketConnection : WebSocketListener() {
     override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
         println("SignalServerConnection.onClosing")
         super.onClosing(webSocket, code, reason)
+        closingListeners.forEach { callback ->
+            webSocket.callback(reason)
+        }
     }
 
     /**
@@ -116,7 +119,7 @@ class WebSocketConnection : WebSocketListener() {
     //ws开启监听
     private val openListeners: ArrayList<WebSocketOpenCallback> = arrayListOf()
     //ws关闭监听
-    private val closeListeners: ArrayList<WebSocketCloseCallback> = arrayListOf()
+    private val closingListeners: ArrayList<WebSocketCloseCallback> = arrayListOf()
     //ws消息发送失败监听
     private val failListeners: ArrayList<WebSocketFailCallback> = arrayListOf()
     //已发送的消息 类型-> 消息内容 map
@@ -142,8 +145,8 @@ class WebSocketConnection : WebSocketListener() {
         return this
     }
 
-    fun whenClose(callback: WebSocketCloseCallback): WebSocketConnection {
-        closeListeners.add(callback)
+    fun whenClosing(callback: WebSocketCloseCallback): WebSocketConnection {
+        closingListeners.add(callback)
         return this
     }
 
@@ -159,7 +162,7 @@ class WebSocketConnection : WebSocketListener() {
         textMessageListenerMap.clear()
         openListeners.clear()
         failListeners.clear()
-        closeListeners.clear()
+        closingListeners.clear()
     }
 
     private fun sendTextMessage(message: String, webSocket: WebSocket, id: String) {

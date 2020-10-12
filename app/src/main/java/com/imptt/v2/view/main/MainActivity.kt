@@ -1,19 +1,18 @@
 package com.imptt.v2.view.main
 
 import android.Manifest
-import android.content.Intent
 import android.os.Bundle
 import android.os.Message
 import android.util.Log
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.imptt.v2.R
-import com.imptt.v2.core.ImService
 import com.imptt.v2.core.messenger.connections.MESSAGE_TYPE_ECHO_TEST
+import com.imptt.v2.core.messenger.connections.MessageFactory
 import com.imptt.v2.core.messenger.view.ViewMessenger
 import com.imptt.v2.core.struct.ServiceBindActivity
 import com.permissionx.guolindev.PermissionX

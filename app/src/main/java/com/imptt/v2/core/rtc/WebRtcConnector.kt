@@ -27,12 +27,6 @@ class WebRtcConnector(
 
     companion object {
         private val TAG = WebRtcConnector::class.java.canonicalName
-
-        ////webRtc定义常量////
-        private const val AUDIO_ECHO_CANCELLATION_CONSTRAINT = "googEchoCancellation"
-        private const val AUDIO_AUTO_GAIN_CONTROL_CONSTRAINT = "googAutoGainControl"
-        private const val AUDIO_HIGH_PASS_FILTER_CONSTRAINT = "googHighpassFilter"
-        private const val AUDIO_NOISE_SUPPRESSION_CONSTRAINT = "googNoiseSuppression"
         private const val VIDEO_FLEXFEC_FIELDTRIAL =
             "WebRTC-FlexFEC-03-Advertised/Enabled/WebRTC-FlexFEC-03/Enabled/"
         private const val VIDEO_VP8_INTEL_HW_ENCODER_FIELDTRIAL = "WebRTC-IntelVP8/Enabled/"
@@ -49,11 +43,10 @@ class WebRtcConnector(
     val factory: PeerConnectionFactory
     private val rtcConfig: RTCConfiguration
 
-    //PeerConnect 音频约束
-    private val audioConstraints: MediaConstraints
-
     //PeerConnect sdp约束
     private val sdpMediaConstraints: MediaConstraints
+        get() = MediaConstraintFactory.getAudioMediaConstraint()
+
     private val eglBase: EglBase by lazy { EglBase.create() }
 
     init {
@@ -63,6 +56,7 @@ class WebRtcConnector(
         //PeerConnectionFactory.initialize
         PeerConnectionFactory.initialize(
             PeerConnectionFactory.InitializationOptions.builder(appContext)
+                .setFieldTrials("$VIDEO_FLEXFEC_FIELDTRIAL$VIDEO_VP8_INTEL_HW_ENCODER_FIELDTRIAL$DISABLE_WEBRTC_AGC_FIELDTRIAL")
                 .setEnableInternalTracer(true)
                 .createInitializationOptions()
         )
@@ -77,9 +71,8 @@ class WebRtcConnector(
             .createPeerConnectionFactory()
 
         //创建IceServers参数
-        iceServers.add(
-            IceServer.builder("stun:stun2.1.google.com:19302").createIceServer()
-        )
+        iceServers.add(IceServer.builder("stun:stun2.1.google.com:19302").createIceServer())
+        iceServers.add(IceServer.builder("stun:23.21.150.121").createIceServer())
         iceServers.add(
             IceServer.builder("turn:numb.viagenie.ca")
                 .setUsername("webrtc@live.com").setPassword("muazkh").createIceServer()
@@ -98,56 +91,6 @@ class WebRtcConnector(
         // Enable DTLS for normal calls and disable for loopback calls.
         rtcConfig.enableDtlsSrtp = false
         rtcConfig.sdpSemantics = PeerConnection.SdpSemantics.UNIFIED_PLAN
-
-        // 音频约束
-        audioConstraints = MediaConstraints()
-        // added for audio performance measurements
-        if (!BuildConfig.AUDIO_PROCESS) {
-            Log.d(
-                TAG,
-                "Disabling audio processing"
-            )
-            audioConstraints.mandatory.add(
-                MediaConstraints.KeyValuePair(
-                    AUDIO_ECHO_CANCELLATION_CONSTRAINT,
-                    "false"
-                )
-            )
-            audioConstraints.mandatory.add(
-                MediaConstraints.KeyValuePair(
-                    AUDIO_AUTO_GAIN_CONTROL_CONSTRAINT,
-                    "false"
-                )
-            )
-            audioConstraints.mandatory.add(
-                MediaConstraints.KeyValuePair(
-                    AUDIO_HIGH_PASS_FILTER_CONSTRAINT,
-                    "false"
-                )
-            )
-            audioConstraints.mandatory.add(
-                MediaConstraints.KeyValuePair(
-                    AUDIO_NOISE_SUPPRESSION_CONSTRAINT,
-                    "false"
-                )
-            )
-        }
-        //SDP约束 createOffer  createAnswer
-        sdpMediaConstraints = MediaConstraints()
-        sdpMediaConstraints.mandatory.add(
-            MediaConstraints.KeyValuePair("OfferToReceiveAudio", "true")
-        )
-//        sdpMediaConstraints.mandatory.add(
-//            MediaConstraints.KeyValuePair(
-//                "OfferToReceiveVideo", "false"
-//            )
-//        )
-//        sdpMediaConstraints.optional.add(
-//            MediaConstraints.KeyValuePair(
-//                "DtlsSrtpKeyAgreement",
-//                "true"
-//            )
-//        )
     }
 
     //创建音频模式JavaAudioDevice
