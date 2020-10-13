@@ -1,6 +1,8 @@
 package com.imptt.v2.core.rtc
 
 import android.content.Context
+import android.media.AudioFormat
+import android.media.MediaRecorder
 import android.util.Log
 import com.imptt.v2.core.websocket.SignalServiceConnector
 import com.imptt.v2.data.model.UserInfo
@@ -11,6 +13,7 @@ import org.webrtc.audio.AudioDeviceModule
 import org.webrtc.audio.JavaAudioDeviceModule
 import org.webrtc.audio.JavaAudioDeviceModule.AudioRecordErrorCallback
 import org.webrtc.audio.JavaAudioDeviceModule.AudioTrackErrorCallback
+import org.webrtc.voiceengine.WebRtcAudioEffects
 import java.util.*
 
 /**
@@ -47,10 +50,12 @@ class WebRtcConnector(
         get() = MediaConstraintFactory.getAudioMediaConstraint()
 
     private val eglBase: EglBase by lazy { EglBase.create() }
+    private val adm: AudioDeviceModule = createJavaAudioDevice(appContext)
+
     init {
         //创建webRtc连接工厂类
         //音频模式
-        val adm: AudioDeviceModule = createJavaAudioDevice(appContext)
+
         //PeerConnectionFactory.initialize
         PeerConnectionFactory.initialize(
             PeerConnectionFactory.InitializationOptions.builder(appContext)
@@ -151,8 +156,8 @@ class WebRtcConnector(
             }
         }
         return JavaAudioDeviceModule.builder(appContext) //.setSamplesReadyCallback(saveRecordedAudioToFile)
-            .setUseHardwareAcousticEchoCanceler(true)
-            .setUseHardwareNoiseSuppressor(true)
+            .setUseHardwareAcousticEchoCanceler(false)
+            .setUseHardwareNoiseSuppressor(false)
             .setAudioRecordErrorCallback(audioRecordErrorCallback)
             .setAudioTrackErrorCallback(audioTrackErrorCallback)
             .createAudioDeviceModule()

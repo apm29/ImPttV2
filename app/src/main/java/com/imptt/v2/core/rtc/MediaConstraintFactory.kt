@@ -49,6 +49,26 @@ object MediaConstraintFactory {
                     MediaConstraints.KeyValuePair(AUDIO_NOISE_SUPPRESSION_CONSTRAINT, "true")
                 )
             }
+            // mandatory.add(
+            //                MediaConstraints.KeyValuePair(
+            //                    "echoCancellation", "false"
+            //                )
+            //            )
+            //            mandatory.add(
+            //                MediaConstraints.KeyValuePair(
+            //                    "googEchoCancellation", "false"
+            //                )
+            //            )
+            //            mandatory.add(
+            //                MediaConstraints.KeyValuePair(
+            //                    "googEchoCancellation2", "false"
+            //                )
+            //            )
+            //            mandatory.add(
+            //                MediaConstraints.KeyValuePair(
+            //                    "googDAEchoCancellation", "true"
+            //                )
+            //            )
             mandatory.add(
                 MediaConstraints.KeyValuePair("OfferToReceiveAudio", "true")
             )
