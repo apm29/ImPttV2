@@ -2,16 +2,17 @@ package com.imptt.v2.core.websocket
 
 import android.content.Context
 import android.util.Log
-import com.imptt.v2.core.messenger.connections.MESSAGE_DATA_KEY_GROUP_ID
-import com.imptt.v2.core.messenger.connections.MESSAGE_TYPE_CALL
-import com.imptt.v2.core.messenger.connections.MESSAGE_TYPE_END_CALL
-import com.imptt.v2.core.messenger.connections.MessageFactory
+import com.imptt.v2.core.messenger.connections.*
 import com.imptt.v2.core.messenger.service.ServiceMessenger
 import com.imptt.v2.core.messenger.view.ViewMessenger
 import com.imptt.v2.core.rtc.WebRtcConnector
 import com.imptt.v2.data.model.UserInfo
+import com.imptt.v2.di.WebSocketRelated
+import okhttp3.OkHttpClient
+import okhttp3.Request
 import okhttp3.WebSocket
 import org.koin.core.parameter.parametersOf
+import org.koin.core.qualifier.StringQualifier
 import org.koin.java.KoinJavaComponent.inject
 import org.webrtc.IceCandidate
 import org.webrtc.SessionDescription
@@ -26,25 +27,37 @@ class SignalServiceConnector(userInfo: UserInfo, context: Context) {
     private val mWebSocketConnection: WebSocketConnection by inject(
         WebSocketConnection::class.java
     )
-
     private val mWebRtcConnector: WebRtcConnector = WebRtcConnector(context, userInfo, this)
-
-    private val mWebSocket: WebSocket by inject(
-        WebSocket::class.java,
-    ) {
+    private val mRequest: Request by inject(
+        Request::class.java,
+    ){
         parametersOf(userInfo)
     }
+    private val mOkHttpClient: OkHttpClient by inject(
+        OkHttpClient::class.java,
+        qualifier = StringQualifier(WebSocketRelated)
+    )
+    private var mWebSocket:WebSocket
     private val mSocketMessageFactory: WebSocketMessageFactory =
         WebSocketMessageFactory.getInstance(userInfo)
 
     init {
         //开启WebSocket链接
-        mWebSocket.request()
+        mWebSocket = mOkHttpClient.newWebSocket(mRequest,mWebSocketConnection)
 
         //打开事件监听
         mWebSocketConnection.whenOpen {
             println("SignalServiceConnector.whenOpen")
             registerToWebSocketServer()
+        }.whenClosing {
+            ServiceMessenger.sendMessage(
+                MessageFactory.createToastMessage("与信令服务器连接断开")
+            )
+        }.whenFail { penddingIds, throwable ->
+            ServiceMessenger.sendMessage(
+                MessageFactory.createToastMessage("与信令服务器连接失败:${penddingIds?.joinToString(",") ?: throwable.localizedMessage}")
+            )
+            mWebSocket = mOkHttpClient.newWebSocket(mRequest,mWebSocketConnection)
         }.on(WebSocketTypes.Register) { signalMessage, _ ->
             //返回group信息
             println("groups = [${signalMessage.info?.groups}]")
@@ -114,6 +127,11 @@ class SignalServiceConnector(userInfo: UserInfo, context: Context) {
             startCall(it.data.getString(MESSAGE_DATA_KEY_GROUP_ID)!!)
         }.on(MESSAGE_TYPE_END_CALL) {
             endCall()
+        }.on(MESSAGE_TYPE_GET_GROUPS_INFO){
+            mWebSocketConnection.send(
+                mSocketMessageFactory.createRegister(),
+                mWebSocket
+            )
         }
     }
 

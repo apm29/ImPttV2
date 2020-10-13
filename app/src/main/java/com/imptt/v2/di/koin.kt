@@ -46,12 +46,19 @@ var serviceModule = module {
         WebSocketConnection()
     }
 
+    factory {(user: UserInfo) ->
+        createWebSocketRequest(
+            user
+        )
+    }
+
+
     //websocket不是单例，需要时再从okhttp新建相同实例
-    factory { (user: UserInfo) ->
+    factory {
         createWebSocket(
             get(named(WebSocketRelated)),
-            user,
-            get<WebSocketConnection>()
+            get<WebSocketConnection>(),
+            get()
         )
     }
 
@@ -70,6 +77,12 @@ var serviceModule = module {
             get(named(HttpApiRelated))
         )
     }
+}
+
+fun createWebSocketRequest(userInfo: UserInfo): Request {
+    return  Request.Builder()
+        .url("ws://192.168.10.181:8080/talk/websocket/v2/${userInfo.userId}")
+        .build()
 }
 
 fun provideWebSocketOkHttpClient() = OkHttpClient.Builder()
@@ -97,12 +110,9 @@ fun provideHttpRetrofit(okHttpClient: OkHttpClient): Retrofit = Retrofit.Builder
 
 fun createWebSocket(
     okHttpClient: OkHttpClient,
-    userInfo: UserInfo,
-    listener: WebSocketListener
+    listener: WebSocketListener,
+    request: Request
 ): WebSocket {
-    val request = Request.Builder()
-        .url("ws://192.168.10.181:8080/talk/websocket/v2/${userInfo.userId}")
-        .build()
     return okHttpClient.newWebSocket(request, listener)
 }
 

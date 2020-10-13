@@ -128,5 +128,9 @@ object MessageFactory {
         )
     }
 
+    fun createGetGroupsInfoMessage(): Message {
+        return createViewSideMessage(MESSAGE_TYPE_GET_GROUPS_INFO)
+    }
+
 
 }
