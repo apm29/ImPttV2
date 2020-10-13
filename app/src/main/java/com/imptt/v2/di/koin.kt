@@ -83,8 +83,7 @@ var serviceModule = module {
 
 fun createWebSocketRequest(userInfo: UserInfo): Request {
     return  Request.Builder()
-//        .url("ws://192.168.10.102:8080/talk/websocket/v2/${userInfo.userId}")
-        .url("ws://172.20.10.5:8080/talk/websocket/v2/${userInfo.userId}")
+        .url("ws://192.168.10.181:8080/talk/websocket/v2/${userInfo.userId}")
         .build()
 }
 
@@ -107,8 +106,7 @@ fun provideWebSocketRetrofit(okHttpClient: OkHttpClient): Retrofit = Retrofit.Bu
 
 fun provideHttpRetrofit(okHttpClient: OkHttpClient): Retrofit = Retrofit.Builder()
     .client(okHttpClient)
-//    .baseUrl("http://192.168.10.102:8080/")
-    .baseUrl("http://172.20.10.5:8080/")
+    .baseUrl("http://192.168.10.181:8080/")
     .addConverterFactory(GsonConverterFactory.create())
     .build()
 
