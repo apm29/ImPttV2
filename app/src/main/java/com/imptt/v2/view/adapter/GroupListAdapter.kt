@@ -9,7 +9,7 @@ import com.imptt.v2.R
 import com.imptt.v2.core.websocket.Group
 
 /**
- *  author : ciih
+ *  author : apm29[ciih]
  *  date : 2020/10/10 10:17 AM
  *  description :
  */

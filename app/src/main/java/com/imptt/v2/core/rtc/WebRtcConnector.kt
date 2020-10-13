@@ -15,7 +15,7 @@ import org.webrtc.audio.JavaAudioDeviceModule.AudioTrackErrorCallback
 import java.util.*
 
 /**
- *  author : ciih
+ *  author : apm29[ciih]
  *  date : 2020/10/9 3:30 PM
  *  description :
  */

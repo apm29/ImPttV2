@@ -19,7 +19,7 @@ import kotlin.coroutines.CoroutineContext
 /**
 
  *  ptt对讲服务总Service
- *  author : ciih
+ *  author : apm29[ciih]
  *  date : 2020/9/29 4:28 PM
  *  description :
  */

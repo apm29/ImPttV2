@@ -7,7 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.imptt.v2.core.messenger.view.ViewMessenger
 
 /**
- *  author : ciih
+ *  author : apm29[ciih]
  *  date : 2020/9/29 4:22 PM
  *  description :
  */
