@@ -27,6 +27,7 @@ class WebRtcConnector(
 
     companion object {
         private val TAG = WebRtcConnector::class.java.canonicalName
+
         private const val VIDEO_FLEXFEC_FIELDTRIAL =
             "WebRTC-FlexFEC-03-Advertised/Enabled/WebRTC-FlexFEC-03/Enabled/"
         private const val VIDEO_VP8_INTEL_HW_ENCODER_FIELDTRIAL = "WebRTC-IntelVP8/Enabled/"
@@ -34,7 +35,6 @@ class WebRtcConnector(
             "WebRTC-Audio-MinimizeResamplingOnMobile/Enabled/"
     }
 
-    //连接池,key为连接id(对方的userId),value为Peer
     private val peers: HashMap<String, Peer> = hashMapOf()
 
     //IceServer集合 用于构建PeerConnection
@@ -48,7 +48,6 @@ class WebRtcConnector(
         get() = MediaConstraintFactory.getAudioMediaConstraint()
 
     private val eglBase: EglBase by lazy { EglBase.create() }
-
     init {
         //创建webRtc连接工厂类
         //音频模式
@@ -65,9 +64,17 @@ class WebRtcConnector(
         factory = PeerConnectionFactory.builder()
             .setOptions(options)
             .setVideoDecoderFactory(DefaultVideoDecoderFactory(eglBase.eglBaseContext))
-            .setVideoEncoderFactory(DefaultVideoEncoderFactory(eglBase.eglBaseContext, true, true))
+            .setVideoEncoderFactory(
+                DefaultVideoEncoderFactory(
+                    eglBase.eglBaseContext,
+                    true,
+                    true
+                )
+            )
             .setAudioDeviceModule(adm)
-            .setAudioDecoderFactoryFactory(BuiltinAudioDecoderFactoryFactory())
+            .setAudioDecoderFactoryFactory(
+                BuiltinAudioDecoderFactoryFactory()
+            )
             .createPeerConnectionFactory()
 
         //创建IceServers参数
@@ -172,6 +179,8 @@ class WebRtcConnector(
         peers.clear()
         groupUsers.forEach { id ->
             getOrCreatePeer(id, groupId).also {
+                Log.e("STEP","03: CREATE OFFER ${peers.size}")
+                //it.createOffer(sdpMediaConstraints)
                 it.addLocalAudioTrack()
             }
         }
@@ -190,6 +199,7 @@ class WebRtcConnector(
         println("from = [${from}], groupId = [${groupId}]")
         val peer = getOrCreatePeer(from, groupId)
         peer.addLocalAudioTrack(factory, streamList, false)
+        Log.e("STEP","02-2: 收到CALL,CREATE 应答端 OFFER ${peers.size}")
         peer.createOffer(sdpMediaConstraints)
     }
 
@@ -201,7 +211,9 @@ class WebRtcConnector(
         println("WebRtcConnector.setRemoteDescriptionAndCreateAnswer")
         println("from = [${from}], groupId = [${groupId}], sdp = [${sdp}]")
         val peer = getOrCreatePeer(from, groupId)
+        Log.e("STEP","07: 应答端 SET REMOTE DESCRIPTION ${peers.size}")
         peer.setRemoteDescription(sdp)
+        Log.e("STEP","08: 应答端 CREATE ANSWER ${peers.size}")
         peer.createAnswer(sdpMediaConstraints)
     }
 
@@ -209,6 +221,7 @@ class WebRtcConnector(
         println("WebRtcConnector.setRemoteDescription")
         println("from = [${from}], groupId = [${groupId}], sdp = [${sdp}]")
         val peer = getOrCreatePeer(from, groupId)
+        Log.e("STEP","10: SET REMOTE DESCRIPTION ${peers.size}")
         peer.setRemoteDescription(sdp)
     }
 

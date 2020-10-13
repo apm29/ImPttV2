@@ -52,11 +52,11 @@ var serviceModule = module {
         )
     }
 
+
     //websocket不是单例，需要时再从okhttp新建相同实例
-    factory { (user: UserInfo) ->
+    factory {
         createWebSocket(
             get(named(WebSocketRelated)),
-            user,
             get<WebSocketConnection>(),
             get()
         )
@@ -77,8 +77,6 @@ var serviceModule = module {
             get(named(HttpApiRelated))
         )
     }
-
-
 }
 
 fun createWebSocketRequest(userInfo: UserInfo): Request {
@@ -112,7 +110,6 @@ fun provideHttpRetrofit(okHttpClient: OkHttpClient): Retrofit = Retrofit.Builder
 
 fun createWebSocket(
     okHttpClient: OkHttpClient,
-    userInfo: UserInfo,
     listener: WebSocketListener,
     request: Request
 ): WebSocket {

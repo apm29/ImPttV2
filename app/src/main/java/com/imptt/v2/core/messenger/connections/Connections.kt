@@ -24,6 +24,5 @@ const val MESSAGE_TYPE_END_CALL = 2019
 const val MESSAGE_TYPE_MESSAGE = 2020
 const val MESSAGE_TYPE_GET_GROUPS_INFO = 2021
 
-
 typealias ServiceMessageCallback = (message: Message) -> Unit
 typealias ViewMessageCallback = (message: Message) -> Unit

@@ -1,8 +1,10 @@
 package com.imptt.v2.core.websocket
 
 import android.content.Context
+import android.util.Log
 import com.imptt.v2.core.messenger.connections.*
 import com.imptt.v2.core.messenger.service.ServiceMessenger
+import com.imptt.v2.core.messenger.view.ViewMessenger
 import com.imptt.v2.core.rtc.WebRtcConnector
 import com.imptt.v2.data.model.UserInfo
 import com.imptt.v2.di.WebSocketRelated
@@ -25,14 +27,13 @@ class SignalServiceConnector(userInfo: UserInfo, context: Context) {
     private val mWebSocketConnection: WebSocketConnection by inject(
         WebSocketConnection::class.java
     )
-
     private val mWebRtcConnector: WebRtcConnector = WebRtcConnector(context, userInfo, this)
-    private val mRequest:Request by inject(
+    private val mRequest: Request by inject(
         Request::class.java,
     ){
         parametersOf(userInfo)
     }
-    private val mOkHttpClient:OkHttpClient by inject(
+    private val mOkHttpClient: OkHttpClient by inject(
         OkHttpClient::class.java,
         qualifier = StringQualifier(WebSocketRelated)
     )
@@ -67,6 +68,7 @@ class SignalServiceConnector(userInfo: UserInfo, context: Context) {
                 )
             )
         }.on(WebSocketTypes.Call) { signalMessage, _ ->
+            Log.e("STEP","02: 收到CALLEE名单")
             //呼叫成功,返回群组用户列表
             val groupUsers = signalMessage.groupUsers
             val groupId = signalMessage.groupId
@@ -82,6 +84,7 @@ class SignalServiceConnector(userInfo: UserInfo, context: Context) {
             val groupId = signalMessage.groupId
             mWebRtcConnector.createCalleeNewPeer(from!!, groupId!!)
         }.on(WebSocketTypes.InCall) { signalMessage, _ ->
+            Log.e("STEP","02-1: 收到CALL,创建应答端Peer")
             //收到其他人呼叫信息
             val from = signalMessage.from
             val groupId = signalMessage.groupId
@@ -93,6 +96,7 @@ class SignalServiceConnector(userInfo: UserInfo, context: Context) {
                 )
             )
         }.on(WebSocketTypes.Offer) { signalMessage, _ ->
+            Log.e("STEP","06: 应答端 RECEIVE OFFER from ${signalMessage.from} , sdp = SDP@${signalMessage.sdp?.description?.hashCode()}")
             //收到Offer
             val sdp = signalMessage.sdp
             val from = signalMessage.from
@@ -103,6 +107,7 @@ class SignalServiceConnector(userInfo: UserInfo, context: Context) {
                 sdp!!
             )
         }.on(WebSocketTypes.Answer) { signalMessage, _ ->
+            Log.e("STEP","09: RECEIVE ANSWER")
             //收到Answer
             val sdp = signalMessage.sdp
             val from = signalMessage.from
@@ -112,9 +117,9 @@ class SignalServiceConnector(userInfo: UserInfo, context: Context) {
                 groupId!!,
                 sdp!!
             )
-        }.on(WebSocketTypes.Fail) { signalMessage, _ ->
-            ServiceMessenger.sendMessage(
-                MessageFactory.createToastMessage(signalMessage.error ?: "失败")
+        }.on(WebSocketTypes.Fail){signalMessage, _ ->
+            ViewMessenger.send(
+                MessageFactory.createToastMessage(signalMessage.error?:"失败")
             )
         }
 
@@ -139,6 +144,7 @@ class SignalServiceConnector(userInfo: UserInfo, context: Context) {
     }
 
     private fun startCall(groupId: String) {
+        Log.e("STEP","01: CALL")
         mWebSocketConnection.send(
             mSocketMessageFactory.createCall(groupId),
             mWebSocket,
@@ -159,6 +165,7 @@ class SignalServiceConnector(userInfo: UserInfo, context: Context) {
     /************************************peer侧调用******************************************/
     //创建offer
     fun sendOfferToPeers(groupId: String, sdp: SessionDescription) {
+        Log.e("STEP","05: SEND OFFER sdp = SDP@${sdp.description.hashCode()}")
         mWebSocketConnection.send(
             mSocketMessageFactory.createOffer(
                 groupId, sdp
