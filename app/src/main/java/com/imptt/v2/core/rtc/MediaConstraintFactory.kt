@@ -35,6 +35,19 @@ object MediaConstraintFactory {
                 this.mandatory.add(
                     MediaConstraints.KeyValuePair(AUDIO_NOISE_SUPPRESSION_CONSTRAINT, "false")
                 )
+            }else{
+                this.mandatory.add(
+                    MediaConstraints.KeyValuePair(AUDIO_ECHO_CANCELLATION_CONSTRAINT, "true")
+                )
+                this.mandatory.add(
+                    MediaConstraints.KeyValuePair(AUDIO_AUTO_GAIN_CONTROL_CONSTRAINT, "true")
+                )
+                this.mandatory.add(
+                    MediaConstraints.KeyValuePair(AUDIO_HIGH_PASS_FILTER_CONSTRAINT, "true")
+                )
+                this.mandatory.add(
+                    MediaConstraints.KeyValuePair(AUDIO_NOISE_SUPPRESSION_CONSTRAINT, "true")
+                )
             }
             mandatory.add(
                 MediaConstraints.KeyValuePair("OfferToReceiveAudio", "true")
@@ -43,6 +56,29 @@ object MediaConstraintFactory {
                 MediaConstraints.KeyValuePair("DtlsSrtpKeyAgreement", "true")
             )
         }
+    }
+
+    fun audioMediaConstraint(): MediaConstraints {
+        val audioConstraints = MediaConstraints()
+        //回声消除
+        audioConstraints.mandatory.add(
+            MediaConstraints.KeyValuePair(
+                "googEchoCancellation",
+                "true"
+            )
+        )
+        //自动增益
+        audioConstraints.mandatory.add(MediaConstraints.KeyValuePair("googAutoGainControl", "true"))
+        //高音过滤
+        audioConstraints.mandatory.add(MediaConstraints.KeyValuePair("googHighpassFilter", "true"))
+        //噪音处理
+        audioConstraints.mandatory.add(
+            MediaConstraints.KeyValuePair(
+                "googNoiseSuppression",
+                "true"
+            )
+        )
+        return audioConstraints
     }
 
 }

@@ -2,7 +2,6 @@ package com.imptt.v2.core.rtc
 
 import android.content.Context
 import android.util.Log
-import com.imptt.v2.BuildConfig
 import com.imptt.v2.core.websocket.SignalServiceConnector
 import com.imptt.v2.data.model.UserInfo
 import org.webrtc.*
@@ -168,7 +167,7 @@ class WebRtcConnector(
 
     //添加本地音频track
     private fun Peer.addLocalAudioTrack() {
-        this.addLocalAudioTrack(factory, streamList)
+        this.addLocalAudioTrack(factory, streamList, sdpMediaConstraints)
     }
 
 
@@ -198,7 +197,7 @@ class WebRtcConnector(
         println("WebRtcConnector.createCalleeNewPeer")
         println("from = [${from}], groupId = [${groupId}]")
         val peer = getOrCreatePeer(from, groupId)
-        peer.addLocalAudioTrack(factory, streamList, false)
+        peer.addLocalAudioTrack(factory, streamList, sdpMediaConstraints,false)
         Log.e("STEP","02-2: 收到CALL,CREATE 应答端 OFFER ${peers.size}")
         peer.createOffer(sdpMediaConstraints)
     }

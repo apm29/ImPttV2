@@ -25,7 +25,7 @@ android {
 
     buildTypes {
         debug{
-            buildConfigField "boolean", "AUDIO_PROCESS", "false"
+            buildConfigField "boolean", "AUDIO_PROCESS", "true"
         }
         release {
             minifyEnabled false

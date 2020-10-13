@@ -24,6 +24,8 @@ class Peer(
     companion object {
         private val TAG = Peer::class.java.canonicalName
         const val VOLUME: Double = 80.0
+        const val LOCAL_AUDIO_STREAM: String = "local_audio_stream"
+        const val AUDIO_TRACK_ID: String = "audio_track_id:"
     }
 
 
@@ -161,7 +163,6 @@ class Peer(
 
     override fun onRenegotiationNeeded() {
         Log.d(TAG, "Peer-$id.onRenegotiationNeeded")
-        createOffer(MediaConstraintFactory.getAudioMediaConstraint())
     }
 
     override fun onAddTrack(reveiver: RtpReceiver?, streams: Array<out MediaStream>?) {
@@ -214,37 +215,19 @@ class Peer(
     fun addLocalAudioTrack(
         factory: PeerConnectionFactory,
         streamList: ArrayList<String>,
+        audioConstraints: MediaConstraints,
         addLocalTrack: Boolean = true
     ) {
-        val audioConstraints = MediaConstraints()
-        //回声消除
-        audioConstraints.mandatory.add(
-            MediaConstraints.KeyValuePair(
-                "googEchoCancellation",
-                "true"
-            )
-        )
-        //自动增益
-        audioConstraints.mandatory.add(MediaConstraints.KeyValuePair("googAutoGainControl", "true"))
-        //高音过滤
-        audioConstraints.mandatory.add(MediaConstraints.KeyValuePair("googHighpassFilter", "true"))
-        //噪音处理
-        audioConstraints.mandatory.add(
-            MediaConstraints.KeyValuePair(
-                "googNoiseSuppression",
-                "true"
-            )
-        )
         val audioSource = factory.createAudioSource(audioConstraints)
-        val localMediaStream = factory.createLocalMediaStream("ARDAMSa0")
         val audioTrack =
-            factory.createAudioTrack("ARDAMS", audioSource)
+            factory.createAudioTrack("$AUDIO_TRACK_ID:${UUID.randomUUID()}", audioSource)
+        val localMediaStream = factory.createLocalMediaStream(LOCAL_AUDIO_STREAM)
         localMediaStream.addTrack(audioTrack)
         audioTrack.setVolume(VOLUME)
         audioTrack.setEnabled(true)
         if (addLocalTrack) {
             try {
-                peerConnection?.addTrack(audioTrack)
+                peerConnection?.addTrack(audioTrack, streamList)
             } catch (e: Exception) {
                 e.printStackTrace()
             }
