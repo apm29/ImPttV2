@@ -1,44 +1,20 @@
 package com.imptt.v2.vm
 
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import com.imptt.v2.data.repo.ImRepository
-import com.squareup.inject.assisted.Assisted
-import com.squareup.inject.assisted.AssistedInject
+import com.imptt.v2.core.websocket.Group
 
-class HomeViewModel @AssistedInject constructor(
-    private val imRepository: ImRepository,
-    @Assisted val id:Long
-): ViewModel() {
+class HomeViewModel: ViewModel() {
 
-    private val _text = MutableLiveData<String>().apply {
-        value = "This is home Fragment"
+    private val groups:MutableLiveData<ArrayList<Group>> = MutableLiveData()
+
+    val imGroups = Transformations.map(groups){
+        it
     }
-    val text: LiveData<String> = _text
-
-    fun say(){
-        println(id)
-        println(imRepository.getMessages())
+    fun setImGroups(groups:ArrayList<Group>){
+        this.groups.value = groups
     }
 
-    @AssistedInject.Factory
-    interface AssistedFactory {
-        fun create(id: Long): HomeViewModel
-    }
-
-    companion object {
-
-        fun provideFactory(
-            assistedFactory: AssistedFactory,
-            id: Long
-        ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-                return assistedFactory.create(id) as T
-            }
-        }
-    }
 }

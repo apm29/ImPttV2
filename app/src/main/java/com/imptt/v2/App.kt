@@ -3,12 +3,11 @@ package com.imptt.v2
 import android.app.Application
 import android.os.Process
 import com.imptt.v2.di.serviceModule
-import dagger.hilt.android.HiltAndroidApp
+import com.imptt.v2.di.viewModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
 
-@HiltAndroidApp
 class App:Application() {
     override fun onCreate() {
         super.onCreate()
@@ -17,7 +16,7 @@ class App:Application() {
         startKoin{
             androidLogger()
             androidContext(this@App)
-            modules(serviceModule)
+            modules(serviceModule,viewModule)
         }
     }
 }

@@ -1,6 +1,5 @@
 package com.imptt.v2.view.main
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -13,19 +12,23 @@ import com.imptt.v2.core.messenger.connections.*
 import com.imptt.v2.core.messenger.view.ViewMessenger
 import com.imptt.v2.core.websocket.Group
 import com.imptt.v2.view.adapter.GroupListAdapter
+import com.imptt.v2.vm.HomeViewModel
 import kotlinx.android.synthetic.main.fragment_home.*
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class HomeFragment : Fragment() {
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+    private val homeViewModel:HomeViewModel by viewModel()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         ViewMessenger.on(MESSAGE_TYPE_GROUP_LIST) {
             //获取group列表
             val groups =
                 it.data.getParcelableArrayList<Group>(MESSAGE_DATA_KEY_GROUP_LIST) ?: arrayListOf()
             if(this@HomeFragment.isAdded) {
                 Toast.makeText(requireContext(), "$groups", Toast.LENGTH_SHORT).show()
-                initialList(groups)
+                homeViewModel.setImGroups(groups)
             }
         }.on(MESSAGE_TYPE_IN_CALL) {
             //获取group列表
@@ -42,6 +45,15 @@ class HomeFragment : Fragment() {
             ).show()
         }
 
+
+
+        homeViewModel.imGroups.observe(this){
+            initialList(it)
+        }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         toggleButtonCall.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
                 ViewMessenger.send(
@@ -63,17 +75,6 @@ class HomeFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_home, container, false)
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        initialList(arrayListOf())
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        ViewMessenger.send(
-            MessageFactory.createGetGroupsInfoMessage()
-        )
-    }
 
     private fun initialList(groups: ArrayList<Group>) {
         recyclerViewGroupList.layoutManager = LinearLayoutManager(requireContext())

@@ -16,9 +16,7 @@ import com.imptt.v2.core.messenger.connections.MessageFactory
 import com.imptt.v2.core.messenger.view.ViewMessenger
 import com.imptt.v2.core.struct.ServiceBindActivity
 import com.permissionx.guolindev.PermissionX
-import dagger.hilt.android.AndroidEntryPoint
 
-@AndroidEntryPoint
 class MainActivity : ServiceBindActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {

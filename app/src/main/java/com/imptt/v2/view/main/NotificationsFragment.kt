@@ -11,10 +11,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.imptt.v2.R
 import com.imptt.v2.vm.NotificationsViewModel
-import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
-@AndroidEntryPoint
 class NotificationsFragment : Fragment() {
 
     private  val notificationsViewModel: NotificationsViewModel by viewModels()

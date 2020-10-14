@@ -7,6 +7,7 @@ import android.text.TextUtils
 import android.view.KeyEvent
 import android.widget.Toast
 import com.imptt.v2.core.media.MediaSessionHandler
+import com.imptt.v2.core.messenger.connections.MESSAGE_TYPE_USER_LOGIN
 import com.imptt.v2.core.messenger.connections.MessageFactory
 import com.imptt.v2.core.messenger.service.ServiceMessenger
 import com.imptt.v2.core.notification.NotificationFactory
@@ -45,6 +46,9 @@ class ImService : Service(), CoroutineScope {
         super.onCreate()
         println("ImService.onCreate")
         loginAsUser()
+        ServiceMessenger.on(MESSAGE_TYPE_USER_LOGIN){
+            loginAsUser()
+        }
     }
 
     private fun loginAsUser() {

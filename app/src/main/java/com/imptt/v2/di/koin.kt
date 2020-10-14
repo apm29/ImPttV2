@@ -1,14 +1,23 @@
 package com.imptt.v2.di
 
+import androidx.lifecycle.LiveData
 import com.google.gson.GsonBuilder
 import com.imptt.v2.core.websocket.WebSocketConnection
+import com.imptt.v2.data.ImDataBase
 import com.imptt.v2.data.api.SignalServerApi
+import com.imptt.v2.data.dao.MessageDao
+import com.imptt.v2.data.entity.Message
 import com.imptt.v2.data.model.UserInfo
+import com.imptt.v2.data.repo.ImRepository
+import com.imptt.v2.vm.HomeViewModel
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.WebSocket
 import okhttp3.WebSocketListener
 import okhttp3.logging.HttpLoggingInterceptor
+import org.koin.android.ext.koin.androidApplication
+import org.koin.android.ext.koin.androidContext
+import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import retrofit2.Retrofit
@@ -46,7 +55,7 @@ var serviceModule = module {
         WebSocketConnection()
     }
 
-    factory {(user: UserInfo) ->
+    factory { (user: UserInfo) ->
         createWebSocketRequest(
             user
         )
@@ -80,7 +89,7 @@ var serviceModule = module {
 }
 
 fun createWebSocketRequest(userInfo: UserInfo): Request {
-    return  Request.Builder()
+    return Request.Builder()
         .url("ws://192.168.10.181:8080/talk/websocket/v2/${userInfo.userId}")
         .build()
 }
@@ -120,4 +129,13 @@ fun createServerApi(
     retrofit: Retrofit
 ): SignalServerApi {
     return retrofit.create(SignalServerApi::class.java)
+}
+
+
+var viewModule = module {
+
+
+    viewModel {
+        HomeViewModel()
+    }
 }
