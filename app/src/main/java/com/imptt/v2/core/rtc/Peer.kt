@@ -19,8 +19,8 @@ class Peer(
     private val groupId: String,
     factory: PeerConnectionFactory,
     rtcConfiguration: PeerConnection.RTCConfiguration,
-    private val signalServiceConnector: SignalServiceConnector
-) : SdpObserver, PeerConnection.Observer {
+    private val candidateSender: CandidateSender
+) :  PeerConnection.Observer {
     companion object {
         private val TAG = Peer::class.java.canonicalName
         const val VOLUME: Double = 80.0
@@ -45,61 +45,7 @@ class Peer(
         Log.e(TAG, "id = $id , groupId = $groupId ")
     }
 
-    /**SdpObserver是来回调sdp是否创建(offer,answer)成功，是否设置描述成功(local,remote）的接口**/
 
-    //Create{Offer,Answer}成功回调
-    override fun onCreateSuccess(sdp: SessionDescription) {
-        Log.d(TAG, "Peer-$id.onCreateSuccess: SDP@${sdp.type}")
-
-        //设置本地LocalDescription
-        println(peerConnection?.signalingState())
-        peerConnection?.setLocalDescription(this, sdp)
-        println(peerConnection?.signalingState())
-        when (sdp.type) {
-            SessionDescription.Type.ANSWER -> {
-                signalServiceConnector.sendAnswerToPeers(groupId, sdp)
-            }
-            SessionDescription.Type.OFFER -> {
-                signalServiceConnector.sendOfferToPeers(groupId, sdp)
-            }
-            else -> {
-
-            }
-        }
-    }
-
-    //Set{Local,Remote}Description()成功回调
-    override fun onSetSuccess() {
-        Log.d(TAG, "Peer-$id.onSetSuccess")
-    }
-
-    //Create{Offer,Answer}失败回调
-    override fun onCreateFailure(reason: String?) {
-        Log.d(
-            TAG, "Peer-$id.onCreateFailure : $reason" +
-                    "\r\nlocalDescription:${peerConnection?.localDescription}" +
-                    "\r\nremoteDescription:${peerConnection?.remoteDescription}" +
-                    "\r\nconnectionState:${peerConnection?.connectionState()}" +
-                    "\r\niceConnectionState:${peerConnection?.iceConnectionState()}" +
-                    "\r\niceGatheringState:${peerConnection?.iceGatheringState()}" +
-                    "\r\nsignalingState:${peerConnection?.signalingState()}"
-        )
-    }
-
-    //Set{Local,Remote}Description()失败回调
-    override fun onSetFailure(reason: String?) {
-        Log.d(
-            TAG, "Peer-$id.onSetFailure : $reason" +
-                    "\r\nlocalDescription:${peerConnection?.localDescription}" +
-                    "\r\nremoteDescription:${peerConnection?.remoteDescription}" +
-                    "\r\nconnectionState:${peerConnection?.connectionState()}" +
-                    "\r\niceConnectionState:${peerConnection?.iceConnectionState()}" +
-                    "\r\niceGatheringState:${peerConnection?.iceGatheringState()}" +
-                    "\r\nsignalingState:${peerConnection?.signalingState()}"
-        )
-    }
-
-    /**SdpObserver是来回调sdp是否创建(offer,answer)成功，是否设置描述成功(local,remote）的接口**/
 
     //信令状态改变时候触发
     override fun onSignalingChange(state: PeerConnection.SignalingState?) {
@@ -134,7 +80,7 @@ class Peer(
     override fun onIceCandidate(candidate: IceCandidate) {
         Log.d(TAG, "Peer-$id.onIceCandidate : $candidate")
         peerConnection?.addIceCandidate(candidate)
-        signalServiceConnector.sendCandidate(
+        candidateSender.sendCandidate(
             groupId,
             candidate
         )
@@ -175,28 +121,25 @@ class Peer(
     }
 
     /*******************************peer公共方法*********************************************/
-
-    fun createOffer(sdpMediaConstraints: MediaConstraints) {
-        peerConnection?.createOffer(this, sdpMediaConstraints)
-    }
-
-    suspend fun createOfferAsync(sdpMediaConstraints: MediaConstraints): Boolean {
+    suspend fun createOfferAsync(sdpMediaConstraints: MediaConstraints): SessionDescription? {
         return suspendCoroutine {
             if (peerConnection != null) {
                 try {
                     peerConnection.createOffer(
                         object : CustomSdpObserver {
                             override fun onCreateSuccess(sdp: SessionDescription?) {
-                                it.resume(true)
+                                it.resume(sdp)
                             }
 
                             override fun onCreateFailure(reason: String?) {
-                                it.resume(false)
+                                Log.e(TAG,reason?:"创建offer失败")
+                                it.resume(null)
                             }
                         },
                         sdpMediaConstraints
                     )
                 } catch (e: Exception) {
+                    e.printStackTrace()
                     it.resumeWithException(e)
                 }
             } else {
@@ -234,9 +177,6 @@ class Peer(
         }
     }
 
-    fun setRemoteDescription(sdp: SessionDescription) {
-        peerConnection?.setRemoteDescription(this, sdp)
-    }
 
     suspend fun setRemoteDescriptionAsync(sdp: SessionDescription): Boolean {
         return suspendCoroutine {
@@ -245,16 +185,19 @@ class Peer(
                     peerConnection.setRemoteDescription(
                         object : CustomSdpObserver {
                             override fun onSetSuccess() {
+                                Log.e(TAG,"设置remote offer成功")
                                 it.resume(true)
                             }
 
                             override fun onSetFailure(reason: String?) {
+                                Log.e(TAG,reason?:"设置remote offer失败")
                                 it.resume(false)
                             }
                         },
                         sdp
                     )
                 } catch (e: Exception) {
+                    e.printStackTrace()
                     it.resumeWithException(e)
                 }
             } else {
@@ -264,27 +207,25 @@ class Peer(
     }
 
 
-    fun createAnswer(sdpMediaConstraints: MediaConstraints) {
-        peerConnection?.createAnswer(this, sdpMediaConstraints)
-    }
-
-    suspend fun createAnswerAsync(sdpMediaConstraints: MediaConstraints): Boolean {
+    suspend fun createAnswerAsync(sdpMediaConstraints: MediaConstraints): SessionDescription? {
         return suspendCoroutine {
             if (peerConnection != null) {
                 try {
                     peerConnection.createAnswer(
                         object : CustomSdpObserver {
                             override fun onCreateSuccess(sdp: SessionDescription?) {
-                                it.resume(true)
+                                it.resume(sdp)
                             }
 
                             override fun onCreateFailure(reason: String?) {
-                                it.resume(false)
+                                Log.e(TAG,reason?:"创建answer失败")
+                                it.resume(null)
                             }
                         },
                         sdpMediaConstraints
                     )
                 } catch (e: Exception) {
+                    e.printStackTrace()
                     it.resumeWithException(e)
                 }
             } else {
@@ -295,5 +236,36 @@ class Peer(
 
     fun close() {
         peerConnection?.close()
+    }
+
+    suspend fun setLocalDescriptionAsync(sdp: SessionDescription): Boolean {
+        return suspendCoroutine {
+            if (peerConnection != null) {
+                try {
+                    println(peerConnection.signalingState())
+                    peerConnection.setLocalDescription(
+                        object : CustomSdpObserver {
+                            override fun onSetSuccess() {
+                                Log.e(TAG,"设置local offer成功")
+                                it.resume(true)
+                                println(peerConnection.signalingState())
+                            }
+
+                            override fun onSetFailure(reason: String?) {
+                                Log.e(TAG,reason?:"设置local offer失败")
+                                it.resume(false)
+                                println(peerConnection.signalingState())
+                            }
+                        },
+                        sdp
+                    )
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    it.resumeWithException(e)
+                }
+            } else {
+                it.resumeWithException(IllegalStateException("Peer连接未建立"))
+            }
+        }
     }
 }

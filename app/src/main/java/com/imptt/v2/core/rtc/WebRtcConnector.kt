@@ -1,20 +1,18 @@
 package com.imptt.v2.core.rtc
 
 import android.content.Context
-import android.media.AudioFormat
-import android.media.MediaRecorder
 import android.util.Log
 import com.imptt.v2.core.websocket.SignalServiceConnector
 import com.imptt.v2.data.model.UserInfo
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import org.webrtc.*
 import org.webrtc.PeerConnection.IceServer
 import org.webrtc.PeerConnection.RTCConfiguration
 import org.webrtc.audio.AudioDeviceModule
-import org.webrtc.audio.JavaAudioDeviceModule
-import org.webrtc.audio.JavaAudioDeviceModule.AudioRecordErrorCallback
-import org.webrtc.audio.JavaAudioDeviceModule.AudioTrackErrorCallback
-import org.webrtc.voiceengine.WebRtcAudioEffects
+import org.webrtc.voiceengine.WebRtcAudioUtils
 import java.util.*
+import kotlin.coroutines.CoroutineContext
 
 /**
  *  author : apm29[ciih]
@@ -24,8 +22,18 @@ import java.util.*
 class WebRtcConnector(
     appContext: Context,
     private val userInfo: UserInfo,
-    private val signalServiceConnector: SignalServiceConnector
-) {
+    private val candidateSender: CandidateSender
+) : CoroutineScope {
+
+    /**
+     * The context of this scope.
+     * Context is encapsulated by the scope and used for implementation of coroutine builders that are extensions on the scope.
+     * Accessing this property in general code is not recommended for any purposes except accessing the [Job] instance for advanced usages.
+     *
+     * By convention, should contain an instance of a [job][Job] to enforce structured concurrency.
+     */
+    override val coroutineContext: CoroutineContext
+        get() = Dispatchers.Main
 
     companion object {
         private val TAG = WebRtcConnector::class.java.canonicalName
@@ -50,7 +58,7 @@ class WebRtcConnector(
         get() = MediaConstraintFactory.getAudioMediaConstraint()
 
     private val eglBase: EglBase by lazy { EglBase.create() }
-    private val adm: AudioDeviceModule = createJavaAudioDevice(appContext)
+    private val adm: AudioDeviceModule = AudioDeviceModuleFactory.createJavaAudioDevice(appContext)
 
     init {
         //创建webRtc连接工厂类
@@ -80,7 +88,8 @@ class WebRtcConnector(
                 BuiltinAudioDecoderFactoryFactory()
             )
             .createPeerConnectionFactory()
-
+        WebRtcAudioUtils.setWebRtcBasedAcousticEchoCanceler(true)
+        WebRtcAudioUtils.setWebRtcBasedNoiseSuppressor(true)
         //创建IceServers参数
         iceServers.add(IceServer.builder("stun:stun2.1.google.com:19302").createIceServer())
         iceServers.add(IceServer.builder("stun:23.21.150.121").createIceServer())
@@ -104,75 +113,17 @@ class WebRtcConnector(
         rtcConfig.sdpSemantics = PeerConnection.SdpSemantics.UNIFIED_PLAN
     }
 
-    //创建音频模式JavaAudioDevice
-    private fun createJavaAudioDevice(appContext: Context): AudioDeviceModule {
-        // Set audio record error callbacks.
-        val audioRecordErrorCallback: AudioRecordErrorCallback = object : AudioRecordErrorCallback {
-            override fun onWebRtcAudioRecordInitError(errorMessage: String) {
-                Log.e(
-                    TAG,
-                    "onWebRtcAudioRecordInitError: $errorMessage"
-                )
-            }
-
-            override fun onWebRtcAudioRecordStartError(
-                errorCode: JavaAudioDeviceModule.AudioRecordStartErrorCode, errorMessage: String
-            ) {
-                Log.e(
-                    TAG,
-                    "onWebRtcAudioRecordStartError: $errorCode. $errorMessage"
-                )
-            }
-
-            override fun onWebRtcAudioRecordError(errorMessage: String) {
-                Log.e(
-                    TAG,
-                    "onWebRtcAudioRecordError: $errorMessage"
-                )
-            }
-        }
-        val audioTrackErrorCallback: AudioTrackErrorCallback = object : AudioTrackErrorCallback {
-            override fun onWebRtcAudioTrackInitError(errorMessage: String) {
-                Log.e(
-                    TAG,
-                    "onWebRtcAudioTrackInitError: $errorMessage"
-                )
-            }
-
-            override fun onWebRtcAudioTrackStartError(
-                errorCode: JavaAudioDeviceModule.AudioTrackStartErrorCode, errorMessage: String
-            ) {
-                Log.e(
-                    TAG,
-                    "onWebRtcAudioTrackStartError: $errorCode. $errorMessage"
-                )
-            }
-
-            override fun onWebRtcAudioTrackError(errorMessage: String) {
-                Log.e(
-                    TAG,
-                    "onWebRtcAudioTrackError: $errorMessage"
-                )
-            }
-        }
-        return JavaAudioDeviceModule.builder(appContext) //.setSamplesReadyCallback(saveRecordedAudioToFile)
-            .setUseHardwareAcousticEchoCanceler(false)
-            .setUseHardwareNoiseSuppressor(false)
-            .setAudioRecordErrorCallback(audioRecordErrorCallback)
-            .setAudioTrackErrorCallback(audioTrackErrorCallback)
-            .createAudioDeviceModule()
-    }
-
     //获取/新建peerConnection
     private fun getOrCreatePeer(id: String, groupId: String): Peer {
-        return peers[id] ?: Peer(id, groupId, factory, rtcConfig, signalServiceConnector).also {
-            peers[id] = it
-        }
+        return peers[id]
+            ?: Peer(id, groupId, factory, rtcConfig, candidateSender).also {
+                peers[id] = it
+            }
     }
 
     //添加本地音频track
-    private fun Peer.addLocalAudioTrack() {
-        this.addLocalAudioTrack(factory, streamList, sdpMediaConstraints)
+    private fun Peer.addLocalAudioTrack(addLocalTrack: Boolean = true) {
+        this.addLocalAudioTrack(factory, streamList, sdpMediaConstraints,addLocalTrack)
     }
 
 
@@ -182,10 +133,8 @@ class WebRtcConnector(
         println("groupId = [${groupId}], groupUsers = [${groupUsers}]")
         peers.clear()
         groupUsers.forEach { id ->
-            getOrCreatePeer(id, groupId).also {
-                Log.e("STEP","03: CREATE OFFER ${peers.size}")
-                //it.createOffer(sdpMediaConstraints)
-                it.addLocalAudioTrack()
+            getOrCreatePeer(id, groupId).also { peer ->
+                peer.addLocalAudioTrack()
             }
         }
     }
@@ -198,35 +147,43 @@ class WebRtcConnector(
     }
 
     //p2p时有新的用户加入
-    fun createCalleeNewPeer(from: String, groupId: String) {
-        println("WebRtcConnector.createCalleeNewPeer")
+    suspend fun createOfferAsync(from: String, groupId: String): SessionDescription? {
+        println("WebRtcConnector.createOfferAsync")
         println("from = [${from}], groupId = [${groupId}]")
         val peer = getOrCreatePeer(from, groupId)
-        peer.addLocalAudioTrack(factory, streamList, sdpMediaConstraints,false)
-        Log.e("STEP","02-2: 收到CALL,CREATE 应答端 OFFER ${peers.size}")
-        peer.createOffer(sdpMediaConstraints)
+        peer.addLocalAudioTrack(false)
+        return try {
+            peer.createOfferAsync(sdpMediaConstraints)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
     }
 
-    fun setRemoteDescriptionAndCreateAnswer(
+    //p2p时有新的用户加入
+    suspend fun createAnswerAsync(from: String, groupId: String): SessionDescription? {
+        val peer = getOrCreatePeer(from, groupId)
+        return try {
+            peer.createAnswerAsync(sdpMediaConstraints)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+    suspend fun setRemoteDescriptionAsync(
         from: String,
         groupId: String,
         sdp: SessionDescription
-    ) {
-        println("WebRtcConnector.setRemoteDescriptionAndCreateAnswer")
+    ): Boolean {
+        println("WebRtcConnector.setRemoteDescriptionAsync")
         println("from = [${from}], groupId = [${groupId}], sdp = [${sdp}]")
         val peer = getOrCreatePeer(from, groupId)
-        Log.e("STEP","07: 应答端 SET REMOTE DESCRIPTION ${peers.size}")
-        peer.setRemoteDescription(sdp)
-        Log.e("STEP","08: 应答端 CREATE ANSWER ${peers.size}")
-        peer.createAnswer(sdpMediaConstraints)
-    }
-
-    fun setRemoteDescription(from: String, groupId: String, sdp: SessionDescription) {
-        println("WebRtcConnector.setRemoteDescription")
-        println("from = [${from}], groupId = [${groupId}], sdp = [${sdp}]")
-        val peer = getOrCreatePeer(from, groupId)
-        Log.e("STEP","10: SET REMOTE DESCRIPTION ${peers.size}")
-        peer.setRemoteDescription(sdp)
+        return try {
+            peer.setRemoteDescriptionAsync(sdp)
+        } catch (e: Exception) {
+            false
+        }
     }
 
     fun endCall() {
@@ -235,6 +192,18 @@ class WebRtcConnector(
             it.value.close()
         }
         peers.clear()
+    }
+
+    suspend fun setLocalDescriptionAsync(
+        from: String,
+        groupId: String, sdp: SessionDescription
+    ): Boolean {
+        val peer = getOrCreatePeer(from, groupId)
+        return try {
+            peer.setLocalDescriptionAsync(sdp)
+        } catch (e: Exception) {
+            false
+        }
     }
 
 }
