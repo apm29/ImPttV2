@@ -1,5 +1,6 @@
 package com.imptt.v2.di
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import com.google.gson.GsonBuilder
 import com.imptt.v2.core.websocket.WebSocketConnection
@@ -134,8 +135,19 @@ fun createServerApi(
 
 var viewModule = module {
 
+    single{
+        ImDataBase.getInstance(get())
+    }
+
+    single {
+        get<ImDataBase>().getMessageDao()
+    }
+
+    single {
+        ImRepository(get())
+    }
 
     viewModel {
-        HomeViewModel()
+        HomeViewModel(get())
     }
 }

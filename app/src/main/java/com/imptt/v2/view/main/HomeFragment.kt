@@ -1,5 +1,6 @@
 package com.imptt.v2.view.main
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,17 +12,46 @@ import com.imptt.v2.R
 import com.imptt.v2.core.messenger.connections.*
 import com.imptt.v2.core.messenger.view.ViewMessenger
 import com.imptt.v2.core.websocket.Group
+import com.imptt.v2.utils.observe
 import com.imptt.v2.view.adapter.GroupListAdapter
 import com.imptt.v2.vm.HomeViewModel
 import kotlinx.android.synthetic.main.fragment_home.*
+import org.koin.androidx.viewmodel.ViewModelOwner
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class HomeFragment : Fragment() {
 
-    private val homeViewModel:HomeViewModel by viewModel()
+    private val homeViewModel:HomeViewModel by viewModel(
+        owner = { ViewModelOwner.from(this.requireActivity(), this.requireActivity()) }
+    )
+
+    /**
+     * Called when a fragment is first attached to its context.
+     * [.onCreate] will be called after this.
+     */
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        println("HomeFragment.onAttach")
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        println("HomeFragment.onDetach")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        println("HomeFragment.onDestroy")
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        println("HomeFragment.onDestroyView")
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        println("HomeFragment.onCreate")
         ViewMessenger.on(MESSAGE_TYPE_GROUP_LIST) {
             //获取group列表
             val groups =
@@ -45,14 +75,10 @@ class HomeFragment : Fragment() {
             ).show()
         }
 
-
-
-        homeViewModel.imGroups.observe(this){
-            initialList(it)
-        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        println("HomeFragment.onViewCreated")
         super.onViewCreated(view, savedInstanceState)
         toggleButtonCall.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
@@ -65,6 +91,10 @@ class HomeFragment : Fragment() {
                 )
             }
         }
+
+        observe(homeViewModel.groups){
+            initialList(it)
+        }
     }
 
     override fun onCreateView(
@@ -72,6 +102,7 @@ class HomeFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        println("HomeFragment.onCreateView")
         return inflater.inflate(R.layout.fragment_home, container, false)
     }
 
