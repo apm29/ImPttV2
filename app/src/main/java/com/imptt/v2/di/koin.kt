@@ -10,7 +10,9 @@ import com.imptt.v2.data.dao.MessageDao
 import com.imptt.v2.data.entity.Message
 import com.imptt.v2.data.model.UserInfo
 import com.imptt.v2.data.repo.ImRepository
+import com.imptt.v2.vm.ContactViewModel
 import com.imptt.v2.vm.HomeViewModel
+import com.imptt.v2.vm.SettingsViewModel
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.WebSocket
@@ -144,10 +146,22 @@ var viewModule = module {
     }
 
     single {
+        get<ImDataBase>().getContactDao()
+    }
+
+    single {
         ImRepository(get())
     }
 
     viewModel {
         HomeViewModel(get())
+    }
+
+    viewModel {
+        ContactViewModel()
+    }
+
+    viewModel {
+        SettingsViewModel()
     }
 }

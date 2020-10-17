@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item   android:state_checked="true">
+        <bitmap android:src="@android:drawable/ic_lock_ringer_on_alpha" android:tint="#333">
+        </bitmap>
+    </item>
+    <item >
+        <bitmap android:src="@android:drawable/ic_lock_ringer_on_alpha">
+        </bitmap>
+    </item>
+
+</selector>

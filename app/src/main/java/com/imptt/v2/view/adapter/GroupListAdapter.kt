@@ -16,7 +16,7 @@ import com.imptt.v2.core.websocket.Group
 class GroupListAdapter constructor(
     private var list: ArrayList<Group>,
     private val layoutInflater: LayoutInflater
-) : RecyclerView.Adapter<VH>() {
+) : RecyclerView.Adapter<GroupListAdapter.VH>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
         val view = layoutInflater.inflate(R.layout.group_item_layout,parent,false)
@@ -37,9 +37,8 @@ class GroupListAdapter constructor(
         this.list = groups
         notifyDataSetChanged()
     }
-
+    class VH(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val textViewGroupName:TextView = itemView.findViewById(R.id.textViewGroupName)
+    }
 }
 
-class VH(itemView: View) : RecyclerView.ViewHolder(itemView) {
-    val textViewGroupName:TextView = itemView.findViewById(R.id.textViewGroupName)
-}

@@ -12,7 +12,6 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.imptt.v2.R
 import com.imptt.v2.core.messenger.connections.MESSAGE_TYPE_ECHO_TEST
-import com.imptt.v2.core.messenger.connections.MessageFactory
 import com.imptt.v2.core.messenger.view.ViewMessenger
 import com.imptt.v2.core.struct.ServiceBindActivity
 import com.permissionx.guolindev.PermissionX
@@ -28,7 +27,7 @@ class MainActivity : ServiceBindActivity() {
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         val appBarConfiguration = AppBarConfiguration(setOf(
-            R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications
+            R.id.navigation_home, R.id.navigation_contact, R.id.navigation_settings
         ))
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)

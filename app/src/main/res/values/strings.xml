@@ -1,6 +1,12 @@
 <resources>
     <string name="app_name">ImPttV2</string>
-    <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
+    <string name="title_home">首页</string>
+    <string name="title_contact">联系人</string>
+    <string name="title_settings">设置</string>
+    <string name="subtitle_phone_number">手机号</string>
+    <string name="hint_user_info">个人信息</string>
+    <string name="subtitle_call_number">呼号</string>
+    <string name="subtitle_name">姓名</string>
+    <string name="subtitle_autoplay">自动播放</string>
+    <string name="icon_desc">right</string>
 </resources>

@@ -17,4 +17,14 @@ class HomeViewModel(
         this.groups.value = groups
     }
 
+
+    init {
+        setImGroups(
+            arrayListOf(
+                Group("测试频道1"),
+                Group("测试频道2")
+            )
+        )
+    }
+
 }

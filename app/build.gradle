@@ -97,4 +97,16 @@ dependencies {
 
     //permission
     implementation 'com.permissionx.guolindev:permissionx:1.4.0'
+
+    /**
+     * glide
+     * @href https://github.com/bumptech/glide
+     */
+    implementation 'com.github.bumptech.glide:glide:4.8.0'
+    kapt 'com.github.bumptech.glide:compiler:4.8.0'
+
+    implementation ("com.github.bumptech.glide:recyclerview-integration:4.8.0") {
+        // Excludes the support library because it's already included by Glide.
+        transitive = false
+    }
 }

@@ -25,30 +25,6 @@ class HomeFragment : Fragment() {
         owner = { ViewModelOwner.from(this.requireActivity(), this.requireActivity()) }
     )
 
-    /**
-     * Called when a fragment is first attached to its context.
-     * [.onCreate] will be called after this.
-     */
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        println("HomeFragment.onAttach")
-    }
-
-    override fun onDetach() {
-        super.onDetach()
-        println("HomeFragment.onDetach")
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        println("HomeFragment.onDestroy")
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        println("HomeFragment.onDestroyView")
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         println("HomeFragment.onCreate")

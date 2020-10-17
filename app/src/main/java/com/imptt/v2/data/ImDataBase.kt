@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.imptt.v2.data.dao.ContactDao
 import com.imptt.v2.data.dao.MessageDao
 import com.imptt.v2.data.entity.Message
 import com.imptt.v2.utils.IContextSingleton
@@ -12,6 +13,8 @@ import com.imptt.v2.utils.IContextSingleton
 abstract class ImDataBase:RoomDatabase() {
 
     abstract fun getMessageDao():MessageDao
+
+    abstract fun getContactDao():ContactDao
 
     companion object: IContextSingleton<ImDataBase>(){
 
