@@ -38,6 +38,7 @@
             </TextView>
         </LinearLayout>
         <androidx.appcompat.widget.AppCompatCheckBox
+            android:button="@drawable/ic_selector_speaker"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
         <ImageView
