@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    app:startDestination="@id/splashFragment"
+    android:id="@+id/host_nav_graph.xml">
+    <fragment
+        android:id="@+id/splashFragment"
+        android:name="com.imptt.v2.view.splash.SplashFragment"
+        android:label="闪屏页面"
+        tools:layout="@layout/fragment_splash">
+        <action
+            android:id="@+id/action_splashFragment_to_mainActivity"
+            app:destination="@id/mainFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/mainFragment"
+        android:name="com.imptt.v2.view.main.MainFragment"
+        android:label="首页"
+        tools:layout="@layout/fragment_main"
+        >
+        <action
+            android:id="@+id/action_mainFragment_to_groupFragment"
+            app:destination="@id/groupFragment"
+            app:enterAnim="@android:anim/slide_in_left"
+            app:exitAnim="@android:anim/slide_out_right"
+            app:popEnterAnim="@android:anim/slide_in_left"
+            app:popExitAnim="@android:anim/slide_out_right" />
+    </fragment>
+    <fragment
+        android:id="@+id/groupFragment"
+        android:name="com.imptt.v2.view.group.GroupFragment"
+        android:label="频道"
+        tools:layout="@layout/fragment_group"
+        >
+        <argument
+            android:name="groupId"
+            app:argType="string"
+            app:nullable="true"
+            >
+        </argument>
+    </fragment>
+    <fragment
+        android:id="@+id/groupSettingsFragment"
+        android:name="com.imptt.v2.view.group.GroupSettingsFragment"
+        android:label="频道"
+        tools:layout="@layout/fragment_group_settings"
+        >
+        <argument
+            android:name="groupId"
+            app:argType="string"
+            app:nullable="true"
+            >
+        </argument>
+    </fragment>
+</navigation>

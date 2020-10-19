@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <stroke android:color="@color/gray_not_enabled" android:width="1dp" android:dashWidth="4dp" android:dashGap="3dp">
+            </stroke>
+            <corners android:radius="5dp"/>
+        </shape>
+    </item>
+    <item>
+        <bitmap android:src="@mipmap/plus" android:mipMap="true" android:tint="@color/gray_not_enabled"/>
+    </item>
+</layer-list>

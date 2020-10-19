@@ -10,9 +10,7 @@ import com.imptt.v2.data.dao.MessageDao
 import com.imptt.v2.data.entity.Message
 import com.imptt.v2.data.model.UserInfo
 import com.imptt.v2.data.repo.ImRepository
-import com.imptt.v2.vm.ContactViewModel
-import com.imptt.v2.vm.HomeViewModel
-import com.imptt.v2.vm.SettingsViewModel
+import com.imptt.v2.vm.*
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.WebSocket
@@ -163,5 +161,13 @@ var viewModule = module {
 
     viewModel {
         SettingsViewModel()
+    }
+
+    viewModel {
+        GroupViewModel()
+    }
+
+    viewModel {
+        GroupSettingsViewModel()
     }
 }

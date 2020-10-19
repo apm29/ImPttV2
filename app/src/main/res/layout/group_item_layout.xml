@@ -10,6 +10,12 @@
         android:layout_width="match_parent"
         android:gravity="center"
         android:layout_height="110dp" android:padding="18dp">
+        <ImageView
+            android:id="@+id/imageViewGroupType"
+            android:src="@mipmap/group_chat"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:contentDescription="@string/icon_desc" />
         <LinearLayout
             android:layout_weight="1"
             android:layout_width="wrap_content"
@@ -40,12 +46,17 @@
         <androidx.appcompat.widget.AppCompatCheckBox
             android:button="@drawable/ic_selector_speaker"
             android:layout_width="wrap_content"
+            android:layout_marginHorizontal="6dp"
+            android:layout_height="wrap_content"/>
+        <androidx.appcompat.widget.AppCompatCheckBox
+            android:button="@drawable/ic_selector_volume"
+            android:layout_width="wrap_content"
+            android:layout_marginHorizontal="6dp"
             android:layout_height="wrap_content"/>
         <ImageView
-            android:src="@android:drawable/ic_find_next_holo_light"
-            android:rotation="270"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:src="@mipmap/chevronright"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:contentDescription="@string/icon_desc" />
     </LinearLayout>
 </androidx.cardview.widget.CardView>

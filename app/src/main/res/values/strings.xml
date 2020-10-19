@@ -9,4 +9,13 @@
     <string name="subtitle_name">姓名</string>
     <string name="subtitle_autoplay">自动播放</string>
     <string name="icon_desc">right</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="settings">设置</string>
+    <string name="hint_group_info">频道信息</string>
+    <string name="subtitle_group_name">频道名称</string>
+    <string name="subtitle_mute_group">不接收群消息</string>
+    <string name="subtitle_pin_group">置顶本群</string>
+    <string name="title_dismiss_group">解散频道</string>
+    <string name="title_leave_group">退出频道</string>
+    <string name="title_group_members">频道成员</string>
 </resources>

@@ -7,6 +7,8 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.imptt.v2.R
 import com.imptt.v2.core.websocket.Group
+import java.util.*
+import kotlin.collections.ArrayList
 
 /**
  *  author : apm29[ciih]
@@ -15,7 +17,8 @@ import com.imptt.v2.core.websocket.Group
  */
 class GroupListAdapter constructor(
     private var list: ArrayList<Group>,
-    private val layoutInflater: LayoutInflater
+    private val layoutInflater: LayoutInflater,
+    private val onItemRoute:((Group,View)->Unit)? = null
 ) : RecyclerView.Adapter<GroupListAdapter.VH>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
@@ -26,6 +29,10 @@ class GroupListAdapter constructor(
 
     override fun onBindViewHolder(holder: VH, position: Int) {
         holder.textViewGroupName.text = list[position].groupId
+        holder.textViewGroupUserCount.text = "${Random().nextInt(100)}人"
+        holder.itemView.setOnClickListener {
+            onItemRoute?.invoke(list[position],it)
+        }
     }
 
 
@@ -39,6 +46,7 @@ class GroupListAdapter constructor(
     }
     class VH(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val textViewGroupName:TextView = itemView.findViewById(R.id.textViewGroupName)
+        val textViewGroupUserCount:TextView = itemView.findViewById(R.id.textViewGroupUserCount)
     }
 }
 

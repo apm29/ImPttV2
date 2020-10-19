@@ -24,10 +24,13 @@
         android:fullBackupContent="true"
         tools:ignore="UnusedAttribute">
         <activity
-            android:name=".view.main.MainActivity"
-            android:label="@string/app_name">
+            android:name=".view.HostActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:launchMode="singleTask"
+            android:theme="@style/FullscreenTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>

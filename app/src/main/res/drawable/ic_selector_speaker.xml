@@ -1,12 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item   android:state_checked="true">
-        <bitmap android:src="@android:drawable/ic_lock_ringer_on_alpha" android:tint="#333">
-        </bitmap>
+    <item   android:state_checked="true" android:drawable="@drawable/layer_speaker_checked">
     </item>
-    <item >
-        <bitmap android:src="@android:drawable/ic_lock_ringer_on_alpha">
-        </bitmap>
+    <item android:drawable="@drawable/layer_speaker_unchecked">
     </item>
 
 </selector>

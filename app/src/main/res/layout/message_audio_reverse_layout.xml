@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:padding="12dp"
+    android:layout_height="wrap_content">
+    <TextView
+        android:id="@+id/textViewTime"
+        tools:text="2020-10-22 10:20"
+        android:layout_marginTop="12dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+    <ImageView
+        android:id="@+id/imageViewGroupIcon"
+        android:layout_width="65dp"
+        android:layout_height="65dp"
+        android:src="@mipmap/accountbox"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textViewTime"
+        android:contentDescription="@string/icon_desc" />
+    <TextView
+        android:id="@+id/textViewUserName"
+        tools:text="姓名XXX-单位XXX"
+        style="@style/TextAppearance.AppCompat.Subhead"
+        app:layout_constraintEnd_toStartOf="@id/imageViewGroupIcon"
+        app:layout_constraintTop_toTopOf="@id/imageViewGroupIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <LinearLayout
+        android:id="@+id/layoutMessageBody"
+        android:background="@drawable/bg_chat_me"
+        android:layout_width="wrap_content"
+        android:paddingStart="32dp"
+        android:paddingEnd="12dp"
+        android:paddingVertical="4dp"
+        android:layout_marginTop="6dp"
+        android:gravity="center_vertical"
+        app:layout_constraintEnd_toStartOf="@id/imageViewGroupIcon"
+        app:layout_constraintTop_toBottomOf="@id/textViewUserName"
+        android:layout_height="60dp">
+        <TextView
+            android:id="@+id/textViewDuration"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:maxWidth="260dp"
+            android:layout_weight="1"
+            android:paddingVertical="12dp"
+            tools:text="12s" />
+        <ImageView
+            android:src="@mipmap/volumehigh"
+            android:layout_width="wrap_content"
+            android:rotation="180"
+            app:tint="@color/white_foreground"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="12dp"
+            android:contentDescription="@string/icon_desc" />
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
