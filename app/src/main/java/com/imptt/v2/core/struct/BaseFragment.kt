@@ -3,6 +3,7 @@ package com.imptt.v2.core.struct
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,17 +12,26 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
+import androidx.navigation.ui.setupWithNavController
 import androidx.transition.*
 import com.imptt.v2.R
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlin.coroutines.CoroutineContext
 
-abstract class BaseFragment : Fragment() {
+abstract class BaseFragment : Fragment() ,CoroutineScope {
+
+    override val coroutineContext: CoroutineContext
+        get() = Dispatchers.Main
 
     val tagFragment: String
         get() = this::class.java.simpleName
 
     open val showToolBar: Boolean = true
     open val useTransitions: Boolean = true
+    open val showBackArrow: Boolean = true
     val mHandler: Handler = Handler(Looper.getMainLooper())
 
     override fun onCreateView(
@@ -42,8 +52,10 @@ abstract class BaseFragment : Fragment() {
                 val toolBar = view.findViewById<Toolbar>(R.id.toolBar)
                 if (toolBar != null) {
                     activity.setSupportActionBar(toolBar)
-                    activity.supportActionBar?.setDisplayHomeAsUpEnabled(true)
-                    NavigationUI.setupWithNavController(toolBar, findNavController())
+                    activity.supportActionBar?.setDisplayHomeAsUpEnabled(showBackArrow)
+                    val appBarConfiguration = AppBarConfiguration( findNavController().graph)
+                    NavigationUI.setupWithNavController(toolBar, findNavController(),appBarConfiguration)
+
                 }
             }
         }
@@ -52,7 +64,7 @@ abstract class BaseFragment : Fragment() {
 
     abstract fun setupViews(view: View, savedInstanceState: Bundle?)
 
-    fun hideToolBarArrow() {
+    private fun hideToolBarArrow() {
         val activity = requireActivity()
         if (activity is AppCompatActivity) {
             activity.supportActionBar?.setDisplayHomeAsUpEnabled(false)
@@ -83,14 +95,14 @@ abstract class BaseFragment : Fragment() {
 
     protected open fun setTransitions() {
         setSharedElementTransitions()
-        val transitionSet = TransitionSet()
-        transitionSet.ordering = TransitionSet.ORDERING_TOGETHER
-        transitionSet.addTransition(Explode().apply { this.duration = duration })
-        transitionSet.addTransition(ChangeBounds().apply { this.duration = duration })
-        enterTransition = transitionSet
-        exitTransition = transitionSet
-        reenterTransition = transitionSet
-        returnTransition = transitionSet
+//        val transitionSet = TransitionSet()
+//        transitionSet.ordering = TransitionSet.ORDERING_TOGETHER
+//        transitionSet.addTransition(Explode().apply { this.duration = duration })
+//        transitionSet.addTransition(ChangeBounds().apply { this.duration = duration })
+        enterTransition = Slide(Gravity.END).apply { this.mode = Slide.MODE_IN }
+        exitTransition = Slide(Gravity.START).apply { this.mode = Slide.MODE_OUT}
+        reenterTransition = Slide(Gravity.START).apply { this.mode = Slide.MODE_IN }
+        returnTransition = Slide(Gravity.END).apply { this.mode = Slide.MODE_OUT }
     }
 
     protected open fun setSharedElementTransitions(duration: Long = 500) {

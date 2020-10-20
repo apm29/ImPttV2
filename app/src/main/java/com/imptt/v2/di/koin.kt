@@ -170,4 +170,12 @@ var viewModule = module {
     viewModel {
         GroupSettingsViewModel()
     }
+
+    viewModel {
+        GroupUsersViewModel()
+    }
+
+    viewModel {
+        UserInfoViewModel()
+    }
 }

@@ -30,10 +30,14 @@ class MessageListAdapter constructor(
     }
 
     override fun getItemViewType(position: Int): Int {
-        if(position == messages.size){
+        if(position == 0){
             return TYPE_FOOTER
         }
-        return  messages[position].contentType.type
+        //倒序取消息
+        //映射关系:
+        //     MSG1 MSG2 MSG3 MSG4 FOOTER
+        //     4    3    2    1    0
+        return  messages[messages.size-position].contentType.type
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {

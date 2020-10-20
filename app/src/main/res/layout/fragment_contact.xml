@@ -1,32 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <include layout="@layout/toolbar_layout"/>
+    <include layout="@layout/toolbar_layout" />
+
     <androidx.constraintlayout.widget.ConstraintLayout
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
         tools:context=".view.main.ContactFragment">
+
         <androidx.appcompat.widget.SearchView
             android:id="@+id/contactSearch"
-            android:background="@drawable/search_bg"
             android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/search_bg"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:layout_height="50dp"/>
+            app:layout_constraintTop_toTopOf="parent" />
+
         <ExpandableListView
             android:id="@+id/expandableListView"
-            android:layout_width="0dp"
-            tools:listitem="@layout/group_item_layout"
+            android:layout_width="match_parent"
             android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/contactSearch" />
+            app:layout_constraintTop_toBottomOf="@id/contactSearch"
+            tools:listitem="@layout/contact_group_layout" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

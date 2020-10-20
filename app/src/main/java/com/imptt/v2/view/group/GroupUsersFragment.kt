@@ -9,38 +9,28 @@ import com.imptt.v2.utils.navigate
 import com.imptt.v2.utils.observe
 import com.imptt.v2.view.adapter.GroupUserGridAdapter
 import com.imptt.v2.view.user.UserInfoFragmentArgs
-import com.imptt.v2.vm.GroupSettingsViewModel
+import com.imptt.v2.vm.GroupUsersViewModel
 import kotlinx.android.synthetic.main.fragment_group_settings.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.lang.IllegalArgumentException
-import java.util.*
 
-/**
- *  author : ciih
- *  date : 2020/10/19 2:41 PM
- *  description :
- */
-class GroupSettingsFragment:BaseFragment() {
+class GroupUsersFragment : BaseFragment() {
 
-    private val groupSettingsViewModel:GroupSettingsViewModel by viewModel()
+    private val groupUserViewModel:GroupUsersViewModel by viewModel()
+
     private val groupId: String by lazy {
-        GroupSettingsFragmentArgs.fromBundle(requireArguments()).groupId
+        GroupUsersFragmentArgs.fromBundle(requireArguments()).groupId
             ?: throw IllegalArgumentException("群组id为空")
     }
+
     override fun setupViewLayout(savedInstanceState: Bundle?): Int {
-        return R.layout.fragment_group_settings
+        return R.layout.fragment_group_users
     }
 
     override fun setupViews(view: View, savedInstanceState: Bundle?) {
-        observe(groupSettingsViewModel.users){
-            initialGrid(it)
-        }
         setToolbarTitle(groupId)
-        editTextGroupName.setText(groupId)
-        imageViewGroupIcon.setImageResource(R.mipmap.ic_launcher)
-        textViewGroupUserCount.text = "群组成员${Random().nextInt(99)}人"
-        layoutGroupUsersDetail.setOnClickListener {
-            navigate(R.id.groupUsersFragment,GroupUsersFragmentArgs.Builder(groupId).build().toBundle())
+        observe(groupUserViewModel.users){
+            initialGrid(it)
         }
     }
 
@@ -53,6 +43,6 @@ class GroupSettingsFragment:BaseFragment() {
     }
 
     private fun onGroupUserClicked(user: UserInfo, view: View) {
-        navigate(R.id.action_groupSettingsFragment_to_userInfoFragment,UserInfoFragmentArgs.Builder(user.userId).build().toBundle())
+        navigate(R.id.action_groupUsersFragment_to_userInfoFragment, UserInfoFragmentArgs.Builder(user.userId).build().toBundle())
     }
 }

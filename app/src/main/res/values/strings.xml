@@ -18,4 +18,9 @@
     <string name="title_dismiss_group">解散频道</string>
     <string name="title_leave_group">退出频道</string>
     <string name="title_group_members">频道成员</string>
+    <string name="subtitle_user_call_number">用户呼号</string>
+    <string name="subtitle_mute_user">禁言</string>
+    <string name="subtitle_user_usage_freq">使用频率</string>
+    <string name="add">添加</string>
+    <string name="home">首页</string>
 </resources>

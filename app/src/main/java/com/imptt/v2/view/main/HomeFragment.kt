@@ -1,19 +1,17 @@
 package com.imptt.v2.view.main
 
-import android.content.Context
 import android.os.Bundle
-import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.Toast
-import androidx.fragment.app.Fragment
-import androidx.navigation.Navigation
-import androidx.navigation.findNavController
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.imptt.v2.R
-import com.imptt.v2.core.messenger.connections.*
+import com.imptt.v2.core.messenger.connections.MESSAGE_DATA_KEY_GROUP_LIST
+import com.imptt.v2.core.messenger.connections.MESSAGE_TYPE_GROUP_LIST
 import com.imptt.v2.core.messenger.view.ViewMessenger
-import com.imptt.v2.core.struct.BaseFragment
+import com.imptt.v2.core.struct.BaseNestedFragment
 import com.imptt.v2.core.websocket.Group
 import com.imptt.v2.utils.navigate
 import com.imptt.v2.utils.observe
@@ -24,11 +22,15 @@ import kotlinx.android.synthetic.main.fragment_home.*
 import org.koin.androidx.viewmodel.ViewModelOwner
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class HomeFragment : BaseFragment() {
+class HomeFragment : BaseNestedFragment() {
 
     private val homeViewModel: HomeViewModel by viewModel(
         owner = { ViewModelOwner.from(this.requireActivity(), this.requireActivity()) }
     )
+
+    override fun setupViewLayout(savedInstanceState: Bundle?): Int {
+        return R.layout.fragment_home
+    }
 
     override fun setupViews(view: View, savedInstanceState: Bundle?) {
 
@@ -44,11 +46,11 @@ class HomeFragment : BaseFragment() {
         observe(homeViewModel.groups) {
             initialList(it)
         }
+
+        println((requireActivity() as AppCompatActivity).supportActionBar?.title)
+        setToolbarTitle("首页")
     }
 
-    override fun setupViewLayout(savedInstanceState: Bundle?): Int {
-        return R.layout.fragment_home
-    }
 
     private fun initialList(groups: ArrayList<Group>) {
         recyclerViewGroupList.layoutManager = LinearLayoutManager(requireContext())
@@ -61,8 +63,12 @@ class HomeFragment : BaseFragment() {
 
     private fun onGroupRoute(group: Group, view: View) {
         navigate(
-            R.id.groupFragment,
+            R.id.action_mainFragment_to_groupFragment,
             GroupFragmentArgs.Builder(group.groupId).build().toBundle()
         )
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.home_menu,menu)
     }
 }

@@ -13,6 +13,7 @@ import com.imptt.v2.data.model.message.Message
 import com.imptt.v2.utils.navigate
 import com.imptt.v2.utils.observe
 import com.imptt.v2.view.adapter.MessageListAdapter
+import com.imptt.v2.view.user.UserInfoFragmentArgs
 import com.imptt.v2.vm.GroupViewModel
 import com.imptt.v2.widget.PttButton
 import kotlinx.android.synthetic.main.fragment_group.*
@@ -56,7 +57,7 @@ class GroupFragment : BaseFragment() {
     }
 
     private fun initialList(messages: ArrayList<Message>) {
-        recyclerViewMessages.layoutManager = LinearLayoutManager(requireContext())
+        recyclerViewMessages.layoutManager = LinearLayoutManager(requireContext(),LinearLayoutManager.VERTICAL,true)
         if (recyclerViewMessages.adapter == null) {
             recyclerViewMessages.adapter =
                 MessageListAdapter(messages, layoutInflater, ::onMessageClicked,::onUserClicked)
@@ -70,7 +71,7 @@ class GroupFragment : BaseFragment() {
     }
 
     private fun onUserClicked(message: Message, view: View) {
-
+        navigate(R.id.userInfoFragment, UserInfoFragmentArgs.Builder(message.fromId).build().toBundle())
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -81,7 +82,7 @@ class GroupFragment : BaseFragment() {
         when (item.itemId) {
             R.id.settings -> {
                 navigate(
-                    R.id.groupSettingsFragment,
+                    R.id.action_groupFragment_to_groupSettingsFragment,
                     GroupSettingsFragmentArgs.Builder(
                         groupId
                     ).build().toBundle()

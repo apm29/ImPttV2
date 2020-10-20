@@ -20,6 +20,6 @@ fun <T> Fragment.observe(data:LiveData<T>,observer: Observer<T>){
 fun Fragment.navigate(targetId:Int, args:Bundle? = null){
     requireActivity().findNavController(R.id.app_host_fragment).navigate(
         targetId,
-        args
+        args,
     )
 }

@@ -2,17 +2,9 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    app:startDestination="@id/splashFragment"
+    app:startDestination="@id/mainFragment"
     android:id="@+id/host_nav_graph.xml">
-    <fragment
-        android:id="@+id/splashFragment"
-        android:name="com.imptt.v2.view.splash.SplashFragment"
-        android:label="闪屏页面"
-        tools:layout="@layout/fragment_splash">
-        <action
-            android:id="@+id/action_splashFragment_to_mainActivity"
-            app:destination="@id/mainFragment" />
-    </fragment>
+
     <fragment
         android:id="@+id/mainFragment"
         android:name="com.imptt.v2.view.main.MainFragment"
@@ -39,15 +31,56 @@
             app:nullable="true"
             >
         </argument>
+        <action
+            android:id="@+id/action_groupFragment_to_groupSettingsFragment"
+            app:destination="@id/groupSettingsFragment" />
+        <action
+            android:id="@+id/action_groupFragment_to_userInfoFragment"
+            app:destination="@id/userInfoFragment" />
     </fragment>
     <fragment
         android:id="@+id/groupSettingsFragment"
         android:name="com.imptt.v2.view.group.GroupSettingsFragment"
-        android:label="频道"
+        android:label="频道设置"
         tools:layout="@layout/fragment_group_settings"
         >
         <argument
             android:name="groupId"
+            app:argType="string"
+            app:nullable="true"
+            >
+        </argument>
+        <action
+            android:id="@+id/action_groupSettingsFragment_to_groupUsersFragment"
+            app:destination="@id/groupUsersFragment" />
+        <action
+            android:id="@+id/action_groupSettingsFragment_to_userInfoFragment"
+            app:destination="@id/userInfoFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/groupUsersFragment"
+        android:name="com.imptt.v2.view.group.GroupUsersFragment"
+        android:label="群组用户"
+        tools:layout="@layout/fragment_group_users"
+        >
+        <argument
+            android:name="groupId"
+            app:argType="string"
+            app:nullable="true"
+            >
+        </argument>
+        <action
+            android:id="@+id/action_groupUsersFragment_to_userInfoFragment"
+            app:destination="@id/userInfoFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/userInfoFragment"
+        android:name="com.imptt.v2.view.user.UserInfoFragment"
+        android:label="用户详情"
+        tools:layout="@layout/fragment_user_info"
+        >
+        <argument
+            android:name="userId"
             app:argType="string"
             app:nullable="true"
             >
