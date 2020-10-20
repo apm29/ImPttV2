@@ -18,6 +18,9 @@
             app:exitAnim="@android:anim/slide_out_right"
             app:popEnterAnim="@android:anim/slide_in_left"
             app:popExitAnim="@android:anim/slide_out_right" />
+        <action
+            android:id="@+id/action_mainFragment_to_editGroupFragment"
+            app:destination="@id/editGroupFragment" />
     </fragment>
     <fragment
         android:id="@+id/groupFragment"
@@ -56,6 +59,9 @@
         <action
             android:id="@+id/action_groupSettingsFragment_to_userInfoFragment"
             app:destination="@id/userInfoFragment" />
+        <action
+            android:id="@+id/action_groupSettingsFragment_to_editGroupFragment"
+            app:destination="@id/editGroupFragment" />
     </fragment>
     <fragment
         android:id="@+id/groupUsersFragment"
@@ -83,6 +89,21 @@
             android:name="userId"
             app:argType="string"
             app:nullable="true"
+            >
+        </argument>
+    </fragment>
+
+    <fragment
+        android:id="@+id/editGroupFragment"
+        android:name="com.imptt.v2.view.group.EditGroupFragment"
+        android:label="编辑群组"
+        tools:layout="@layout/fragment_edit_group"
+        >
+        <argument
+            android:name="groupId"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="@null"
             >
         </argument>
     </fragment>

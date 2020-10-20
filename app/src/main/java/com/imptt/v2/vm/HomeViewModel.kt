@@ -4,7 +4,7 @@ package com.imptt.v2.vm
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.imptt.v2.core.websocket.Group
+import com.imptt.v2.data.entity.Group
 import com.imptt.v2.data.repo.ImRepository
 
 class HomeViewModel(
@@ -15,19 +15,12 @@ class HomeViewModel(
 
     val groups: LiveData<ArrayList<Group>> = _groups
 
-
-    fun setImGroups(groups:ArrayList<Group>){
-        this._groups.value = groups
+    suspend fun loadGroups(){
+        _groups.value = ArrayList(imRepository.getGroups())
     }
 
+    fun setImGroups(groups: java.util.ArrayList<com.imptt.v2.core.websocket.Group>) {
 
-    init {
-        setImGroups(
-            arrayListOf(
-                Group("测试频道1"),
-                Group("测试频道2")
-            )
-        )
     }
 
 }

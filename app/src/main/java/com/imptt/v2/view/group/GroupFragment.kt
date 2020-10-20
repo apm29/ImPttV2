@@ -17,6 +17,7 @@ import com.imptt.v2.view.user.UserInfoFragmentArgs
 import com.imptt.v2.vm.GroupViewModel
 import com.imptt.v2.widget.PttButton
 import kotlinx.android.synthetic.main.fragment_group.*
+import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.lang.IllegalArgumentException
 import java.util.ArrayList
@@ -50,9 +51,15 @@ class GroupFragment : BaseFragment() {
             }
         }
         setHasOptionsMenu(true)
-        setToolbarTitle(groupId)
+
         observe(groupViewModel.messages) {
             initialList(it)
+        }
+        observe(groupViewModel.current){
+            setToolbarTitle(it.groupName)
+        }
+        launch {
+            groupViewModel.loadGroupInfo(groupId)
         }
     }
 

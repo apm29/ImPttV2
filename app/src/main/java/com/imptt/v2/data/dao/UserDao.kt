@@ -8,6 +8,6 @@ import androidx.room.Dao
  *  description :
  */
 @Dao
-interface ContactDao {
+interface UserDao {
 
 }

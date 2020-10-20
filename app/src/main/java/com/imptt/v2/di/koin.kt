@@ -1,13 +1,9 @@
 package com.imptt.v2.di
 
-import android.content.Context
-import androidx.lifecycle.LiveData
 import com.google.gson.GsonBuilder
 import com.imptt.v2.core.websocket.WebSocketConnection
 import com.imptt.v2.data.ImDataBase
 import com.imptt.v2.data.api.SignalServerApi
-import com.imptt.v2.data.dao.MessageDao
-import com.imptt.v2.data.entity.Message
 import com.imptt.v2.data.model.UserInfo
 import com.imptt.v2.data.repo.ImRepository
 import com.imptt.v2.vm.*
@@ -16,8 +12,6 @@ import okhttp3.Request
 import okhttp3.WebSocket
 import okhttp3.WebSocketListener
 import okhttp3.logging.HttpLoggingInterceptor
-import org.koin.android.ext.koin.androidApplication
-import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
@@ -135,7 +129,7 @@ fun createServerApi(
 
 var viewModule = module {
 
-    single{
+    single {
         ImDataBase.getInstance(get())
     }
 
@@ -144,11 +138,15 @@ var viewModule = module {
     }
 
     single {
-        get<ImDataBase>().getContactDao()
+        get<ImDataBase>().getUserDao()
     }
 
     single {
-        ImRepository(get())
+        get<ImDataBase>().getGroupDao()
+    }
+
+    single {
+        ImRepository(get(), get(), get())
     }
 
     viewModel {
@@ -164,7 +162,7 @@ var viewModule = module {
     }
 
     viewModel {
-        GroupViewModel()
+        GroupViewModel(get())
     }
 
     viewModel {
@@ -177,5 +175,9 @@ var viewModule = module {
 
     viewModel {
         UserInfoViewModel()
+    }
+
+    viewModel {
+        EditGroupViewModel(get())
     }
 }

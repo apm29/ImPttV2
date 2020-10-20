@@ -9,11 +9,12 @@ import androidx.room.PrimaryKey
  *  date : 2020/10/17 10:27 AM
  *  description :
  */
-@Entity(tableName = "im_contact")
-data class Contact(
+@Entity(tableName = "im_user")
+data class User(
     @field:PrimaryKey
     @field:ColumnInfo
     val id:Long? = null,
-    val group:String? = null,
+
+    @field:ColumnInfo
     val name:String? = null,
 )

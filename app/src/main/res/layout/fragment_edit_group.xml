@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <include layout="@layout/toolbar_layout" />
+
+    <androidx.core.widget.NestedScrollView
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <LinearLayout
+            app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingTop="16dp"
+            android:orientation="vertical"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:gravity="center_horizontal"
+            tools:context=".view.main.SettingsFragment">
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_width="match_parent"
+                android:layout_height="60dp">
+                <TextView
+                    android:text="@string/subtitle_group_name"
+                    style="@style/TextAppearance.MaterialComponents.Subtitle1"
+                    android:layout_width="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:layout_height="wrap_content"/>
+                <androidx.appcompat.widget.AppCompatEditText
+                    android:id="@+id/editTextGroupName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/subtitle_group_name"
+                    android:paddingVertical="6dp"
+                    android:background="@null" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_width="match_parent"
+                android:layout_height="60dp">
+                <TextView
+                    android:text="@string/subtitle_group_icon"
+                    style="@style/TextAppearance.MaterialComponents.Subtitle1"
+                    android:layout_width="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:layout_height="wrap_content"/>
+                <com.imptt.v2.widget.EditableImageView
+                    android:id="@+id/imageViewGroupIcon"
+                    android:layout_width="60dp"
+                    tools:src="@mipmap/ic_launcher"
+                    android:layout_height="60dp"/>
+
+            </LinearLayout>
+            <View
+                android:background="#3333"
+                android:layout_marginVertical="6dp"
+                android:layout_width="match_parent"
+                android:layout_height="1px"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+                app:spanCount="4"
+                android:id="@+id/recyclerViewGroupMembers"
+                tools:itemCount="7"
+                tools:listitem="@layout/group_user_layout"
+                android:layout_width="match_parent"
+                android:layout_height="240dp"/>
+            <View
+                android:background="#3333"
+                android:layout_marginVertical="6dp"
+                android:layout_width="match_parent"
+                android:layout_height="1px"/>
+
+            <Button
+                android:id="@+id/buttonSaveGroup"
+                android:layout_marginTop="24dp"
+                style="@style/TextAppearance.AppCompat.Widget.Button.Colored"
+                android:background="@drawable/selector_btn_primary"
+                android:text="@string/title_create_group"
+                android:elevation="12dp"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"/>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

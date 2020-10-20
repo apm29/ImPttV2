@@ -8,5 +8,6 @@ import com.imptt.v2.data.entity.Message
 @Dao
 interface MessageDao {
     @Query("SELECT * FROM im_message")
-    fun getMessages():LiveData<List<Message>>
+    suspend fun getMessages():List<Message>
 }
+

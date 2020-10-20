@@ -11,6 +11,8 @@ import com.imptt.v2.view.adapter.GroupUserGridAdapter
 import com.imptt.v2.view.user.UserInfoFragmentArgs
 import com.imptt.v2.vm.GroupUsersViewModel
 import kotlinx.android.synthetic.main.fragment_group_settings.*
+import kotlinx.android.synthetic.main.fragment_group_settings.recyclerViewGroupMembers
+import kotlinx.android.synthetic.main.fragment_group_users.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.lang.IllegalArgumentException
 

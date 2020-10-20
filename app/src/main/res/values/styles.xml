@@ -8,7 +8,10 @@
         <item name="colorAccent">@color/colorAccent</item>
         <!--api19-20 时 使用半透明状态栏 + fitSystemWindow 实现沉浸式-->
         <item name="android:windowTranslucentStatus">true</item>
+        <!--背景-->
         <item name="android:windowBackground">@drawable/layer_window_background</item>
+        <!--menu 文本颜色-->
+        <item name="android:actionMenuTextColor">@color/white_foreground</item>
     </style>
 
     <style name="FullscreenTheme" parent="AppTheme">

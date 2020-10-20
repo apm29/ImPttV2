@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.imptt.v2.R
-import com.imptt.v2.core.websocket.Group
+import com.imptt.v2.data.entity.Group
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -28,7 +28,7 @@ class GroupListAdapter constructor(
 
 
     override fun onBindViewHolder(holder: VH, position: Int) {
-        holder.textViewGroupName.text = list[position].groupId
+        holder.textViewGroupName.text = list[position].groupName
         holder.textViewGroupUserCount.text = "${Random().nextInt(100)}人"
         holder.itemView.setOnClickListener {
             onItemRoute?.invoke(list[position],it)

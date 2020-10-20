@@ -4,17 +4,22 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.imptt.v2.data.dao.ContactDao
+import com.imptt.v2.data.dao.UserDao
+import com.imptt.v2.data.dao.GroupDao
 import com.imptt.v2.data.dao.MessageDao
+import com.imptt.v2.data.entity.Group
 import com.imptt.v2.data.entity.Message
+import com.imptt.v2.data.entity.User
 import com.imptt.v2.utils.IContextSingleton
 
-@Database(entities = [Message::class],version = 1,exportSchema = false)
+@Database(entities = [Message::class,User::class,Group::class],version = 2,exportSchema = false)
 abstract class ImDataBase:RoomDatabase() {
 
     abstract fun getMessageDao():MessageDao
 
-    abstract fun getContactDao():ContactDao
+    abstract fun getUserDao():UserDao
+
+    abstract fun getGroupDao():GroupDao
 
     companion object: IContextSingleton<ImDataBase>(){
 

@@ -23,4 +23,16 @@
     <string name="subtitle_user_usage_freq">使用频率</string>
     <string name="add">添加</string>
     <string name="home">首页</string>
+    <string name="save">保存</string>
+    <string name="subtitle_group_icon">群组图标</string>
+    <string name="title_create_group">创建群组</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="add_widget">Add widget</string>
+    <string name="cancel">取消</string>
+    <string name="title_take_photo">拍照</string>
+    <string name="title_from_gallery">从手机相册选择</string>
+    <string-array name="option_photo">
+        <item>拍照</item>
+        <item>从手机相册选择</item>
+    </string-array>
 </resources>
