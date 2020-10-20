@@ -8,7 +8,7 @@ import androidx.room.PrimaryKey
 data class Group(
     @field:PrimaryKey(autoGenerate = true)
     @field:ColumnInfo
-    val id: Long? = 0,
+    val id: Long? = null,
 
     @field:ColumnInfo(name = "group_name")
     var groupName: String? = null,

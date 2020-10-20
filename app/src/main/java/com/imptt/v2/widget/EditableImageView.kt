@@ -98,6 +98,7 @@ class EditableImageView @JvmOverloads constructor(
 
     private fun onResult(uri: MutableList<Uri>, path: MutableList<String>) {
         if (uri.isNotEmpty()) {
+            imageUrl = path.first()
             GlideApp.with(this)
                 .load(uri.first())
                 .transform(RoundedCorners(15))
