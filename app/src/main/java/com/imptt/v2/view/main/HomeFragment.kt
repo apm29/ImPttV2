@@ -13,7 +13,7 @@ import com.imptt.v2.core.messenger.connections.MESSAGE_DATA_KEY_GROUP_LIST
 import com.imptt.v2.core.messenger.connections.MESSAGE_TYPE_GROUP_LIST
 import com.imptt.v2.core.messenger.view.ViewMessenger
 import com.imptt.v2.core.struct.BaseNestedFragment
-import com.imptt.v2.data.entity.Group
+import com.imptt.v2.data.entity.GroupWithUsers
 import com.imptt.v2.utils.navigate
 import com.imptt.v2.utils.observe
 import com.imptt.v2.view.adapter.GroupListAdapter
@@ -65,7 +65,7 @@ class HomeFragment : BaseNestedFragment() {
     }
 
 
-    private fun initialList(groups: ArrayList<Group>) {
+    private fun initialList(groups: ArrayList<GroupWithUsers>) {
         recyclerViewGroupList.layoutManager = LinearLayoutManager(requireContext())
         if (recyclerViewGroupList.adapter == null) {
             recyclerViewGroupList.adapter = GroupListAdapter(groups, layoutInflater, ::onGroupRoute)
@@ -74,10 +74,10 @@ class HomeFragment : BaseNestedFragment() {
         }
     }
 
-    private fun onGroupRoute(group: Group, view: View) {
+    private fun onGroupRoute(groupWithUsers: GroupWithUsers, view: View) {
         navigate(
             R.id.action_mainFragment_to_groupFragment,
-            GroupFragmentArgs.Builder(group.id.toString()).build().toBundle()
+            GroupFragmentArgs.Builder(groupWithUsers.group.id.toString()).build().toBundle()
         )
     }
 

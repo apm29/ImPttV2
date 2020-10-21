@@ -146,7 +146,11 @@ var viewModule = module {
     }
 
     single {
-        ImRepository(get(), get(), get())
+        get<ImDataBase>().getGroupUserDao()
+    }
+
+    single {
+        ImRepository(get(), get(), get(),get())
     }
 
     viewModel {

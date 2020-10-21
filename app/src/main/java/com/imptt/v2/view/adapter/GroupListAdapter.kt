@@ -1,5 +1,6 @@
 package com.imptt.v2.view.adapter
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,6 +9,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.imptt.v2.R
 import com.imptt.v2.data.entity.Group
+import com.imptt.v2.data.entity.GroupWithUsers
 import com.imptt.v2.di.GlideApp
 import java.util.*
 import kotlin.collections.ArrayList
@@ -18,9 +20,9 @@ import kotlin.collections.ArrayList
  *  description :
  */
 class GroupListAdapter constructor(
-    private var list: ArrayList<Group>,
+    private var list: ArrayList<GroupWithUsers>,
     private val layoutInflater: LayoutInflater,
-    private val onItemRoute: ((Group, View) -> Unit)? = null
+    private val onItemRoute: ((GroupWithUsers, View) -> Unit)? = null
 ) : RecyclerView.Adapter<GroupListAdapter.VH>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
@@ -29,12 +31,13 @@ class GroupListAdapter constructor(
     }
 
 
+    @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: VH, position: Int) {
-        holder.textViewGroupName.text = list[position].groupName
-        holder.textViewGroupUserCount.text = "${Random().nextInt(100)}人"
-        if (!list[position].groupIcon.isNullOrBlank()) {
+        holder.textViewGroupName.text = list[position].group.groupName
+        holder.textViewGroupUserCount.text = "${list[position].users.size}人"
+        if (!list[position].group.groupIcon.isNullOrBlank()) {
             GlideApp.with(holder.imageViewGroupType)
-                .load(list[position].groupIcon)
+                .load(list[position].group.groupIcon)
                 .into(holder.imageViewGroupType)
         }
         holder.itemView.setOnClickListener {
@@ -47,7 +50,7 @@ class GroupListAdapter constructor(
         return list.size
     }
 
-    fun newList(groups: java.util.ArrayList<Group>) {
+    fun newList(groups: ArrayList<GroupWithUsers>) {
         this.list = groups
         notifyDataSetChanged()
     }
