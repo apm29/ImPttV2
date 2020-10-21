@@ -1,0 +1,5 @@
+<resources>
+    <declare-styleable name="EditableImageView">
+        <attr name="editable" format="boolean" />
+    </declare-styleable>
+</resources>

@@ -33,15 +33,36 @@ class EditableImageView @JvmOverloads constructor(
         const val REQUEST_CODE_CHOOSE = 1878
     }
 
+    private var mEditable:Boolean
+
     init {
-        if (drawable == null) {
+
+        val typedArray = context.obtainStyledAttributes(
+            attrs, R.styleable.EditableImageView, defStyleAttr, 0
+        )
+
+        mEditable = typedArray.getBoolean(R.styleable.EditableImageView_editable, true)
+
+        typedArray.recycle()
+        updateUi(context)
+    }
+
+    private fun updateUi(context: Context) {
+        if (drawable == null && mEditable) {
             setImageResource(R.drawable.layer_user_add)
         }
-        setOnClickListener {
-            doRequestPermissions {
-                showChooseDialog(context)
+        if (mEditable) {
+            setOnClickListener {
+                doRequestPermissions {
+                    showChooseDialog(context)
+                }
             }
         }
+    }
+
+    fun setEditable(editable:Boolean){
+        mEditable = editable
+        updateUi(context)
     }
 
     private fun doRequestPermissions(
