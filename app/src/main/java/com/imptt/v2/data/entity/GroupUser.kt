@@ -10,7 +10,7 @@ import androidx.room.*
 @Entity(
     tableName = "im_group_user",
     primaryKeys = ["group_id", "user_id"],
-    indices = [Index(value = ["group_id", "user_id"])]
+    indices = [Index("group_id"), Index("user_id")]
 )
 data class GroupUserCrossRef(
     @ColumnInfo(name = "group_id")
