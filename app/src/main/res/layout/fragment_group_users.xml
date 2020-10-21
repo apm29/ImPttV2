@@ -9,7 +9,7 @@
     <include layout="@layout/toolbar_layout"/>
     <androidx.appcompat.widget.SearchView
         android:id="@+id/contactSearch"
-        android:background="@drawable/search_bg"
+        android:background="@drawable/bg_search_bar"
         android:layout_width="match_parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
