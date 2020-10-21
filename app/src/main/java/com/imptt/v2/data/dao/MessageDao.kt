@@ -2,6 +2,7 @@ package com.imptt.v2.data.dao
 
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
+import androidx.room.Insert
 import androidx.room.Query
 import com.imptt.v2.data.entity.Message
 
@@ -9,5 +10,9 @@ import com.imptt.v2.data.entity.Message
 interface MessageDao {
     @Query("SELECT * FROM im_message")
     suspend fun getMessages():List<Message>
+
+    @Insert
+    suspend fun insertMessage(message: Message)
+
 }
 

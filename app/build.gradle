@@ -66,7 +66,11 @@ dependencies {
     kapt "androidx.room:room-compiler:$rootProject.roomVersion"
     implementation "androidx.room:room-runtime:$rootProject.roomVersion"
     implementation "androidx.room:room-ktx:$rootProject.roomVersion"
-    implementation 'com.amitshekhar.android:debug-db:1.0.4'
+    debugImplementation 'com.amitshekhar.android:debug-db:1.0.4'
+    //paging
+    implementation "androidx.paging:paging-runtime:$rootProject.pagingVersion" // For Kotlin use paging-runtime-ktx
+    // alternatively - without Android dependencies for testing
+    testImplementation "androidx.paging:paging-common:$rootProject.pagingVersion" // For Kotlin use paging-common-ktx
 
     //lifecycle扩展
     implementation "androidx.lifecycle:lifecycle-extensions:$rootProject.lifecycleVersion"
