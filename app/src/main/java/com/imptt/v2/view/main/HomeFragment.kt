@@ -104,8 +104,8 @@ class HomeFragment : BaseNestedFragment() {
     private fun onGroupRoute(channel: Channel, view: View) {
         launch {
             val service = requirePttService()
-            service.setListen(channel.id,true)
             service.enterChannel(channel.id)
+            service.setListen(channel.id,true)
             navigate(
                 R.id.action_mainFragment_to_groupFragment,
                 GroupFragmentArgs.Builder(channel.id.toString()).build().toBundle()
@@ -116,7 +116,7 @@ class HomeFragment : BaseNestedFragment() {
     private fun onCurrentChannelListenChange(channel: Channel, checked: Boolean, view: View) {
         launch {
             val service = requirePttService()
-            service.setListen(channel.id, checked)
+            service.setListen(channel.id, !service.isListen(channel.id))
         }
     }
 
