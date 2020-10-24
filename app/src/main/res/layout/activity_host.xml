@@ -1,15 +1,75 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".view.HostActivity">
     <!--所有fragment的根视图-->
-    <androidx.fragment.app.FragmentContainerView
+    <fragment
         android:id="@+id/app_host_fragment"
         android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:defaultNavHost="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         app:navGraph="@navigation/host_nav_graph" />
-</FrameLayout>
+
+    <LinearLayout
+        android:id="@+id/layoutVolume"
+        android:background="@drawable/bg_volume_rhythm"
+        android:layout_width="360dp"
+        android:visibility="gone"
+        android:paddingVertical="12dp"
+        android:orientation="vertical"
+        tools:visibility="visible"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" >
+        <com.imptt.apm29.widget.RhythmView
+            android:id="@+id/rhythmView"
+            android:layout_width="match_parent"
+            android:layout_height="180dp"
+            >
+        </com.imptt.apm29.widget.RhythmView>
+        <TextView
+            android:paddingHorizontal="12dp"
+            android:id="@+id/textViewCaller"
+            android:textColor="@color/white_foreground"
+            android:textSize="28sp"
+            android:textAlignment="center"
+            tools:text="正在讲话"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layoutState"
+        android:visibility="gone"
+        tools:visibility="visible"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:gravity="center"
+        android:background="#3333"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+        <ProgressBar
+            android:layout_marginBottom="12dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp"/>
+        <TextView
+            android:id="@+id/textViewState"
+            android:textSize="24sp"
+            tools:text="正在登录"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

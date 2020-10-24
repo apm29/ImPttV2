@@ -7,8 +7,10 @@ import com.imptt.v2.R
 import com.imptt.v2.core.struct.BaseFragment
 import com.imptt.v2.core.struct.BaseNestedFragment
 import com.imptt.v2.utils.observe
+import com.imptt.v2.utils.requirePttService
 import com.imptt.v2.vm.SettingsViewModel
 import kotlinx.android.synthetic.main.fragment_settings.*
+import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ViewModelOwner
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -33,5 +35,13 @@ class SettingsFragment : BaseNestedFragment() {
         }
 
         setToolbarTitle("设置")
+
+        launch {
+            val pttService = requirePttService()
+            val currentUser = pttService.currentUser
+            editTextName.setText("")
+            editTextGroupName.setText(currentUser.name)
+            editTextCallNumber.setText(currentUser.iId.toString())
+        }
     }
 }

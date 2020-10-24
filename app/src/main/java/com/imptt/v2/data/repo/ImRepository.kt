@@ -5,12 +5,14 @@ import com.imptt.v2.data.dao.GroupUserDao
 import com.imptt.v2.data.dao.MessageDao
 import com.imptt.v2.data.dao.UserDao
 import com.imptt.v2.data.entity.Group
+import com.imptt.v2.utils.LocalStorage
 
 class ImRepository constructor(
     private val messageDao: MessageDao,
     private val groupDao: GroupDao,
     private val groupUserDao: GroupUserDao,
-    private val userDao: UserDao
+    private val userDao: UserDao,
+    private val localStorage: LocalStorage
 ) {
     suspend fun getMessages() = messageDao.getMessages()
 
@@ -21,4 +23,5 @@ class ImRepository constructor(
     suspend fun addGroup(group:Group) =  groupDao.addGroup(group)
 
     suspend fun queryGroupById(id: String) = groupDao.queryGroupById(id.toLong())
+
 }

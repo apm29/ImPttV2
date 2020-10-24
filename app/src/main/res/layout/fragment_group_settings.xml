@@ -145,6 +145,7 @@
                 android:layout_marginTop="6dp"
                 android:text="@string/title_leave_group"
                 android:elevation="12dp"
+                android:layout_marginBottom="12dp"
                 style="@style/TextAppearance.AppCompat.Widget.Button.Colored"
                 android:background="@drawable/selector_btn_error"
                 android:layout_width="match_parent"

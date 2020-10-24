@@ -12,6 +12,9 @@
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
 
     <application
         android:name=".App"
@@ -53,6 +56,34 @@
             android:foregroundServiceType="location|mediaPlayback|mediaProjection|phoneCall"
             android:permission="@string/app_name"
             android:process=":ptt" />
+
+        <!-- AlarmAlert是被单呼时，本地弹窗 -->
+        <activity
+            android:name="com.kylindev.pttlib.view.AlarmAlert"
+            android:launchMode="singleInstance"
+            android:excludeFromRecents="true"
+            android:taskAffinity="com.imptt.v2"
+            android:theme="@android:style/Theme.Wallpaper.NoTitleBar"
+            android:configChanges="orientation|keyboardHidden|keyboard|navigation"
+            android:screenOrientation="portrait" />
+
+        <!-- 用于开机自启动 -->
+        <receiver android:name=".core.ptt.BootCompleteReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <receiver android:name="com.kylindev.pttlib.utils.AutoRestartServiceReceiver">
+            <intent-filter>
+                <action android:name="com.kylindev.pttlib.auto_restart_service" />
+            </intent-filter>
+        </receiver>
+        <!-- ptt功能主服务 -->
+        <service
+            android:name="com.kylindev.pttlib.service.InterpttService"
+            android:exported="true">
+        </service>
     </application>
 
 </manifest>

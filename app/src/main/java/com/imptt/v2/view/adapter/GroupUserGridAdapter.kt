@@ -7,13 +7,12 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.imptt.v2.R
-import com.imptt.v2.data.model.UserInfo
-import java.util.*
+import com.kylindev.pttlib.service.model.User
 
 class GroupUserGridAdapter(
-    private var users: ArrayList<UserInfo>,
+    private var users: MutableList<User>,
     private val layoutInflater: LayoutInflater,
-    private val onUserClick: ((UserInfo, View)->Unit)?=null,
+    private val onUserClick: ((User, View)->Unit)?=null,
     private val onAddClick: ((View)->Unit)?=null
 ) : RecyclerView.Adapter<GroupUserGridAdapter.VH>() {
 
@@ -45,11 +44,12 @@ class GroupUserGridAdapter(
 
     override fun onBindViewHolder(holder: VH, position: Int) {
         if(getItemViewType(position) != TYPE_ADD) {
+            val user = users[position]
             holder.itemView.setOnClickListener {
-                onUserClick?.invoke(users[position], it)
+                onUserClick?.invoke(user, it)
             }
-            holder.textViewUserName.text = "用户${users[position].userId}"
-            holder.textViewUserDesc.text = "3300xxxxx"
+            holder.textViewUserName.text = "用户${user.name}"
+            holder.textViewUserDesc.text = user.iId.toString()
         }else{
             holder.itemView.setOnClickListener {
                 onAddClick?.invoke(it)
@@ -62,7 +62,7 @@ class GroupUserGridAdapter(
         return users.size + 1
     }
 
-    fun newList(users: ArrayList<UserInfo>) {
+    fun newList(users: MutableList<User>) {
         this.users = users
         notifyDataSetChanged()
     }

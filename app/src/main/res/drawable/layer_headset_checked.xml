@@ -2,11 +2,11 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item>
         <shape android:shape="rectangle">
-            <size android:height="35dp" android:width="35dp"/>
+            <size android:height="32dp" android:width="32dp"/>
         </shape>
     </item>
     <item>
-        <bitmap android:src="@mipmap/microphoneoutline" android:mipMap="true" android:tint="@color/orange_warning">
+        <bitmap android:src="@mipmap/headset" android:mipMap="true" android:tint="@color/colorPrimary">
         </bitmap>
     </item>
 </layer-list>

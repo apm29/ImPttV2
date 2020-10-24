@@ -5,17 +5,20 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
-import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.imptt.v2.R
+import com.imptt.v2.core.ptt.PttObserver
 import com.imptt.v2.core.struct.BaseFragment
 import com.imptt.v2.data.model.message.Message
+import com.imptt.v2.utils.clamp
 import com.imptt.v2.utils.navigate
-import com.imptt.v2.utils.observe
+import com.imptt.v2.utils.registerObserverWithLifecycle
+import com.imptt.v2.utils.requirePttService
 import com.imptt.v2.view.adapter.MessageListAdapter
 import com.imptt.v2.view.user.UserInfoFragmentArgs
 import com.imptt.v2.vm.GroupViewModel
 import com.imptt.v2.widget.PttButton
+import com.kylindev.pttlib.service.model.User
 import kotlinx.android.synthetic.main.fragment_group.*
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -41,25 +44,24 @@ class GroupFragment : BaseFragment() {
     }
 
     override fun setupViews(view: View, savedInstanceState: Bundle?) {
-        buttonPtt.pttButtonState = object : PttButton.PttButtonState {
-            override fun onPressDown() {
-                super.onPressDown()
-            }
 
-            override fun onPressUp() {
-                super.onPressUp()
-            }
-        }
         setHasOptionsMenu(true)
 
-        observe(groupViewModel.messages) {
-            initialList(it)
-        }
-        observe(groupViewModel.current){
-            setToolbarTitle(it.groupName)
-        }
         launch {
-            groupViewModel.loadGroupInfo(groupId)
+            val pttService = requirePttService()
+            pttService.enterChannel(groupId.toInt())
+            buttonPtt.pttButtonState = object : PttButton.PttButtonState {
+                override fun onPressDown() {
+                    super.onPressDown()
+                    pttService.userPressDown()
+                }
+
+                override fun onPressUp() {
+                    super.onPressUp()
+                    pttService.userPressUp()
+                }
+            }
+            setToolbarTitle(pttService.getChannelByChanId(groupId.toInt()).name)
         }
     }
 

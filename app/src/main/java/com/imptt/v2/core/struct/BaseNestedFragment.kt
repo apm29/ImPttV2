@@ -16,13 +16,20 @@ import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
 import androidx.transition.*
 import com.imptt.v2.R
+import com.imptt.v2.utils.LocalStorage
 import com.imptt.v2.utils.findPrimaryNavController
+import com.imptt.v2.utils.log
 import com.imptt.v2.utils.observe
+import com.imptt.v2.view.HostActivity
+import com.kylindev.pttlib.service.InterpttService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
-abstract class BaseNestedFragment : Fragment() ,CoroutineScope {
+abstract class BaseNestedFragment : Fragment(), CoroutineScope {
 
     /**
      * The context of this scope.
@@ -34,10 +41,16 @@ abstract class BaseNestedFragment : Fragment() ,CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Main
 
-    private val tagFragment: String
+    val ioContext: CoroutineContext
+        get() = Dispatchers.IO
+
+    val tagFragment: String
         get() = this::class.java.simpleName
 
     val mHandler: Handler = Handler(Looper.getMainLooper())
+    val localStorage: LocalStorage by lazy {
+        LocalStorage.getInstance(requireContext())
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -63,6 +76,13 @@ abstract class BaseNestedFragment : Fragment() ,CoroutineScope {
     }
 
     abstract fun setupViews(view: View, savedInstanceState: Bundle?)
+
+
+    val mService: InterpttService?
+        get() {
+            val hostActivity = requireActivity() as HostActivity
+            return hostActivity.mService
+        }
 
 
     fun setToolbarTitle(title: String?) {
@@ -119,7 +139,8 @@ abstract class BaseNestedFragment : Fragment() ,CoroutineScope {
 
     //设置result,pop后前一fragment可以通过observeResult监听result
     protected fun <T> setResult(key: String, value: T, finish: Boolean = true): Boolean {
-        findPrimaryNavController().previousBackStackEntry?.savedStateHandle?.set(key, value)?:Log.e(tagFragment,"保存数据失败:key=$key,value=$value")
+        findPrimaryNavController().previousBackStackEntry?.savedStateHandle?.set(key, value)
+            ?: Log.e(tagFragment, "保存数据失败:key=$key,value=$value")
         return if (finish) findPrimaryNavController().popBackStack() else false
     }
 

@@ -6,6 +6,7 @@ import com.imptt.v2.data.ImDataBase
 import com.imptt.v2.data.api.SignalServerApi
 import com.imptt.v2.data.model.UserInfo
 import com.imptt.v2.data.repo.ImRepository
+import com.imptt.v2.utils.LocalStorage
 import com.imptt.v2.vm.*
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -26,6 +27,7 @@ import java.util.concurrent.TimeUnit
  */
 const val WebSocketRelated = "websocket-okhttpclient"
 const val HttpApiRelated = "http-okhttpclient"
+const val PttRelated = "ptt-okhttpclient"
 const val PrettyPrintGson = "pretty_print"
 const val ParserGson = "parser"
 
@@ -81,6 +83,7 @@ var serviceModule = module {
             get(named(HttpApiRelated))
         )
     }
+
 }
 
 fun createWebSocketRequest(userInfo: UserInfo): Request {
@@ -101,8 +104,20 @@ fun provideHttpOkHttpClient() = OkHttpClient.Builder()
     .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
     .build()
 
+fun providePttOkHttpClient() = OkHttpClient.Builder()
+    .connectTimeout(150000L, TimeUnit.MILLISECONDS)
+    .readTimeout(150000L, TimeUnit.MILLISECONDS)
+    .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
+    .build()
+
 fun provideWebSocketRetrofit(okHttpClient: OkHttpClient): Retrofit = Retrofit.Builder()
     .client(okHttpClient)
+    .addConverterFactory(GsonConverterFactory.create())
+    .build()
+
+fun providePttRetrofit(okHttpClient: OkHttpClient): Retrofit = Retrofit.Builder()
+    .client(okHttpClient)
+    .baseUrl("http://115.28.211.15/")
     .addConverterFactory(GsonConverterFactory.create())
     .build()
 
@@ -149,8 +164,12 @@ var viewModule = module {
         get<ImDataBase>().getGroupUserDao()
     }
 
+    single{
+        LocalStorage.getInstance(get())
+    }
+
     single {
-        ImRepository(get(), get(), get(),get())
+        ImRepository(get(), get(), get(),get(),get())
     }
 
     viewModel {

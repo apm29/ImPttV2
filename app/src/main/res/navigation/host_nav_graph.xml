@@ -2,15 +2,30 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    app:startDestination="@id/mainFragment"
-    android:id="@+id/host_nav_graph.xml">
+    android:id="@+id/host_nav_graph"
+    app:startDestination="@id/loginFragment">
+
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.imptt.v2.view.user.LoginFragment"
+        android:label="登录"
+        tools:layout="@layout/fragment_user_login">
+        <action
+            android:id="@+id/action_loginFragment_to_mainFragment"
+            app:destination="@id/mainFragment"
+            app:popUpToInclusive="true"
+            app:popUpTo="@id/host_nav_graph"
+            app:enterAnim="@android:anim/slide_in_left"
+            app:exitAnim="@android:anim/slide_out_right"
+            app:popEnterAnim="@android:anim/slide_in_left"
+            app:popExitAnim="@android:anim/slide_out_right" />
+    </fragment>
 
     <fragment
         android:id="@+id/mainFragment"
         android:name="com.imptt.v2.view.main.MainFragment"
         android:label="首页"
-        tools:layout="@layout/fragment_main"
-        >
+        tools:layout="@layout/fragment_main">
         <action
             android:id="@+id/action_mainFragment_to_groupFragment"
             app:destination="@id/groupFragment"
@@ -26,14 +41,11 @@
         android:id="@+id/groupFragment"
         android:name="com.imptt.v2.view.group.GroupFragment"
         android:label="频道"
-        tools:layout="@layout/fragment_group"
-        >
+        tools:layout="@layout/fragment_group">
         <argument
             android:name="groupId"
             app:argType="string"
-            app:nullable="true"
-            >
-        </argument>
+            app:nullable="true"></argument>
         <action
             android:id="@+id/action_groupFragment_to_groupSettingsFragment"
             app:destination="@id/groupSettingsFragment" />
@@ -45,14 +57,11 @@
         android:id="@+id/groupSettingsFragment"
         android:name="com.imptt.v2.view.group.GroupSettingsFragment"
         android:label="频道设置"
-        tools:layout="@layout/fragment_group_settings"
-        >
+        tools:layout="@layout/fragment_group_settings">
         <argument
             android:name="groupId"
             app:argType="string"
-            app:nullable="true"
-            >
-        </argument>
+            app:nullable="true"></argument>
         <action
             android:id="@+id/action_groupSettingsFragment_to_groupUsersFragment"
             app:destination="@id/groupUsersFragment" />
@@ -67,14 +76,11 @@
         android:id="@+id/groupUsersFragment"
         android:name="com.imptt.v2.view.group.GroupUsersFragment"
         android:label="群组用户"
-        tools:layout="@layout/fragment_group_users"
-        >
+        tools:layout="@layout/fragment_group_users">
         <argument
             android:name="groupId"
             app:argType="string"
-            app:nullable="true"
-            >
-        </argument>
+            app:nullable="true"></argument>
         <action
             android:id="@+id/action_groupUsersFragment_to_userInfoFragment"
             app:destination="@id/userInfoFragment" />
@@ -83,28 +89,22 @@
         android:id="@+id/userInfoFragment"
         android:name="com.imptt.v2.view.user.UserInfoFragment"
         android:label="用户详情"
-        tools:layout="@layout/fragment_user_info"
-        >
+        tools:layout="@layout/fragment_user_info">
         <argument
             android:name="userId"
             app:argType="string"
-            app:nullable="true"
-            >
-        </argument>
+            app:nullable="true"></argument>
     </fragment>
 
     <fragment
         android:id="@+id/editGroupFragment"
         android:name="com.imptt.v2.view.group.EditGroupFragment"
         android:label="编辑群组"
-        tools:layout="@layout/fragment_edit_group"
-        >
+        tools:layout="@layout/fragment_edit_group">
         <argument
             android:name="groupId"
-            app:argType="string"
-            app:nullable="true"
             android:defaultValue="@null"
-            >
-        </argument>
+            app:argType="string"
+            app:nullable="true"></argument>
     </fragment>
 </navigation>

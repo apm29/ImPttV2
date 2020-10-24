@@ -54,7 +54,7 @@ class ImService : Service(), CoroutineScope {
     private fun loginAsUser() {
         launch(ioContext) {
             try {
-                val userId = LocalStorage.getInstance(this@ImService).getUserId()?:"yjw"
+                val userId = LocalStorage.getInstance(this@ImService).userId?:"yjw"
                 val baseResp = mSignalServerApi.login(userId)
                 if (baseResp.success && baseResp.hasData) {
                     mSignalServiceConnector = SignalServiceConnector(

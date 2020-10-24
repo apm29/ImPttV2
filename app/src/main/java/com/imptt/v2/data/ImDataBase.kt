@@ -15,7 +15,7 @@ import com.imptt.v2.utils.IContextSingleton
 
 @Database(
     entities = [Message::class, User::class, Group::class, GroupUserCrossRef::class],
-    version = 8,
+    version = 9,
     exportSchema = false,
 )
 @TypeConverters(Converters::class)
@@ -44,7 +44,6 @@ abstract class ImDataBase : RoomDatabase() {
             return Room.databaseBuilder(context, ImDataBase::class.java, DATABASE_NAME)
                 .fallbackToDestructiveMigration()
                 .allowMainThreadQueries()
-                .fallbackToDestructiveMigrationOnDowngrade()
                 .build()
         }
     }

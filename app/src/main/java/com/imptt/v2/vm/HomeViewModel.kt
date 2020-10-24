@@ -16,12 +16,10 @@ class HomeViewModel(
 
     val groups: LiveData<ArrayList<GroupWithUsers>> = _groups
 
-    suspend fun loadGroups(){
-        _groups.value = ArrayList(imRepository.getGroupsWithUsers())
-    }
 
-    fun setImGroups(groups: java.util.ArrayList<com.imptt.v2.core.websocket.Group>) {
+    suspend fun loadChannels(){
 
     }
+
 
 }

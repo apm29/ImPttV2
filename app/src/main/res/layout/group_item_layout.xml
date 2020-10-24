@@ -15,6 +15,7 @@
             android:src="@mipmap/group_chat"
             android:layout_width="40dp"
             android:layout_height="40dp"
+            app:tint="@color/green_success"
             android:contentDescription="@string/icon_desc" />
         <LinearLayout
             android:layout_weight="1"
@@ -44,12 +45,15 @@
             </TextView>
         </LinearLayout>
         <androidx.appcompat.widget.AppCompatCheckBox
+            android:id="@+id/checkboxCurrentChannel"
             android:button="@drawable/ic_selector_speaker"
             android:layout_width="wrap_content"
+            android:checked="true"
             android:layout_marginHorizontal="6dp"
             android:layout_height="wrap_content"/>
         <androidx.appcompat.widget.AppCompatCheckBox
-            android:button="@drawable/ic_selector_volume"
+            android:id="@+id/checkboxMuteChannel"
+            android:button="@drawable/ic_selector_headset"
             android:layout_width="wrap_content"
             android:layout_marginHorizontal="6dp"
             android:layout_height="wrap_content"/>

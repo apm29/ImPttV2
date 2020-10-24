@@ -10,6 +10,9 @@
 
     <color name="gray_not_enabled">#a2a9b2</color>
     <color name="gray_not_enabled_dark">#737e8f</color>
+    <color name="black_dark">#333</color>
+    <color name="green_success">#4CAF50</color>
+    <color name="orange_warning">#FF9800</color>
     <color name="red_error">#E15349</color>
     <color name="blue_primary">#3F51B5</color>
 
