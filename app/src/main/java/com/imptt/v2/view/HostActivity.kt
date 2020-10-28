@@ -1,17 +1,29 @@
 package com.imptt.v2.view
 
 import android.Manifest
-import android.content.Intent
+import android.annotation.SuppressLint
+import android.content.*
+import android.media.AudioManager
+import android.media.session.MediaSession
+import android.media.session.PlaybackState
 import android.os.Bundle
+import android.os.PowerManager
+import android.support.v4.media.session.MediaSessionCompat
+import android.support.v4.media.session.PlaybackStateCompat
 import android.text.format.Formatter
 import android.util.Log
+import android.view.KeyEvent
 import android.view.View
 import android.widget.Toast
 import androidx.navigation.findNavController
 import androidx.navigation.navOptions
 import com.imptt.v2.R
+import com.imptt.v2.core.MediaService.Companion.ACTION_VOLUME_UP_DOWN
+import com.imptt.v2.core.MediaService.Companion.ACTION_VOLUME_UP_RELEASE
+import com.imptt.v2.core.media.MediaSessionHandler
 import com.imptt.v2.core.ptt.PttObserver
 import com.imptt.v2.core.struct.PttServiceBindActivity
+import com.imptt.v2.receiver.MediaButtonReceiver
 import com.imptt.v2.utils.*
 import com.itsmartreach.libzm.ZmCmdLink
 import com.kylindev.pttlib.service.InterpttProtocolHandler
@@ -20,6 +32,7 @@ import com.kylindev.pttlib.service.model.User
 import com.kylindev.pttlib.utils.ServerProto
 import com.permissionx.guolindev.PermissionX
 import kotlinx.android.synthetic.main.activity_host.*
+import kotlinx.android.synthetic.main.fragment_user_login.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -42,24 +55,42 @@ class HostActivity : PttServiceBindActivity(), CoroutineScope {
     val localStorage: LocalStorage by lazy {
         LocalStorage.getInstance(this)
     }
+    private val mAudioManager by lazy {
+        getSystemService(AUDIO_SERVICE) as AudioManager
+    }
 
-    private val zmLink: ZmCmdLink by lazy {
-        ZmCmdLink(this, object : ZmCmdLink.ZmEventListener {
+    /**
+     * 智咪按键监听
+     */
+    private lateinit var zmLink: ZmCmdLink
+
+    private fun createZmLink(): ZmCmdLink {
+        return ZmCmdLink(this, object : ZmCmdLink.ZmEventListener {
+            //sco
             override fun onScoStateChanged(sco: Boolean) {
-                println("AudioRecordActivity.onScoStateChanged")
-                println("sco = [${sco}]")
+                println("AudioRecordActivity.onScoStateChanged sco = [${sco}]")
+//                if(sco){
+//                    zmLink.enterSppMode()
+//                }else{
+//                    zmLink.enterSppStandbyMode()
+//                }
             }
 
+            //spp
             override fun onSppStateChanged(spp: Boolean) {
                 Toast.makeText(
                     this@HostActivity,
-                    if (spp) "连接蓝牙肩咪成功" else "连接蓝牙肩咪失败",
+                    if (spp) "连接蓝牙肩咪成功" else "外放模式",
                     Toast.LENGTH_SHORT
                 ).show()
+//                if(!spp){
+//                    zmLink.enterSpeakMode()
+//                }
             }
 
+            //用户按键
             override fun onUserEvent(event: ZmCmdLink.ZmUserEvent?) {
-                println("AudioRecordActivity.onUserEvent")
+                println("AudioRecordActivity.onUserEvent event = [${event}]")
                 println("event = [${event}]")
                 if (event == ZmCmdLink.ZmUserEvent.zmEventPttPressed) {
                     launch {
@@ -82,30 +113,87 @@ class HostActivity : PttServiceBindActivity(), CoroutineScope {
         }, true)
     }
 
+//    //按键监听
+//    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+//        if(keyCode == KeyEvent.KEYCODE_VOLUME_UP){
+//            launch {
+//                requirePttService().userPressDown()
+//            }
+//            return true
+//        }
+//        return super.onKeyDown(keyCode, event)
+//    }
+//
+//    override fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
+//        if(keyCode == KeyEvent.KEYCODE_VOLUME_UP){
+//            launch {
+//                requirePttService().userPressUp()
+//            }
+//            return true
+//        }
+//        return super.onKeyUp(keyCode, event)
+//    }
+
+    private val mPowerManager by lazy {
+        getSystemService(Context.POWER_SERVICE) as PowerManager
+    }
+
+    private val mWakeLock by lazy {
+        mPowerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "ptt:MyWakelockTag")
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        mWakeLock.acquire()
+
         setContentView(R.layout.activity_host)
         doRequestPermissions {
             Log.e("HostActivity", "权限获取成功")
         }
-        Log.e(TAG, zmLink.isConnected.toString())
+        zmLink = createZmLink()
         findNavController(R.id.app_host_fragment)
-
         launch {
             val pttService = requirePttService()
+            var lastRhythmTime = 0L
             pttService.registerObserverWithLifecycle(this@HostActivity,
                 object : PttObserver(this@HostActivity::class.simpleName) {
                     override fun onLocalUserTalkingChanged(user: User?, talking: Boolean) {
                         super.onLocalUserTalkingChanged(user, talking)
-                        layoutVolume.visibility = if (talking) View.VISIBLE else View.GONE
+                        if (talking) {
+                            layoutVolume.visible()
+                        }else {
+                            layoutVolume.gone()
+                        }
+
                         textViewCaller.text =
-                            if (user != null) "${user.channel.name}|${user.name}\r\n正在讲话" else "正在讲话"
+                            if (user != null && pttService.currentUser.iId != user.iId && talking)
+                                "${user.channel.name} | ${user.name}\r\n正在讲话"
+                            else if(talking){
+                                "正在讲话"
+                            } else {
+                                "结束"
+                            }
                     }
 
                     override fun onNewVolumeData(volume: Short) {
                         super.onNewVolumeData(volume)
-                        rhythmView.setPerHeight((volume.clamp() / 5000f).toFloat())
+                        val currentTimeMillis = System.currentTimeMillis()
+                        if (currentTimeMillis - lastRhythmTime > 500) {
+                            rhythmView.setPerHeight((volume.clamp() / 5000f).toFloat())
+                            lastRhythmTime = currentTimeMillis
+                        }
+                    }
+
+                    override fun onTalkingTimerCanceled() {
+                        super.onTalkingTimerCanceled()
+                        textViewDuration.gone()
+                    }
+
+                    @SuppressLint("SetTextI18n")
+                    override fun onTalkingTimerTick(duration: Int) {
+                        super.onTalkingTimerTick(duration)
+                        textViewDuration.visible()
+                        textViewDuration.text = "已录制${duration}秒"
                     }
 
                     override fun onPcmRecordFinished(
@@ -167,24 +255,101 @@ class HostActivity : PttServiceBindActivity(), CoroutineScope {
                                     this@HostActivity,
                                     "登录失败:$rejectType",
                                     Toast.LENGTH_SHORT
-                                )
-                                    .show()
+                                ).show()
                             }
                         }
                     }
 
                     override fun onListenChanged(listen: Boolean) {
                         super.onListenChanged(listen)
+//                        runOnUiThread {
+//                            Toast.makeText(
+//                                this@HostActivity,
+//                                if (listen) "开始监听频道" else "停止监听频道",
+//                                Toast.LENGTH_SHORT
+//                            ).show()
+//                        }
+                    }
+
+                    override fun onPermissionDenied(reason: String, code: Int) {
+                        super.onPermissionDenied(reason, code)
                         runOnUiThread {
                             Toast.makeText(
                                 this@HostActivity,
-                                if (listen) "开始监听频道" else "停止监听频道",
+                                "操作失败($code):$reason",
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
                     }
+
+                    override fun onHeadsetStateChanged(headState: InterpttService.HeadsetState) {
+                        super.onHeadsetStateChanged(headState)
+                    }
+
+                    override fun onShowToast(message: String) {
+                        super.onShowToast(message)
+                        runOnUiThread {
+                            Toast.makeText(
+                                this@HostActivity,
+                                message,
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+
                 })
+            pttService.recordMode
         }
+
+//        mAudioManager.registerMediaButtonEventReceiver(
+//            ComponentName(this,MediaButtonReceiver::class.java)
+//        )
+//
+//        val mediaSession = MediaSession(this, "ms")
+//        mediaSession.setFlags(MediaSession.FLAG_HANDLES_MEDIA_BUTTONS  or
+//                MediaSession.FLAG_HANDLES_TRANSPORT_CONTROLS
+//        )
+//        val playbackState = PlaybackState.Builder()
+//            .setActions(PlaybackState.ACTION_PLAY_PAUSE)
+//            .build()
+//        mediaSession.setPlaybackState(playbackState)
+//        mediaSession.setCallback(object:MediaSession.Callback(){
+//            override fun onPlay() {
+//                println("HostActivity.onPlay")
+//            }
+//
+//            override fun onPause() {
+//                println("HostActivity.onPause")
+//            }
+//
+//            override fun onMediaButtonEvent(mediaButtonIntent: Intent): Boolean {
+//                println("HostActivity.onMediaButtonEvent")
+//                return super.onMediaButtonEvent(mediaButtonIntent)
+//            }
+//        })
+//        mediaSession.isActive = true
+    }
+
+    override fun onRestart() {
+        super.onRestart()
+        launch {
+            val pttService = requirePttService()
+            if(pttService.isAduioPlaying){
+                layoutVolume.visible()
+            }else{
+                layoutVolume.gone()
+            }
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        println("HostActivity.onDestroy")
+        zmLink.destroy()
+        mWakeLock.release()
+        mAudioManager.unregisterMediaButtonEventReceiver(
+            ComponentName(this,MediaButtonReceiver::class.java)
+        )
     }
 
 
@@ -195,8 +360,6 @@ class HostActivity : PttServiceBindActivity(), CoroutineScope {
                 textViewState.text = "正在连接服务器"
             }
             InterpttService.ConnState.CONNECTION_STATE_DISCONNECTED -> {
-
-
                 layoutState.gone()
                 textViewState.text = "对讲服务已断开"
                 //断开原因
@@ -228,6 +391,10 @@ class HostActivity : PttServiceBindActivity(), CoroutineScope {
             InterpttService.ConnState.CONNECTION_STATE_CONNECTED -> {
                 layoutState.gone()
                 textViewState.text = "对讲服务已连接"
+                Log.e(TAG,"pttKeycode:${pttService.pttKeycode}")
+                pttService.pttKeycode = KeyEvent.KEYCODE_VOLUME_UP
+                pttService.strongOnline = true
+                pttService.supportHeadsetKey = true
             }
         }
     }
@@ -242,11 +409,6 @@ class HostActivity : PttServiceBindActivity(), CoroutineScope {
 
     override fun onSupportNavigateUp(): Boolean {
         return findNavController(R.id.app_host_fragment).navigateUp() || super.onSupportNavigateUp()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        zmLink.destroy()
     }
 
     private fun doRequestPermissions(

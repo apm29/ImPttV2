@@ -40,6 +40,13 @@ class EditGroupFragment : BaseFragment() {
             setToolbarTitle("新建群组")
         } else {
             buttonSaveGroup.text = "保存"
+            launch {
+                val pttService = requirePttService()
+                val channel = pttService.getChannelByChanId(groupId?.toInt() ?: 0)
+                if(channel!=null){
+                    editTextGroupName.setText(channel.name)
+                }
+            }
         }
         buttonSaveGroup.setOnClickListener(::saveGroup)
     }
@@ -51,10 +58,20 @@ class EditGroupFragment : BaseFragment() {
 //                imageViewGroupIcon.imageUrl
 //            )
 
-            requirePttService().createChannel(
-                editTextGroupName.text?.trim().toString(),
-                "Null", "Null", true, false
-            )
+            val pttService = requirePttService()
+            if (groupId != null) {
+                groupId?.toInt()?.let { channelId ->
+                    pttService.changeChannelName(
+                        channelId,
+                        editTextGroupName.text?.trim().toString()
+                    )
+                }
+            } else {
+                pttService.createChannel(
+                    editTextGroupName.text?.trim().toString(),
+                    "Null", "Null", true, false
+                )
+            }
             delay(300)
             //保存群组信息
             setResult(KEY_SAVE_GROUP_RESULT, true)

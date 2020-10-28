@@ -60,8 +60,8 @@ class GroupListAdapter(
         holder.checkboxCurrentChannel.visibility =
             if (isCurrentChannel) View.VISIBLE else View.INVISIBLE
 
-        holder.checkboxMuteChannel.isEnabled =
-            !isCurrentChannel
+        holder.checkboxMuteChannel.visibility =
+            if (!isCurrentChannel) View.VISIBLE else View.GONE
 
         holder.checkboxMuteChannel.isChecked =
             listenChannels?.contains(channel.id) == true || isCurrentChannel
@@ -72,8 +72,12 @@ class GroupListAdapter(
             onChannelSpeakChange?.invoke(channel, isChecked, buttonView)
         }
 
-        holder.checkboxMuteChannel.setOnCheckedChangeListener { buttonView, isChecked ->
-            onChannelListenChange?.invoke(channel, isChecked, buttonView)
+//        holder.checkboxMuteChannel.setOnCheckedChangeListener { buttonView, isChecked ->
+//            onChannelListenChange?.invoke(channel, isChecked, buttonView)
+//        }
+
+        holder.checkboxMuteChannel.setOnClickListener {
+            onChannelListenChange?.invoke(channel, holder.checkboxMuteChannel.isChecked, it)
         }
     }
 
@@ -84,7 +88,7 @@ class GroupListAdapter(
             "(当前频道)",
             TextAppearanceSpan(
                 itemView.context,
-                R.style.TextAppearance_AppCompat_Button
+                R.style.CaptionText
             ),
             SpannableStringBuilder.SPAN_EXCLUSIVE_EXCLUSIVE
         )

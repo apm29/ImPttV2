@@ -46,4 +46,6 @@
     <string name="login_failed">"Login failed"</string>
     <string name="user_name">用户名</string>
     <string name="title_mute">静音</string>
+    <string name="edit">编辑</string>
+    <string name="subtitle_float_window">悬浮窗</string>
 </resources>

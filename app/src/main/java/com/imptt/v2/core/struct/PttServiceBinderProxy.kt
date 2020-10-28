@@ -8,6 +8,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import com.imptt.v2.core.ImService
+import com.imptt.v2.core.MediaService
 import com.kylindev.pttlib.service.InterpttService
 
 /**
@@ -42,6 +43,11 @@ class PttServiceBinderProxy(
         println("PttServiceBinderProxy.onCreate")
         println("lifecycleOwner = $lifecycleOwner")
         lifecycleOwner.startService(serviceIntent)
+//        lifecycleOwner.startService(
+//            Intent(
+//                lifecycleOwner, MediaService::class.java
+//            )
+//        )
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_START)

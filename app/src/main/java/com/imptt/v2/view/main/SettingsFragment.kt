@@ -42,6 +42,10 @@ class SettingsFragment : BaseNestedFragment() {
             editTextName.setText("")
             editTextGroupName.setText(currentUser.name)
             editTextCallNumber.setText(currentUser.iId.toString())
+            checkboxAlertWindow.isChecked = pttService.floatWindow
+            checkboxAlertWindow.setOnCheckedChangeListener { _, isChecked ->
+                pttService.floatWindow = isChecked
+            }
         }
     }
 }

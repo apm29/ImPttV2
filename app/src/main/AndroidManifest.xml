@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:installLocation="auto"
     package="com.imptt.v2">
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -15,6 +16,16 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-feature android:name="android.hardware.microphone" />
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
+    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.BLUETOOTH"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/> <!--for bluetooth-->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+
+    <uses-permission android:name="android.permission.BROADCAST_STICKY"/>
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
 
     <application
         android:name=".App"
@@ -36,7 +47,6 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -79,11 +89,40 @@
                 <action android:name="com.kylindev.pttlib.auto_restart_service" />
             </intent-filter>
         </receiver>
+        <receiver
+            android:name="com.kylindev.pttlib.utils.MediaButtonIntentReceiver"
+            android:enabled="true"
+            android:priority="10000">
+            <intent-filter>
+                <action android:name="android.intent.action.MEDIA_BUTTON" />
+            </intent-filter>
+        </receiver>
         <!-- ptt功能主服务 -->
         <service
             android:name="com.kylindev.pttlib.service.InterpttService"
             android:exported="true">
         </service>
+        <service android:name=".core.MediaService"
+            android:enabled="true"
+            android:exported="true"
+            android:process=":media"
+            android:foregroundServiceType="location|mediaPlayback|mediaProjection|phoneCall"
+            android:permission="@string/app_name"
+            >
+        </service>
+        <receiver android:name=".core.ptt.BootCompleteReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
+        </receiver>
+<!--        <receiver-->
+<!--            android:enabled="true"-->
+<!--            android:priority="2147483647"-->
+<!--            android:name=".receiver.MediaButtonReceiver">-->
+<!--            <intent-filter>-->
+<!--                <action android:name="android.intent.action.MEDIA_BUTTON"/>-->
+<!--            </intent-filter>-->
+<!--        </receiver>-->
     </application>
 
 </manifest>

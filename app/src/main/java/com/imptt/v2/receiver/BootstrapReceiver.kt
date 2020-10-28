@@ -16,3 +16,10 @@ class BootstrapReceiver : BroadcastReceiver() {
         }
     }
 }
+
+class MediaButtonReceiver : BroadcastReceiver() {
+    override fun onReceive(context: Context, intent: Intent) {
+        println("MediaButtonReceiver.onReceive")
+        println("context = [${context}], intent = [${intent}]")
+    }
+}

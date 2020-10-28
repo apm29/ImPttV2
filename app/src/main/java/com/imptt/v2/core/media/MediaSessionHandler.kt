@@ -4,6 +4,8 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.support.v4.media.session.MediaSessionCompat
+import android.util.Log
+import android.view.KeyEvent
 import androidx.media.session.MediaButtonReceiver
 
 /**
@@ -26,6 +28,7 @@ object MediaSessionHandler {
         }
         mMediaSession.setCallback(object : MediaSessionCompat.Callback() {
             override fun onMediaButtonEvent(intent: Intent): Boolean {
+                Log.e("MediaSessionHandler","action:${intent.action},key_event:${intent.getParcelableExtra<KeyEvent>(Intent.EXTRA_KEY_EVENT)}")
                 return onMediaIntent.invoke(intent)
             }
         })

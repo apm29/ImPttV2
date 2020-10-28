@@ -1,10 +1,13 @@
 package com.imptt.v2.view.main
 
+import android.content.DialogInterface
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
+import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.imptt.v2.R
 import com.imptt.v2.core.ptt.PttObserver
@@ -17,6 +20,7 @@ import com.imptt.v2.view.adapter.GroupListAdapter
 import com.imptt.v2.view.group.EditGroupFragment
 import com.imptt.v2.view.group.GroupFragmentArgs
 import com.imptt.v2.vm.HomeViewModel
+import com.kylindev.pttlib.service.InterpttService
 import com.kylindev.pttlib.service.model.Channel
 import kotlinx.android.synthetic.main.fragment_home.*
 import kotlinx.coroutines.launch
@@ -60,7 +64,7 @@ class HomeFragment : BaseNestedFragment() {
                 }
 
                 override fun onChannelUpdated(channel: Channel) {
-                    initialList(service.channelList,service.listenChannels)
+                    initialList(service.channelList, service.listenChannels)
                 }
 
                 override fun onChannelAdded(channel: Channel) {
@@ -69,6 +73,19 @@ class HomeFragment : BaseNestedFragment() {
 
                 override fun onChannelRemoved(channel: Channel) {
                     initialList(service.channelList, service.listenChannels)
+                }
+
+                override fun onConnectionStateChanged(state: InterpttService.ConnState) {
+                    if (state == InterpttService.ConnState.CONNECTION_STATE_DISCONNECTED) {
+                        initialList(arrayListOf(), arrayListOf())
+                    } else {
+                        initialList(service.channelList, service.listenChannels)
+                    }
+                }
+
+                override fun onListenChanged(listen: Boolean) {
+                    super.onListenChanged(listen)
+
                 }
             })
         }
@@ -96,7 +113,7 @@ class HomeFragment : BaseNestedFragment() {
                         listenChannels
                     )
             } else {
-                (recyclerViewGroupList.adapter as GroupListAdapter).newList(groups,listenChannels)
+                (recyclerViewGroupList.adapter as GroupListAdapter).newList(groups, listenChannels)
             }
         }
     }
@@ -104,13 +121,34 @@ class HomeFragment : BaseNestedFragment() {
     private fun onGroupRoute(channel: Channel, view: View) {
         launch {
             val service = requirePttService()
-            service.enterChannel(channel.id)
-            service.setListen(channel.id,true)
-            navigate(
-                R.id.action_mainFragment_to_groupFragment,
-                GroupFragmentArgs.Builder(channel.id.toString()).build().toBundle()
-            )
+            if (service.currentChannel.id == channel.id) {
+                navigateToChannel(channel, service)
+            } else {
+                AlertDialog.Builder(view.context)
+                    .setTitle("提示")
+                    .setMessage("切换到${channel.name}吗?")
+                    .setPositiveButton("切换") { dialogInterface: DialogInterface, which: Int ->
+                        dialogInterface.dismiss()
+                        navigateToChannel(channel, service)
+                    }
+                    .setNegativeButton("取消") { dialog, which ->
+                        dialog.dismiss()
+                    }
+                    .create()
+                    .show()
+            }
         }
+    }
+
+    private fun navigateToChannel(
+        channel: Channel,
+        service: InterpttService
+    ) {
+        service.enterChannel(channel.id)
+        navigate(
+            R.id.action_mainFragment_to_groupFragment,
+            GroupFragmentArgs.Builder(channel.id.toString()).build().toBundle()
+        )
     }
 
     private fun onCurrentChannelListenChange(channel: Channel, checked: Boolean, view: View) {
@@ -123,8 +161,8 @@ class HomeFragment : BaseNestedFragment() {
     private fun onCurrentChannelSpeakChange(channel: Channel, checked: Boolean, view: View) {
         launch {
             val service = requirePttService()
-            if(checked){
-                service.joinChannel(channel.id,"","")
+            if (checked) {
+                service.joinChannel(channel.id, "", "")
             }
         }
 

@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="utf-8"?>
+<bitmap android:src="@mipmap/edit_pen" android:mipMap="true" android:tint="@color/white_foreground" xmlns:android="http://schemas.android.com/apk/res/android">
+</bitmap>

@@ -20,7 +20,7 @@ open class PttObserver(
     override fun onChannelAdded(channel: Channel) {
         super.onChannelAdded(channel)
         println("$tag.onChannelAdded")
-        println("channel = [${channel}]")
+        println("$tag:channel = [${channel}]")
     }
 
     override fun onAmrData(data: ByteArray?, length: Int, duration: Int) {
@@ -31,7 +31,7 @@ open class PttObserver(
     override fun onChannelRemoved(channel: Channel) {
         super.onChannelRemoved(channel)
         println("$tag.onChannelRemoved")
-        println("channel = [${channel}]")
+        println("$tag:channel = [${channel}]")
     }
 
     override fun onChannelUpdated(channel: Channel) {
@@ -78,12 +78,13 @@ open class PttObserver(
     override fun onNewVolumeData(volume: Short) {
         super.onNewVolumeData(volume)
         println("$tag.onNewVolumeData")
-        println("volume = [${volume}]")
+        println("$tag:volume = [${volume}]")
     }
 
-    override fun onPermissionDenied(p0: String, p1: Int) {
-        super.onPermissionDenied(p0, p1)
+    override fun onPermissionDenied(reason: String, code: Int) {
+        super.onPermissionDenied(reason, code)
         println("$tag.onPermissionDenied")
+        println("$tag:reason = [${reason}], code = [${code}]")
     }
 
     override fun onRegisterResult(p0: Int) {
@@ -109,7 +110,7 @@ open class PttObserver(
     override fun onHeadsetStateChanged(headState: InterpttService.HeadsetState) {
         super.onHeadsetStateChanged(headState)
         println("$tag.onHeadsetStateChanged")
-        println("headState = [${headState}]")
+        println("$tag:headState = [${headState}]")
     }
 
     override fun onScoStateChanged(p0: Int) {
@@ -130,14 +131,15 @@ open class PttObserver(
         println("$tag.onLeDeviceScanStarted")
     }
 
-    override fun onLeDeviceFound(p0: BluetoothDevice) {
-        super.onLeDeviceFound(p0)
+    override fun onLeDeviceFound(device: BluetoothDevice) {
+        super.onLeDeviceFound(device)
         println("$tag.onLeDeviceFound")
     }
 
-    override fun onTalkingTimerTick(p0: Int) {
-        super.onTalkingTimerTick(p0)
+    override fun onTalkingTimerTick(duration: Int) {
+        super.onTalkingTimerTick(duration)
         println("$tag.onTalkingTimerTick")
+        println("$tag:duration = [${duration}]")
     }
 
     override fun onTalkingTimerCanceled() {
@@ -165,11 +167,11 @@ open class PttObserver(
     ) {
         super.onChannelSearched(p0, p1, p2, p3, p4, p5)
         println("$tag.onChannelSearched")
-        println("p0 = [${p0}], p1 = [${p1}], p2 = [${p2}], p3 = [${p3}], p4 = [${p4}], p5 = [${p5}]")
+        println("$tag:p0 = [${p0}], p1 = [${p1}], p2 = [${p2}], p3 = [${p3}], p4 = [${p4}], p5 = [${p5}]")
     }
 
-    override fun onShowToast(p0: String) {
-        super.onShowToast(p0)
+    override fun onShowToast(message: String) {
+        super.onShowToast(message)
         println("$tag.onShowToast")
     }
 
@@ -251,8 +253,8 @@ open class PttObserver(
         println("$tag.onGeneralMessageGot")
     }
 
-    override fun onBleButtonDown(p0: Boolean) {
-        super.onBleButtonDown(p0)
+    override fun onBleButtonDown(down: Boolean) {
+        super.onBleButtonDown(down)
         println("$tag.onBleButtonDown")
     }
 }

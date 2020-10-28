@@ -61,7 +61,7 @@
         <argument
             android:name="groupId"
             app:argType="string"
-            app:nullable="true"></argument>
+            app:nullable="true"/>
         <action
             android:id="@+id/action_groupSettingsFragment_to_groupUsersFragment"
             app:destination="@id/groupUsersFragment" />
@@ -80,7 +80,7 @@
         <argument
             android:name="groupId"
             app:argType="string"
-            app:nullable="true"></argument>
+            app:nullable="true"/>
         <action
             android:id="@+id/action_groupUsersFragment_to_userInfoFragment"
             app:destination="@id/userInfoFragment" />
@@ -93,7 +93,7 @@
         <argument
             android:name="userId"
             app:argType="string"
-            app:nullable="true"></argument>
+            app:nullable="true"/>
     </fragment>
 
     <fragment
@@ -105,6 +105,6 @@
             android:name="groupId"
             android:defaultValue="@null"
             app:argType="string"
-            app:nullable="true"></argument>
+            app:nullable="true"/>
     </fragment>
 </navigation>

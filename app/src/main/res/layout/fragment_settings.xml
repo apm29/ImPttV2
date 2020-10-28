@@ -113,5 +113,23 @@
                 android:checked="true"
                 android:layout_height="wrap_content"/>
         </LinearLayout>
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:minHeight="50dp"
+            android:gravity="center_vertical"
+            android:layout_height="wrap_content">
+            <TextView
+                android:labelFor="@id/checkboxAutoPlay"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:text="@string/subtitle_float_window"
+                android:layout_height="wrap_content"/>
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/checkboxAlertWindow"
+                android:layout_width="wrap_content"
+                android:checked="true"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
     </LinearLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

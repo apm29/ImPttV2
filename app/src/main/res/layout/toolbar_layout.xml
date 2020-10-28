@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:paddingTop="25dp"
     app:elevation="0dp"
+    app:layout_collapseMode="pin"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 

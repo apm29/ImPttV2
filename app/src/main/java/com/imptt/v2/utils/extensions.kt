@@ -50,6 +50,7 @@ fun View.visible(delay:Long = 0){
         this.visibility = View.VISIBLE
     },delay)
 }
+
 fun View.invisible(delay:Long = 0){
     this.postDelayed( {
         this.visibility = View.INVISIBLE
@@ -59,6 +60,15 @@ fun View.invisible(delay:Long = 0){
 fun View.gone(delay:Long = 0){
     this.postDelayed({
         this.visibility = View.GONE
+    },delay)
+}
+
+fun View.showAndHide(delay:Long = 0){
+    this.post {
+        this.visibility = View.VISIBLE
+    }
+    this.postDelayed({
+        this.visibility = View.INVISIBLE
     },delay)
 }
 
