@@ -392,9 +392,7 @@ class HostActivity : PttServiceBindActivity(), CoroutineScope {
                 layoutState.gone()
                 textViewState.text = "对讲服务已连接"
                 Log.e(TAG,"pttKeycode:${pttService.pttKeycode}")
-                pttService.pttKeycode = KeyEvent.KEYCODE_VOLUME_UP
                 pttService.strongOnline = true
-                pttService.supportHeadsetKey = true
             }
         }
     }
