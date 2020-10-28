@@ -134,4 +134,9 @@ dependencies {
     implementation files('libs/BaiduLBS_Android.jar')
     //amr库
     implementation 'io.kvh:amr:1.1.1'
+
+    //agentWeb
+    implementation 'com.just.agentweb:agentweb-androidx:4.1.4' // (必选)
+    implementation 'com.just.agentweb:filechooser-androidx:4.1.4'// (可选)
+    //implementation 'com.download.library:downloader-androidx:4.1.4'// (可选)
 }

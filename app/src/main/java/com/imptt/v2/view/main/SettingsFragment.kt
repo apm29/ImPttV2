@@ -6,6 +6,7 @@ import com.bumptech.glide.Glide
 import com.imptt.v2.R
 import com.imptt.v2.core.struct.BaseFragment
 import com.imptt.v2.core.struct.BaseNestedFragment
+import com.imptt.v2.utils.findPrimaryNavController
 import com.imptt.v2.utils.observe
 import com.imptt.v2.utils.requirePttService
 import com.imptt.v2.vm.SettingsViewModel
@@ -40,6 +41,9 @@ class SettingsFragment : BaseNestedFragment() {
             val pttService = requirePttService()
             val currentUser = pttService.currentUser
             editTextName.setText("")
+            imageViewGroupIcon.setOnClickListener {
+                findPrimaryNavController().navigate(R.id.agentWebViewFragment)
+            }
             editTextGroupName.setText(currentUser.name)
             editTextCallNumber.setText(currentUser.iId.toString())
             checkboxAlertWindow.isChecked = pttService.floatWindow

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Carson_Ho</title>
+
+    <script>
+         async function add(){
+            let a = await jsBridge.add(1,2)
+            jsBridge.showToast(a.toString())
+         }
+
+    </script>
+</head>
+
+<body>
+<div style="height:200px"></div>
+<button type="button" id="button1" onclick="add()">点击调用ADD</button>
+</body>
+</html>
