@@ -2,25 +2,18 @@ package com.imptt.v2.view
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.content.*
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
 import android.media.AudioManager
-import android.media.session.MediaSession
-import android.media.session.PlaybackState
 import android.os.Bundle
 import android.os.PowerManager
-import android.support.v4.media.session.MediaSessionCompat
-import android.support.v4.media.session.PlaybackStateCompat
 import android.text.format.Formatter
 import android.util.Log
-import android.view.KeyEvent
-import android.view.View
 import android.widget.Toast
 import androidx.navigation.findNavController
 import androidx.navigation.navOptions
 import com.imptt.v2.R
-import com.imptt.v2.core.MediaService.Companion.ACTION_VOLUME_UP_DOWN
-import com.imptt.v2.core.MediaService.Companion.ACTION_VOLUME_UP_RELEASE
-import com.imptt.v2.core.media.MediaSessionHandler
 import com.imptt.v2.core.ptt.PttObserver
 import com.imptt.v2.core.struct.PttServiceBindActivity
 import com.imptt.v2.receiver.MediaButtonReceiver
@@ -32,10 +25,7 @@ import com.kylindev.pttlib.service.model.User
 import com.kylindev.pttlib.utils.ServerProto
 import com.permissionx.guolindev.PermissionX
 import kotlinx.android.synthetic.main.activity_host.*
-import kotlinx.android.synthetic.main.fragment_user_login.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
 
 /**
@@ -45,8 +35,17 @@ import kotlin.coroutines.CoroutineContext
  */
 class HostActivity : PttServiceBindActivity(), CoroutineScope {
 
+    private val mExceptionHandler: CoroutineExceptionHandler =
+        CoroutineExceptionHandler { _, throwable ->
+            Log.e(TAG,"COROUTINE EXCEPTION:")
+            //在此处捕获异常
+            throwable.printStackTrace()
+        }
+    //SupervisorJob在子协程抛出异常时不会被取消
+    private val mJob = SupervisorJob()
+
     override val coroutineContext: CoroutineContext
-        get() = Dispatchers.Main
+        get() = Dispatchers.Main + mJob + mExceptionHandler
 
     companion object {
         const val TAG = "HostActivity"
@@ -350,6 +349,7 @@ class HostActivity : PttServiceBindActivity(), CoroutineScope {
         mAudioManager.unregisterMediaButtonEventReceiver(
             ComponentName(this,MediaButtonReceiver::class.java)
         )
+        mJob.cancelChildren()
     }
 
 

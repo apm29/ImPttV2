@@ -1,7 +1,12 @@
 package com.imptt.v2.utils
 
+import android.app.Activity
+import android.content.ComponentName
 import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
 import android.os.Bundle
+import android.os.IBinder
 import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
@@ -15,6 +20,9 @@ import com.imptt.v2.core.struct.BaseNestedFragment
 import com.imptt.v2.view.HostActivity
 import com.kylindev.pttlib.service.BaseServiceObserver
 import com.kylindev.pttlib.service.InterpttService
+import com.kylindev.pttlib.service.model.Channel
+import java.lang.reflect.Field
+import java.util.ArrayList
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
@@ -154,3 +162,25 @@ suspend fun HostActivity.requirePttService() = suspendCoroutine<InterpttService>
         continuation.resumeWithException(e)
     }
 }
+
+
+suspend fun HostActivity.requireInterPttService() = suspendCoroutine<InterpttService> {
+    if (mService == null) {
+        bindService(Intent(this, InterpttService::class.java), object : ServiceConnection {
+            override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+                val localBinder = service as InterpttService.LocalBinder
+                mService = localBinder.service
+                it.resume(mService!!)
+            }
+
+            override fun onServiceDisconnected(name: ComponentName?) {
+
+            }
+        }, Context.BIND_AUTO_CREATE)
+    } else {
+        it.resume(mService!!)
+    }
+}
+
+suspend fun Fragment.requireInterPttService() =
+    (requireActivity() as HostActivity).requireInterPttService()
