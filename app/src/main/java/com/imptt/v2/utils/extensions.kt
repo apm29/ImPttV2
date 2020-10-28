@@ -30,7 +30,7 @@ fun <T> Fragment.observe(data: LiveData<T>?, observer: Observer<T>) {
 }
 
 fun Fragment.navigate(targetId: Int, args: Bundle? = null, popUpToMain: Boolean = false) {
-    findPrimaryNavController().navigate(
+    return findPrimaryNavController().navigate(
         targetId,
         args,
         if (popUpToMain) navOptions {
@@ -42,6 +42,10 @@ fun Fragment.navigate(targetId: Int, args: Bundle? = null, popUpToMain: Boolean 
             null
         }
     )
+}
+
+fun Fragment.pop(): Boolean {
+    return findPrimaryNavController().popBackStack()
 }
 
 fun Fragment.findPrimaryNavController() =

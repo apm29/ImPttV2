@@ -8,6 +8,8 @@ import android.widget.LinearLayout
 import androidx.activity.OnBackPressedCallback
 import com.imptt.v2.R
 import com.imptt.v2.core.struct.BaseFragment
+import com.imptt.v2.utils.navigate
+import com.imptt.v2.utils.pop
 import com.just.agentweb.AgentWeb
 import com.just.agentweb.WebChromeClient
 
@@ -45,7 +47,7 @@ class AgentWebViewFragment : BaseFragment() {
                     if(mAgentWeb.webCreator.webView.canGoBack()){
                         mAgentWeb.webCreator.webView.goBack()
                     }else{
-                        requireActivity().onBackPressedDispatcher.onBackPressed()
+                        pop()
                     }
                 }
             }
