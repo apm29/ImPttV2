@@ -5,6 +5,8 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
@@ -22,6 +24,7 @@ import com.kylindev.pttlib.service.InterpttService
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
+
 
 /**
  *  author : ciih
@@ -197,4 +200,37 @@ fun isServiceRunning(context: Context, className: String = "com.kylindev.pttlib.
         }
     }
     return isRunning
+}
+
+fun getAppVersionCode(context: Context): Long {
+    var appVersionCode: Long = 0
+    try {
+        val packageInfo = context.applicationContext
+            .packageManager
+            .getPackageInfo(context.packageName, 0)
+        appVersionCode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            packageInfo.longVersionCode
+        } else {
+            packageInfo.versionCode.toLong()
+        }
+    } catch (e: PackageManager.NameNotFoundException) {
+        e.printStackTrace()
+    }
+    return appVersionCode
+}
+
+/**
+ * 获取当前app version name
+ */
+fun getAppVersionName(context: Context): String? {
+    var appVersionName = ""
+    try {
+        val packageInfo = context.applicationContext
+            .packageManager
+            .getPackageInfo(context.packageName, 0)
+        appVersionName = packageInfo.versionName
+    } catch (e: PackageManager.NameNotFoundException) {
+        e.printStackTrace()
+    }
+    return appVersionName
 }

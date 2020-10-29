@@ -26,6 +26,7 @@ import com.kylindev.pttlib.service.InterpttService
 import com.kylindev.pttlib.service.model.User
 import com.kylindev.pttlib.utils.ServerProto
 import com.permissionx.guolindev.PermissionX
+import com.tencent.bugly.beta.Beta
 import kotlinx.android.synthetic.main.activity_host.*
 import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
@@ -333,6 +334,11 @@ class HostActivity : PttServiceBindActivity(), CoroutineScope {
 //            }
 //        })
 //        mediaSession.isActive = true
+    }
+
+    override fun onStart() {
+        super.onStart()
+        Beta.checkAppUpgrade(false,false)
     }
 
     override fun onRestart() {

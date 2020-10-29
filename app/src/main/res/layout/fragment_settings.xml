@@ -149,5 +149,11 @@
                 android:checked="true"
                 android:layout_height="wrap_content"/>
         </LinearLayout>
+        <TextView
+            android:layout_marginTop="48dp"
+            android:id="@+id/textViewVersion"
+            android:textAlignment="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
     </LinearLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

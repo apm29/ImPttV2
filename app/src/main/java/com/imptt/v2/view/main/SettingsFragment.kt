@@ -1,15 +1,16 @@
 package com.imptt.v2.view.main
 
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.View
 import com.bumptech.glide.Glide
 import com.imptt.v2.R
 import com.imptt.v2.core.struct.BaseFragment
 import com.imptt.v2.core.struct.BaseNestedFragment
-import com.imptt.v2.utils.findPrimaryNavController
-import com.imptt.v2.utils.observe
-import com.imptt.v2.utils.requirePttService
+import com.imptt.v2.utils.*
 import com.imptt.v2.vm.SettingsViewModel
+import com.tencent.bugly.Bugly
+import com.tencent.bugly.beta.Beta
 import kotlinx.android.synthetic.main.fragment_settings.*
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ViewModelOwner
@@ -26,17 +27,12 @@ class SettingsFragment : BaseNestedFragment() {
     }
 
     override fun setupViews(view: View, savedInstanceState: Bundle?) {
-        observe(settingsViewModel.userInfo) {
-            editTextName.setText("张三")
-            editTextGroupName.setText("156XXXXXXX")
-            editTextCallNumber.setText("02321111")
-            Glide.with(view)
-                .load(R.drawable.ic_launcher_foreground)
-                .into(imageViewGroupIcon)
-        }
 
         setToolbarTitle("设置")
-
+        textViewVersion.text = "${getAppVersionName(requireContext())} ${getAppVersionCode(requireContext())}"
+        textViewVersion.setOnClickListener {
+            Beta.checkAppUpgrade(true,false)
+        }
         launch {
             val pttService = requirePttService()
             val currentUser = pttService.currentUser
