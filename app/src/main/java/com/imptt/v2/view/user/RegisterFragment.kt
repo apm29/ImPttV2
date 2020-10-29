@@ -20,7 +20,6 @@ class RegisterFragment:BaseFragment() {
     override fun setupViews(view: View, savedInstanceState: Bundle?) {
         launch {
             val pttService = requirePttService()
-            pttService.register()
         }
     }
 }
