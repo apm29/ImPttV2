@@ -30,7 +30,7 @@ class GroupViewModel(
         }
         val loaded = service.loadDBRecords(groupId,messages.size,pageSize)
         if(loaded!=null&&loaded.isNotEmpty()) {
-            messages.addAll(loaded)
+            messages.addAll(0,loaded)
             data.value = messages
         }
     }
