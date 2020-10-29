@@ -54,4 +54,5 @@
     <string name="desc_dissmiss_group">确定解散该频道吗?</string>
     <string name="title_confirm">确定</string>
     <string name="desc_quit_group">确定要退出该频道吗?</string>
+    <string name="desc_no_channel">频道列表为空,请检查网络连接</string>
 </resources>

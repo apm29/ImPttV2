@@ -41,17 +41,41 @@ class GroupListAdapter(
         }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
-        val view = layoutInflater.inflate(R.layout.group_item_layout, parent, false)
+        val view = if (viewType != TYPE_EMPTY)
+            layoutInflater.inflate(
+                R.layout.group_item_layout,
+                parent,
+                false
+            )
+        else
+            layoutInflater.inflate(
+                R.layout.group_item_empty_layout,
+                parent,
+                false
+            )
         return VH(view)
     }
 
+    companion object {
+        const val TYPE_EMPTY = 1288
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        if (list.size == 0) {
+            return TYPE_EMPTY
+        }
+        return super.getItemViewType(position)
+    }
 
     @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: VH, position: Int) {
+        if(getItemViewType(position) == TYPE_EMPTY){
+            return
+        }
         val channel = list[position]
         val isCurrentChannel = currentChannel != null && currentChannel?.id == channel.id
         holder.textViewGroupName.text =
-            if (isCurrentChannel) getCurrentChannelText(channel,holder.itemView) else channel.name
+            if (isCurrentChannel) getCurrentChannelText(channel, holder.itemView) else channel.name
         holder.textViewGroupUserCount.text = "${channel.memberCount}人"
         holder.itemView.setOnClickListener {
             onItemRoute?.invoke(channel, it)
@@ -96,6 +120,9 @@ class GroupListAdapter(
 
 
     override fun getItemCount(): Int {
+        if (list.size == 0) {
+            return 1
+        }
         return list.size
     }
 
