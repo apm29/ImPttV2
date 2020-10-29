@@ -1,6 +1,6 @@
 package com.imptt.v2.utils
 
-import android.app.Activity
+import android.app.ActivityManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -12,7 +12,6 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.*
 import androidx.navigation.Navigation
-import androidx.navigation.findNavController
 import androidx.navigation.navOptions
 import com.imptt.v2.R
 import com.imptt.v2.core.struct.BaseFragment
@@ -20,9 +19,6 @@ import com.imptt.v2.core.struct.BaseNestedFragment
 import com.imptt.v2.view.HostActivity
 import com.kylindev.pttlib.service.BaseServiceObserver
 import com.kylindev.pttlib.service.InterpttService
-import com.kylindev.pttlib.service.model.Channel
-import java.lang.reflect.Field
-import java.util.ArrayList
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
@@ -184,3 +180,21 @@ suspend fun HostActivity.requireInterPttService() = suspendCoroutine<InterpttSer
 
 suspend fun Fragment.requireInterPttService() =
     (requireActivity() as HostActivity).requireInterPttService()
+
+
+fun isServiceRunning(context: Context, className: String = "com.kylindev.pttlib.service.InterpttService"): Boolean {
+    var isRunning = false
+    val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+    //200 安全起见，此值选大点，以免不够
+    val serviceList = activityManager.getRunningServices(200)
+    if (serviceList.size <= 0) {
+        return false
+    }
+    for (i in serviceList.indices) {
+        if (serviceList[i].service.className == className) {
+            isRunning = true
+            break
+        }
+    }
+    return isRunning
+}

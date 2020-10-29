@@ -69,7 +69,7 @@ class HostActivity : PttServiceBindActivity(), CoroutineScope {
         return ZmCmdLink(this, object : ZmCmdLink.ZmEventListener {
             //sco
             override fun onScoStateChanged(sco: Boolean) {
-                println("AudioRecordActivity.onScoStateChanged sco = [${sco}]")
+                println("AudioRecord.onScoStateChanged sco = [${sco}]")
 //                if(sco){
 //                    zmLink.enterSppMode()
 //                }else{
@@ -79,6 +79,7 @@ class HostActivity : PttServiceBindActivity(), CoroutineScope {
 
             //spp
             override fun onSppStateChanged(spp: Boolean) {
+                println("AudioRecord.onSppStateChanged state = [$spp]")
                 Toast.makeText(
                     this@HostActivity,
                     if (spp) "连接蓝牙肩咪成功" else "外放模式",
@@ -91,17 +92,19 @@ class HostActivity : PttServiceBindActivity(), CoroutineScope {
 
             //用户按键
             override fun onUserEvent(event: ZmCmdLink.ZmUserEvent?) {
-                println("AudioRecordActivity.onUserEvent event = [${event}]")
+                println("AudioRecord.onUserEvent event = [${event}]")
                 println("event = [${event}]")
                 if (event == ZmCmdLink.ZmUserEvent.zmEventPttPressed) {
                     launch {
                         val pttService = requirePttService()
+                        mAudioManager.startBluetoothSco()
                         pttService.userPressDown()
                     }
                 } else if (event == ZmCmdLink.ZmUserEvent.zmEventPttReleased) {
                     launch {
                         val pttService = requirePttService()
                         pttService.userPressUp()
+                        mAudioManager.stopBluetoothSco()
                     }
                 }
             }
@@ -346,8 +349,11 @@ class HostActivity : PttServiceBindActivity(), CoroutineScope {
 
     override fun onDestroy() {
         super.onDestroy()
-        println("HostActivity.onDestroy")
-        zmLink.destroy()
+        val serviceRunning = isServiceRunning(this)
+        println("HostActivity.onDestroy:$serviceRunning")
+        if(!serviceRunning){
+            zmLink.destroy()
+        }
         mWakeLock.release()
         mAudioManager.unregisterMediaButtonEventReceiver(
             ComponentName(this,MediaButtonReceiver::class.java)
