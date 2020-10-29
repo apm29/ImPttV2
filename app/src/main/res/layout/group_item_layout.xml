@@ -34,7 +34,7 @@
                 tools:text="频道666"
                 style="@style/TextAppearance.AppCompat.Title"
                 android:gravity="center_vertical"
-                android:textSize="20sp"
+                android:textSize="16sp"
                 android:id="@+id/textViewGroupName"
                 android:layout_height="match_parent">
             </TextView>
@@ -44,7 +44,7 @@
                 android:paddingEnd="12dp"
                 tools:text="666"
                 android:gravity="center_vertical"
-                android:textSize="20sp"
+                android:textSize="16sp"
                 android:id="@+id/textViewGroupUserCount"
                 android:layout_height="match_parent">
             </TextView>
