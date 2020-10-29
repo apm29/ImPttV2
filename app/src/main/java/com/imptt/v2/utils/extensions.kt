@@ -11,6 +11,7 @@ import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
 import android.view.View
+import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.*
 import androidx.navigation.Navigation
@@ -18,6 +19,7 @@ import androidx.navigation.navOptions
 import com.imptt.v2.R
 import com.imptt.v2.core.struct.BaseFragment
 import com.imptt.v2.core.struct.BaseNestedFragment
+import com.imptt.v2.di.GlideApp
 import com.imptt.v2.view.HostActivity
 import com.kylindev.pttlib.service.BaseServiceObserver
 import com.kylindev.pttlib.service.InterpttService
@@ -233,4 +235,12 @@ fun getAppVersionName(context: Context): String? {
         e.printStackTrace()
     }
     return appVersionName
+}
+
+fun ImageView.loadImageData(res:ByteArray?){
+    res?.let {
+        GlideApp.with(this)
+            .load(it)
+            .into(this)
+    }
 }

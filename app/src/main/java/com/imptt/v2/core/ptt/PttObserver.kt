@@ -175,13 +175,13 @@ open class PttObserver(
         println("$tag.onShowToast")
     }
 
-    override fun onPlaybackChanged(p0: Int, p1: Int, p2: Boolean) {
-        super.onPlaybackChanged(p0, p1, p2)
-        println("$tag.onPlaybackChanged")
+    override fun onPlaybackChanged(channelId: Int, resId: Int, play: Boolean) {
+        super.onPlaybackChanged(channelId, resId, play)
+        println("$tag.onPlaybackChanged channelId = [${channelId}], resId = [${resId}], play = [${play}]")
     }
 
-    override fun onRecordFinished(p0: ChatMessageBean) {
-        super.onRecordFinished(p0)
+    override fun onRecordFinished(messageBean: ChatMessageBean) {
+        super.onRecordFinished(messageBean)
         println("$tag.onRecordFinished")
     }
 

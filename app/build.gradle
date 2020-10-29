@@ -9,6 +9,17 @@ android {
     buildFeatures {
         dataBinding = true
     }
+
+    signingConfigs {
+
+        releaseConfig {
+            storeFile file("../keystore/ptt.keystore")
+            storePassword "com.imptt.v2"
+            keyAlias "ptt"
+            keyPassword "com.imptt.v2"
+        }
+    }
+
     defaultConfig {
         applicationId "com.imptt.v2"
         minSdkVersion 21
@@ -29,11 +40,13 @@ android {
     buildTypes {
         debug{
             buildConfigField "boolean", "AUDIO_PROCESS", "true"
+            signingConfig signingConfigs.releaseConfig
         }
         release {
             minifyEnabled false
             buildConfigField "boolean", "AUDIO_PROCESS", "true"
             proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
+            signingConfig signingConfigs.releaseConfig
         }
     }
     compileOptions {

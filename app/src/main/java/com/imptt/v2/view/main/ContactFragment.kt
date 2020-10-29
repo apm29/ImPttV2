@@ -2,8 +2,10 @@ package com.imptt.v2.view.main
 
 import android.os.Bundle
 import android.view.View
+import androidx.lifecycle.Observer
 import com.imptt.v2.R
 import com.imptt.v2.core.struct.BaseNestedFragment
+import com.imptt.v2.data.model.Contact
 import com.imptt.v2.utils.observe
 import com.imptt.v2.view.adapter.ContactAdapter
 import com.imptt.v2.vm.ContactViewModel
@@ -22,13 +24,14 @@ class ContactFragment : BaseNestedFragment() {
     }
 
     override fun setupViews(view: View, savedInstanceState: Bundle?) {
-        observe(contactViewModel.contacts) {
-            expandableListView.setAdapter(
-                ContactAdapter(
-                    it, layoutInflater
+        observe<Contact>(contactViewModel.contacts,
+            Observer { t ->
+                expandableListView.setAdapter(
+                    ContactAdapter(
+                        t, layoutInflater
+                    )
                 )
-            )
-        }
+            })
         setToolbarTitle("联系人")
     }
 

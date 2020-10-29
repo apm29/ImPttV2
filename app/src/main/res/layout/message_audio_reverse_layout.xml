@@ -53,6 +53,7 @@
             android:paddingVertical="12dp"
             tools:text="12s" />
         <ImageView
+            android:id="@+id/imageViewPlay"
             android:src="@mipmap/volumehigh"
             android:layout_width="wrap_content"
             android:rotation="180"

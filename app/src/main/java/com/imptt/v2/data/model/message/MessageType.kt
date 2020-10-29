@@ -11,4 +11,5 @@ enum class MessageType(val type: Int) {
     IMAGE_ME(10008),
     FILE_OTHER(10009),
     FILE_ME(10010),
+    UNKNOWN(99999),
 }

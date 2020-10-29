@@ -7,6 +7,9 @@ import com.imptt.v2.data.entity.Group
 import com.imptt.v2.data.model.message.Message
 import com.imptt.v2.data.model.message.MessageType
 import com.imptt.v2.data.repo.ImRepository
+import com.kylindev.pttlib.db.ChatMessageBean
+import com.kylindev.pttlib.service.InterpttService
+import java.util.ArrayList
 
 /**
  *  author : ciih
@@ -17,33 +20,19 @@ class GroupViewModel(
     private val imRepository: ImRepository
 ):ViewModel() {
 
-    private val _messages: MutableLiveData<ArrayList<Message>> = MutableLiveData()
+    private val pageSize = 20
+    private val messages: ArrayList<ChatMessageBean> = arrayListOf()
+    val data:MutableLiveData<ArrayList<ChatMessageBean>> = MutableLiveData(messages)
 
-    val messages: LiveData<ArrayList<Message>> = _messages
-
-
-    private fun setMessages(groups:ArrayList<Message>){
-        this._messages.value = groups
-    }
-
-    private val currentGroup:MutableLiveData<Group> = MutableLiveData()
-    val current:LiveData<Group> = currentGroup
-
-    init {
-        setMessages(
-            arrayListOf(
-                Message(1L),
-                Message(2L,contentType = MessageType.AUDIO_ME),
-                Message(3L,contentType = MessageType.AUDIO_ME),
-                Message(4L),
-                Message(5L,contentType = MessageType.TEXT_ME),
-                Message(6L,contentType = MessageType.TEXT_OTHER),
-            )
-        )
-    }
-
-    suspend fun loadGroupInfo(id:String){
-        currentGroup.value = imRepository.queryGroupById(id)
+    fun loadMessages(groupId:Int,service:InterpttService,refresh:Boolean = true){
+        if(refresh){
+            messages.clear()
+        }
+        val loaded = service.loadDBRecords(groupId,messages.size,pageSize)
+        if(loaded!=null&&loaded.isNotEmpty()) {
+            messages.addAll(loaded)
+            data.value = messages
+        }
     }
 
 }

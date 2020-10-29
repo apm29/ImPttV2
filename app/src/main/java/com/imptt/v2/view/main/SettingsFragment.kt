@@ -50,6 +50,9 @@ class SettingsFragment : BaseNestedFragment() {
             checkboxHeadSet.setOnCheckedChangeListener { _, isChecked ->
                 pttService.supportHeadsetKey = isChecked
             }
+            checkboxAutoPlay.setOnCheckedChangeListener { _, isChecked ->
+                pttService.toggleVoiceOn()
+            }
         }
     }
 }

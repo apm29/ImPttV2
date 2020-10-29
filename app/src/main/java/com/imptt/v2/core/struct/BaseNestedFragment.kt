@@ -12,22 +12,16 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.navigation.Navigation
-import androidx.navigation.fragment.findNavController
 import androidx.transition.*
 import com.imptt.v2.R
 import com.imptt.v2.utils.LocalStorage
 import com.imptt.v2.utils.findPrimaryNavController
-import com.imptt.v2.utils.log
 import com.imptt.v2.utils.observe
 import com.imptt.v2.view.HostActivity
 import com.kylindev.pttlib.service.InterpttService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
-import kotlin.coroutines.suspendCoroutine
 
 abstract class BaseNestedFragment : Fragment(), CoroutineScope {
 

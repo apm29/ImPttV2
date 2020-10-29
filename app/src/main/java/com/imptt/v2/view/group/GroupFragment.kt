@@ -5,20 +5,17 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.imptt.v2.R
 import com.imptt.v2.core.ptt.PttObserver
 import com.imptt.v2.core.struct.BaseFragment
-import com.imptt.v2.data.model.message.Message
-import com.imptt.v2.utils.clamp
-import com.imptt.v2.utils.navigate
-import com.imptt.v2.utils.registerObserverWithLifecycle
-import com.imptt.v2.utils.requirePttService
+import com.imptt.v2.utils.*
 import com.imptt.v2.view.adapter.MessageListAdapter
 import com.imptt.v2.view.user.UserInfoFragmentArgs
 import com.imptt.v2.vm.GroupViewModel
 import com.imptt.v2.widget.PttButton
-import com.kylindev.pttlib.service.model.User
+import com.kylindev.pttlib.db.ChatMessageBean
 import kotlinx.android.synthetic.main.fragment_group.*
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -35,6 +32,7 @@ class GroupFragment : BaseFragment() {
             ?: throw IllegalArgumentException("群组id为空")
     }
 
+
     override fun setupViewLayout(savedInstanceState: Bundle?): Int {
         return R.layout.fragment_group
     }
@@ -47,8 +45,13 @@ class GroupFragment : BaseFragment() {
 
         setHasOptionsMenu(true)
 
+
+
         launch {
             val pttService = requirePttService()
+            observe<ArrayList<ChatMessageBean>>(groupViewModel.data, Observer {
+                initialList(it, pttService.currentUser.iId)
+            })
             pttService.enterChannel(groupId.toInt())
             buttonPtt.pttButtonState = object : PttButton.PttButtonState {
                 override fun onPressDown() {
@@ -62,25 +65,69 @@ class GroupFragment : BaseFragment() {
                 }
             }
             setToolbarTitle(pttService.getChannelByChanId(groupId.toInt()).name)
+            pttService.registerObserverWithLifecycle(this@GroupFragment,object:PttObserver(){
+                override fun onRecordFinished(messageBean: ChatMessageBean) {
+                    super.onRecordFinished(messageBean)
+                    groupViewModel.loadMessages(groupId.toInt(), pttService)
+                }
+
+                override fun onPlaybackChanged(channelId: Int, resId: Int, play: Boolean) {
+                    super.onPlaybackChanged(channelId, resId, play)
+                    val messageListAdapter = recyclerViewMessages.adapter as MessageListAdapter
+                    if(play){
+                        messageListAdapter.notifyPlaybackStart(resId)
+                    }else{
+                        messageListAdapter.notifyPlaybackStop()
+                    }
+                }
+            })
+            layoutSwipeRefresh.setOnRefreshListener {
+                groupViewModel.loadMessages(groupId.toInt(), pttService,false)
+                layoutSwipeRefresh.isRefreshing = false
+            }
+            groupViewModel.loadMessages(groupId.toInt(), pttService)
         }
     }
 
-    private fun initialList(messages: ArrayList<Message>) {
-        recyclerViewMessages.layoutManager = LinearLayoutManager(requireContext(),LinearLayoutManager.VERTICAL,true)
+    private fun initialList(messages: ArrayList<ChatMessageBean>, myId: Int) {
+        recyclerViewMessages.layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, true)
         if (recyclerViewMessages.adapter == null) {
             recyclerViewMessages.adapter =
-                MessageListAdapter(messages, layoutInflater, ::onMessageClicked,::onUserClicked)
+                MessageListAdapter(
+                    messages,
+                    layoutInflater,
+                    myId,
+                    -1,
+                    ::onMessageClicked,
+                    ::onUserClicked
+                )
         } else {
             (recyclerViewMessages.adapter as MessageListAdapter).newList(messages)
         }
     }
 
-    private fun onMessageClicked(message: Message, view: View) {
-
+    private fun onMessageClicked(message: ChatMessageBean, view: View,position:Int) {
+        if (message.voice != null && message.voice.isNotEmpty() && message.text == null)
+            launch {
+                val pttService = requirePttService()
+                val messageListAdapter = recyclerViewMessages.adapter as MessageListAdapter
+                val currentPlayPosition = messageListAdapter.getCurrentPlayPosition()
+                if( currentPlayPosition == position){
+                    pttService.stopPlayback()
+                    messageListAdapter.notifyPlaybackStop()
+                }else {
+                    pttService.playback(message.voice, groupId.toInt(), position)
+                    messageListAdapter.notifyPlaybackStart(position)
+                }
+            }
     }
 
-    private fun onUserClicked(message: Message, view: View) {
-        navigate(R.id.userInfoFragment, UserInfoFragmentArgs.Builder(message.fromId).build().toBundle())
+    private fun onUserClicked(message: ChatMessageBean, view: View) {
+        navigate(
+            R.id.userInfoFragment,
+            UserInfoFragmentArgs.Builder(message.uid.toString()).build().toBundle()
+        )
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
