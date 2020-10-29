@@ -49,7 +49,7 @@ class GroupFragment : BaseFragment() {
 
         launch {
             val pttService = requirePttService()
-            observe<ArrayList<ChatMessageBean>>(groupViewModel.data, Observer {
+            observe<MutableList<ChatMessageBean>>(groupViewModel.data, Observer {
                 initialList(it, pttService.currentUser.iId)
             })
             pttService.enterChannel(groupId.toInt())
@@ -65,7 +65,7 @@ class GroupFragment : BaseFragment() {
                 }
             }
             setToolbarTitle(pttService.getChannelByChanId(groupId.toInt()).name)
-            pttService.registerObserverWithLifecycle(this@GroupFragment,object:PttObserver(){
+            pttService.registerObserverWithLifecycle(this@GroupFragment, object : PttObserver() {
                 override fun onRecordFinished(messageBean: ChatMessageBean) {
                     super.onRecordFinished(messageBean)
                     groupViewModel.loadMessages(groupId.toInt(), pttService)
@@ -74,22 +74,22 @@ class GroupFragment : BaseFragment() {
                 override fun onPlaybackChanged(channelId: Int, resId: Int, play: Boolean) {
                     super.onPlaybackChanged(channelId, resId, play)
                     val messageListAdapter = recyclerViewMessages.adapter as MessageListAdapter
-                    if(play){
+                    if (play) {
                         messageListAdapter.notifyPlaybackStart(resId)
-                    }else{
+                    } else {
                         messageListAdapter.notifyPlaybackStop()
                     }
                 }
             })
             layoutSwipeRefresh.setOnRefreshListener {
-                groupViewModel.loadMessages(groupId.toInt(), pttService,false)
+                groupViewModel.loadMessages(groupId.toInt(), pttService, false)
                 layoutSwipeRefresh.isRefreshing = false
             }
             groupViewModel.loadMessages(groupId.toInt(), pttService)
         }
     }
 
-    private fun initialList(messages: ArrayList<ChatMessageBean>, myId: Int) {
+    private fun initialList(messages: MutableList<ChatMessageBean>, myId: Int) {
         recyclerViewMessages.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, true)
         if (recyclerViewMessages.adapter == null) {
@@ -103,20 +103,26 @@ class GroupFragment : BaseFragment() {
                     ::onUserClicked
                 )
         } else {
-            (recyclerViewMessages.adapter as MessageListAdapter).newList(messages)
+
+            val messageListAdapter = recyclerViewMessages.adapter as MessageListAdapter
+            val old = messageListAdapter.itemCount
+            messageListAdapter.addData(messages)
+            recyclerViewMessages.postDelayed({
+                recyclerViewMessages.scrollToPosition(old)
+            },0)
         }
     }
 
-    private fun onMessageClicked(message: ChatMessageBean, view: View,position:Int) {
+    private fun onMessageClicked(message: ChatMessageBean, view: View, position: Int) {
         if (message.voice != null && message.voice.isNotEmpty() && message.text == null)
             launch {
                 val pttService = requirePttService()
                 val messageListAdapter = recyclerViewMessages.adapter as MessageListAdapter
                 val currentPlayPosition = messageListAdapter.getCurrentPlayPosition()
-                if( currentPlayPosition == position){
+                if (currentPlayPosition == position) {
                     pttService.stopPlayback()
                     messageListAdapter.notifyPlaybackStop()
-                }else {
+                } else {
                     pttService.playback(message.voice, groupId.toInt(), position)
                     messageListAdapter.notifyPlaybackStart(position)
                 }

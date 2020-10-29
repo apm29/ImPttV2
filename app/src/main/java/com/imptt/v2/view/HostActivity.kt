@@ -163,7 +163,7 @@ class HostActivity : PttServiceBindActivity(), CoroutineScope {
                 object : PttObserver(this@HostActivity::class.simpleName) {
                     override fun onLocalUserTalkingChanged(user: User?, talking: Boolean) {
                         super.onLocalUserTalkingChanged(user, talking)
-                        val fromSelf = pttService.currentUser.iId == user?.iId
+                        val fromSelf = pttService.currentUser!=null && pttService.currentUser?.iId == user?.iId
                         if (talking) {
                             if(pttService.voiceOn || fromSelf) {
                                 layoutVolume.visible()

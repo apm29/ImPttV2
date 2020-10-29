@@ -10,12 +10,15 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.google.gson.Gson
 import com.imptt.v2.R
 import com.imptt.v2.data.model.message.MessageType
 import com.imptt.v2.utils.loadImageData
 import com.kylindev.pttlib.db.ChatMessageBean
+import okhttp3.internal.notifyAll
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
 /**
  *  author : apm29[ciih]
@@ -23,7 +26,7 @@ import java.util.*
  *  description :
  */
 class MessageListAdapter constructor(
-    private var messages: ArrayList<ChatMessageBean>,
+    private val messages: MutableList<ChatMessageBean>,
     private val layoutInflater: LayoutInflater,
     private val myId: Int,
     private var currentPlayPosition: Int = -1,
@@ -32,6 +35,11 @@ class MessageListAdapter constructor(
 ) : RecyclerView.Adapter<MessageListAdapter.VH>() {
     companion object {
         const val TYPE_FOOTER = 199999
+        const val EXTRA_ITEM_COUNT = 1
+    }
+
+    init {
+        setHasStableIds(true)
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -120,7 +128,6 @@ class MessageListAdapter constructor(
             onUserClicked?.invoke(messages[position], it)
         }
         holder.imageViewPlay?.id = position
-        Log.e("Image","$currentPlayPosition $position")
         if (contentType == MessageType.AUDIO_OTHER.type || contentType == MessageType.AUDIO_ME.type) {
             //语音
             holder.textViewDuration?.text =
@@ -143,7 +150,7 @@ class MessageListAdapter constructor(
         }
     }
 
-    private fun getMessageByPosition(position: Int) = messages[messages.size - position]
+    private fun getMessageByPosition(position: Int) = messages[position - 1]
 
     private fun getVoiceSize(
         holder: VH,
@@ -155,6 +162,8 @@ class MessageListAdapter constructor(
         )
     }
 
+
+
     //duration, in Seconds.
     private fun getVoiceDuration(data: ByteArray): Int {
         val frames = data.size / 30 //帧数
@@ -163,22 +172,32 @@ class MessageListAdapter constructor(
     }
 
     override fun getItemCount(): Int {
-        return messages.size + 1
+        return messages.size + EXTRA_ITEM_COUNT
     }
 
-    fun newList(messages: ArrayList<ChatMessageBean>) {
-        this.messages = messages
-        notifyDataSetChanged()
+    override fun getItemId(position: Int): Long {
+        if(position == 0){
+            return Long.MIN_VALUE
+        }
+        return getMessageByPosition(position).hashCode().toLong()
+    }
+
+    fun addData(messages: MutableList<ChatMessageBean>) {
+        val oldSize = itemCount
+        this.messages.addAll(messages)
+        println(oldSize)
+        println(messages.size)
+        notifyItemRangeInserted(oldSize,messages.size)
     }
 
     fun notifyPlaybackStart(currentPlayPosition: Int) {
         this.currentPlayPosition = currentPlayPosition
-        notifyDataSetChanged()
+        notifyItemChanged(currentPlayPosition)
     }
 
     fun notifyPlaybackStop() {
+        notifyItemChanged(currentPlayPosition)
         this.currentPlayPosition = -1
-        notifyDataSetChanged()
     }
 
     fun getCurrentPlayPosition(): Int {

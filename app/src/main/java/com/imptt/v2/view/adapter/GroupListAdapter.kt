@@ -31,9 +31,9 @@ class GroupListAdapter(
 
     private var list: ArrayList<Channel>
         get() {
-            channelList.sortWith { one, other ->
+            channelList.sortWith (Comparator{ one, other ->
                 one.id - other.id
-            }
+            })
             return channelList
         }
         set(value) {
