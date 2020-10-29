@@ -13,7 +13,9 @@ import android.util.Log
 import android.widget.Toast
 import androidx.navigation.findNavController
 import androidx.navigation.navOptions
+import com.imptt.v2.AppConst
 import com.imptt.v2.R
+import com.imptt.v2.core.ptt.AppConstants
 import com.imptt.v2.core.ptt.PttObserver
 import com.imptt.v2.core.struct.PttServiceBindActivity
 import com.imptt.v2.receiver.MediaButtonReceiver
@@ -275,7 +277,7 @@ class HostActivity : PttServiceBindActivity(), CoroutineScope {
                         runOnUiThread {
                             Toast.makeText(
                                 this@HostActivity,
-                                "操作失败($code):$reason",
+                                "操作失败(${AppConstants.permReason[code]})$reason",
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
