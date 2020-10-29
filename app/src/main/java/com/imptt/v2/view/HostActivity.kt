@@ -188,6 +188,7 @@ class HostActivity : PttServiceBindActivity(), CoroutineScope {
                     override fun onTalkingTimerCanceled() {
                         super.onTalkingTimerCanceled()
                         textViewDuration.gone()
+                        textViewCaller.text = "结束"
                     }
 
                     @SuppressLint("SetTextI18n")
