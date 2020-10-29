@@ -5,6 +5,7 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
+import androidx.appcompat.app.AlertDialog
 import androidx.navigation.navOptions
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -53,32 +54,40 @@ class GroupSettingsFragment : BaseFragment() {
             initialGrid(users ?: arrayListOf())
             editTextGroupName.setText(channel.name)
             buttonDismissGroup.setOnClickListener {
-                service.deleteChannel(groupId.toInt())
-                //登录成功
-                findPrimaryNavController().navigate(
-                    R.id.mainFragment,
-                    null,
-                    navOptions {
-                        popUpTo(R.id.host_nav_graph) {
-                            inclusive = true
-                        }
-                        launchSingleTop = true
+                AlertDialog.Builder(requireContext())
+                    .setTitle(R.string.title_warning)
+                    .setMessage(R.string.desc_dissmiss_group)
+                    .setPositiveButton(R.string.title_confirm){
+                        dialog,_->
+                        service.deleteChannel(groupId.toInt())
+                        dialog.dismiss()
+                        navigate(
+                            R.id.mainFragment,
+                            null,
+                            true
+                        )
                     }
-                )
+                    .create()
+                    .show()
+
             }
             buttonQuitGroup.setOnClickListener {
-                service.quitChannel(groupId.toInt())
-                //登录成功
-                findPrimaryNavController().navigate(
-                    R.id.mainFragment,
-                    null,
-                    navOptions {
-                        popUpTo(R.id.host_nav_graph) {
-                            inclusive = true
-                        }
-                        launchSingleTop = true
+                AlertDialog.Builder(requireContext())
+                    .setTitle(R.string.title_warning)
+                    .setMessage(R.string.desc_quit_group)
+                    .setPositiveButton(R.string.title_confirm){
+                            dialog,_->
+                        service.quitChannel(groupId.toInt())
+                        dialog.dismiss()
+                        navigate(
+                            R.id.mainFragment,
+                            null,
+                            true
+                        )
                     }
-                )
+                    .create()
+                    .show()
+
             }
         }
 

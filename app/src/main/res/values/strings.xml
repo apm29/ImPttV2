@@ -50,4 +50,8 @@
     <string name="subtitle_float_window">悬浮窗</string>
     <string name="subtitle_headset_support">耳机/蓝牙播放键起麦</string>
     <string name="action_sign_up">注册</string>
+    <string name="title_warning">警告</string>
+    <string name="desc_dissmiss_group">确定解散该频道吗?</string>
+    <string name="title_confirm">确定</string>
+    <string name="desc_quit_group">确定要退出该频道吗?</string>
 </resources>
