@@ -49,4 +49,5 @@
     <string name="edit">编辑</string>
     <string name="subtitle_float_window">悬浮窗</string>
     <string name="subtitle_headset_support">耳机/蓝牙播放键起麦</string>
+    <string name="action_sign_up">注册</string>
 </resources>

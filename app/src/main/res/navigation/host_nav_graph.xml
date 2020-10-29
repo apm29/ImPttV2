@@ -131,4 +131,11 @@
             app:nullable="true">
         </argument>
     </fragment>
+    <fragment
+        android:id="@+id/registerFragment"
+        tools:layout="@layout/fragment_register"
+        android:name="com.imptt.v2.view.user.RegisterFragment"
+        android:label="@string/action_sign_up"
+        >
+    </fragment>
 </navigation>

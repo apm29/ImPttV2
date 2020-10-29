@@ -3,6 +3,7 @@ package com.imptt.v2.core.struct
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -24,15 +25,24 @@ import com.imptt.v2.utils.findPrimaryNavController
 import com.imptt.v2.utils.observe
 import com.imptt.v2.view.HostActivity
 import com.kylindev.pttlib.service.InterpttService
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlin.coroutines.CoroutineContext
 
 
 abstract class BaseFragment : Fragment(), CoroutineScope {
 
+    private val mJob = SupervisorJob()
+
+    private val mCoroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
+        Log.e(tagFragment,"COROUTINE EXCEPTION:")
+        throwable.printStackTrace()
+    }
+
     override val coroutineContext: CoroutineContext
-        get() = Dispatchers.Main
+        get() = Dispatchers.Main + mJob + mCoroutineExceptionHandler
 
     val ioContext: CoroutineContext
         get() = Dispatchers.IO

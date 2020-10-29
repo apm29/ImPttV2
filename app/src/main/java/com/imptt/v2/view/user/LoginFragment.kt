@@ -31,6 +31,9 @@ class LoginFragment : BaseFragment() {
     override fun setupViews(view: View, savedInstanceState: Bundle?) {
         enableUserInterface(false)
         username.setText(localStorage.userId)
+        buttonRegister.setOnClickListener {
+            navigate(R.id.registerFragment)
+        }
         launch {
             val pttService = requirePttService()
             enableUserInterface(true)
