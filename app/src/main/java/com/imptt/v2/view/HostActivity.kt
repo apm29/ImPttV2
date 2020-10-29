@@ -13,7 +13,6 @@ import android.util.Log
 import android.widget.Toast
 import androidx.navigation.findNavController
 import androidx.navigation.navOptions
-import com.imptt.v2.AppConst
 import com.imptt.v2.R
 import com.imptt.v2.core.ptt.AppConstants
 import com.imptt.v2.core.ptt.PttObserver
@@ -164,14 +163,16 @@ class HostActivity : PttServiceBindActivity(), CoroutineScope {
                 object : PttObserver(this@HostActivity::class.simpleName) {
                     override fun onLocalUserTalkingChanged(user: User?, talking: Boolean) {
                         super.onLocalUserTalkingChanged(user, talking)
+                        val fromSelf = pttService.currentUser.iId == user?.iId
                         if (talking) {
-                            layoutVolume.visible()
+                            if(pttService.voiceOn || fromSelf) {
+                                layoutVolume.visible()
+                            }
                         }else {
                             layoutVolume.gone()
                         }
-
                         textViewCaller.text =
-                            if (user != null && pttService.currentUser.iId != user.iId && talking)
+                            if (user != null && !fromSelf && talking)
                                 "${user.channel.name} | ${user.name}\r\n正在讲话"
                             else if(talking){
                                 "正在讲话"
@@ -345,7 +346,7 @@ class HostActivity : PttServiceBindActivity(), CoroutineScope {
         super.onRestart()
         launch {
             val pttService = requirePttService()
-            if(pttService.isAduioPlaying){
+            if(pttService.isAduioPlaying && pttService.voiceOn){
                 layoutVolume.visible()
             }else{
                 layoutVolume.gone()

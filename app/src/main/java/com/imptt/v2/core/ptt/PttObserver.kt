@@ -228,9 +228,9 @@ open class PttObserver(
         println("$tag.onSynced")
     }
 
-    override fun onVoiceToggleChanged(p0: Boolean) {
-        super.onVoiceToggleChanged(p0)
-        println("$tag.onVoiceToggleChanged")
+    override fun onVoiceToggleChanged(on: Boolean) {
+        super.onVoiceToggleChanged(on)
+        println("$tag.onVoiceToggleChanged on = [$on]")
     }
 
     override fun onMembersGot(p0: Int, p1: String) {

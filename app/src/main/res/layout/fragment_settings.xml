@@ -110,7 +110,6 @@
             <com.google.android.material.switchmaterial.SwitchMaterial
                 android:id="@+id/checkboxAutoPlay"
                 android:layout_width="wrap_content"
-                android:checked="true"
                 android:layout_height="wrap_content"/>
         </LinearLayout>
         <LinearLayout
