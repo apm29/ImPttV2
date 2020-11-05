@@ -2,10 +2,12 @@ package com.imptt.v2.view
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.content.ComponentName
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
+import android.media.AudioAttributes
 import android.media.AudioManager
+import android.media.SoundPool
 import android.os.Bundle
 import android.os.PowerManager
 import android.text.format.Formatter
@@ -17,7 +19,6 @@ import com.imptt.v2.R
 import com.imptt.v2.core.ptt.AppConstants
 import com.imptt.v2.core.ptt.PttObserver
 import com.imptt.v2.core.struct.PttServiceBindActivity
-import com.imptt.v2.receiver.MediaButtonReceiver
 import com.imptt.v2.utils.*
 import com.itsmartreach.libzm.ZmCmdLink
 import com.kylindev.pttlib.service.InterpttProtocolHandler
@@ -39,10 +40,11 @@ class HostActivity : PttServiceBindActivity(), CoroutineScope {
 
     private val mExceptionHandler: CoroutineExceptionHandler =
         CoroutineExceptionHandler { _, throwable ->
-            Log.e(TAG,"COROUTINE EXCEPTION:")
+            Log.e(TAG, "COROUTINE EXCEPTION:")
             //在此处捕获异常
             throwable.printStackTrace()
         }
+
     //SupervisorJob在子协程抛出异常时不会被取消
     private val mJob = SupervisorJob()
 
@@ -146,6 +148,7 @@ class HostActivity : PttServiceBindActivity(), CoroutineScope {
         mPowerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "ptt:MyWakelockTag")
     }
 
+    @SuppressLint("WakelockTimeout")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mWakeLock.acquire()
@@ -159,26 +162,31 @@ class HostActivity : PttServiceBindActivity(), CoroutineScope {
         launch {
             val pttService = requirePttService()
             var lastRhythmTime = 0L
+            pttService.alertType =  1
             pttService.registerObserverWithLifecycle(this@HostActivity,
                 object : PttObserver(this@HostActivity::class.simpleName) {
                     override fun onLocalUserTalkingChanged(user: User?, talking: Boolean) {
                         super.onLocalUserTalkingChanged(user, talking)
-                        val fromSelf = pttService.currentUser!=null && pttService.currentUser?.iId == user?.iId
+                        val fromSelf =
+                            pttService.currentUser != null && pttService.currentUser?.iId == user?.iId
+                        val message: CharSequence? = if (user != null && !fromSelf && talking)
+                            "${user.channel.name} | ${user.name}\r\n正在讲话"
+                        else if (talking) {
+                            "正在讲话"
+                        } else if (user == null || !user.isCurrent) {
+                            "结束"
+                        } else {
+                            null
+                        }
+                        if (message != null)  textViewCaller.text = message
+
                         if (talking) {
-                            if(pttService.voiceOn || fromSelf) {
+                            if (pttService.voiceOn || fromSelf) {
                                 layoutVolume.visible()
                             }
-                        }else {
-                            layoutVolume.gone()
+                        } else {
+                            layoutVolume.gone(400)
                         }
-                        textViewCaller.text =
-                            if (user != null && !fromSelf && talking)
-                                "${user.channel.name} | ${user.name}\r\n正在讲话"
-                            else if(talking){
-                                "正在讲话"
-                            } else {
-                                "结束"
-                            }
                     }
 
                     override fun onNewVolumeData(volume: Short) {
@@ -193,7 +201,6 @@ class HostActivity : PttServiceBindActivity(), CoroutineScope {
                     override fun onTalkingTimerCanceled() {
                         super.onTalkingTimerCanceled()
                         textViewDuration.gone()
-                        textViewCaller.text = "结束"
                     }
 
                     @SuppressLint("SetTextI18n")
@@ -257,12 +264,24 @@ class HostActivity : PttServiceBindActivity(), CoroutineScope {
                                 }
                             }
                             else -> {
-                                //登录失败
-                                Toast.makeText(
-                                    this@HostActivity,
-                                    "登录失败:$rejectType",
-                                    Toast.LENGTH_SHORT
-                                ).show()
+                                runOnUiThread {
+                                    val message = when (rejectType) {
+                                        ServerProto.Reject.RejectType.None -> "登录成功"
+                                        ServerProto.Reject.RejectType.WrongVersion -> "版本错误"
+                                        ServerProto.Reject.RejectType.InvalidUsername -> "非法用户名"
+                                        ServerProto.Reject.RejectType.WrongUserPW -> "错误的用户名密码"
+                                        ServerProto.Reject.RejectType.UsernameInUse -> "该用户名已被使用"
+                                        ServerProto.Reject.RejectType.ServerFull -> "服务器负载高"
+                                        ServerProto.Reject.RejectType.AuthenticatorFail -> "验证失败"
+                                        ServerProto.Reject.RejectType.WrongClientType -> "错误的客户端类型"
+                                    }
+                                    //登录失败
+                                    AlertDialog.Builder(this@HostActivity)
+                                        .setTitle("登录失败")
+                                        .setMessage(message)
+                                        .create()
+                                        .show()
+                                }
                             }
                         }
                     }
@@ -339,16 +358,16 @@ class HostActivity : PttServiceBindActivity(), CoroutineScope {
 
     override fun onStart() {
         super.onStart()
-        Beta.checkAppUpgrade(false,false)
+        Beta.checkAppUpgrade(false, false)
     }
 
     override fun onRestart() {
         super.onRestart()
         launch {
             val pttService = requirePttService()
-            if(pttService.isAduioPlaying && pttService.voiceOn){
+            if ((pttService.isAduioPlaying && pttService.voiceOn) || pttService.currentUser?.isLocalTalking == true) {
                 layoutVolume.visible()
-            }else{
+            } else {
                 layoutVolume.gone()
             }
         }
@@ -358,13 +377,13 @@ class HostActivity : PttServiceBindActivity(), CoroutineScope {
         super.onDestroy()
         val serviceRunning = isServiceRunning(this)
         println("HostActivity.onDestroy:$serviceRunning")
-        if(!serviceRunning){
+        if (!serviceRunning) {
             zmLink.destroy()
         }
         mWakeLock.release()
-        mAudioManager.unregisterMediaButtonEventReceiver(
-            ComponentName(this,MediaButtonReceiver::class.java)
-        )
+//        mAudioManager.unregisterMediaButtonEventReceiver(
+//            ComponentName(this, MediaButtonReceiver::class.java)
+//        )
         mJob.cancelChildren()
     }
 
@@ -407,7 +426,7 @@ class HostActivity : PttServiceBindActivity(), CoroutineScope {
             InterpttService.ConnState.CONNECTION_STATE_CONNECTED -> {
                 layoutState.gone()
                 textViewState.text = "对讲服务已连接"
-                Log.e(TAG,"pttKeycode:${pttService.pttKeycode}")
+                Log.e(TAG, "pttKeycode:${pttService.pttKeycode}")
                 pttService.strongOnline = true
             }
         }

@@ -85,7 +85,7 @@ class HomeFragment : BaseNestedFragment() {
 
                 override fun onListenChanged(listen: Boolean) {
                     super.onListenChanged(listen)
-
+                    initialList(service.channelList, service.listenChannels)
                 }
             })
         }

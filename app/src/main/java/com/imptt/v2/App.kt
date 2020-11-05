@@ -12,13 +12,13 @@ import org.koin.core.context.startKoin
 class App:Application() {
     override fun onCreate() {
         super.onCreate()
-        // Start Koin:因为运行在ptt进程中,所以koin需要在此处初始化两次
         println("start koin : pid = ${Process.myPid()}")
         startKoin{
             androidLogger()
             androidContext(this@App)
             modules(serviceModule,viewModule)
         }
-        Bugly.init(this, "3328c83306", BuildConfig.DEBUG)
+        if(!BuildConfig.DEBUG)
+            Bugly.init(this, "3328c83306", BuildConfig.DEBUG)
     }
 }

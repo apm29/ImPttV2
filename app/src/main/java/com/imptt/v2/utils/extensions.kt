@@ -244,3 +244,8 @@ fun ImageView.loadImageData(res:ByteArray?){
             .into(this)
     }
 }
+
+fun InterpttService.userPressedWithHam(){
+    SoundPoolUtils.getInstance(this).playPttStartHam()
+    this.userPressDown()
+}

@@ -76,7 +76,7 @@ class GroupListAdapter(
         val isCurrentChannel = currentChannel != null && currentChannel?.id == channel.id
         holder.textViewGroupName.text =
             if (isCurrentChannel) getCurrentChannelText(channel, holder.itemView) else channel.name
-        holder.textViewGroupUserCount.text = "${channel.memberCount}人"
+        holder.textViewGroupUserCount.text = "${channel.memberCount}人（${channel.userCount}在线）"
         holder.itemView.setOnClickListener {
             onItemRoute?.invoke(channel, it)
         }
@@ -109,7 +109,7 @@ class GroupListAdapter(
         return SpannableStringBuilder().append(
             channel.name
         ).append(
-            "(当前频道)",
+            "\r\n(当前频道)",
             TextAppearanceSpan(
                 itemView.context,
                 R.style.CaptionText

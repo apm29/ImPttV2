@@ -1,6 +1,7 @@
 package com.imptt.v2.core.ptt
 
 import android.bluetooth.BluetoothDevice
+import com.google.gson.Gson
 import com.kylindev.pttlib.db.ChatMessageBean
 import com.kylindev.pttlib.service.BaseServiceObserver
 import com.kylindev.pttlib.service.InterpttService
@@ -71,14 +72,11 @@ open class PttObserver(
 
     override fun onLocalUserTalkingChanged(user: User?, talking: Boolean) {
         super.onLocalUserTalkingChanged(user, talking)
-        println("$tag.onLocalUserTalkingChanged")
-        println("user = [${user}], talking = [${talking}]")
+        println("$tag.onLocalUserTalkingChanged user = [${user}], talking = [${talking}]")
     }
 
     override fun onNewVolumeData(volume: Short) {
         super.onNewVolumeData(volume)
-        println("$tag.onNewVolumeData")
-        println("$tag:volume = [${volume}]")
     }
 
     override fun onPermissionDenied(reason: String, code: Int) {
@@ -182,7 +180,7 @@ open class PttObserver(
 
     override fun onRecordFinished(messageBean: ChatMessageBean) {
         super.onRecordFinished(messageBean)
-        println("$tag.onRecordFinished")
+        println("$tag.onRecordFinished ${Gson().toJson(messageBean)}")
     }
 
     /**

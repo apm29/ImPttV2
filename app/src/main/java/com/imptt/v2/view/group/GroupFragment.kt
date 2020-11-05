@@ -1,6 +1,7 @@
 package com.imptt.v2.view.group
 
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
@@ -16,11 +17,11 @@ import com.imptt.v2.view.user.UserInfoFragmentArgs
 import com.imptt.v2.vm.GroupViewModel
 import com.imptt.v2.widget.PttButton
 import com.kylindev.pttlib.db.ChatMessageBean
+import com.kylindev.pttlib.service.model.User
 import kotlinx.android.synthetic.main.fragment_group.*
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.lang.IllegalArgumentException
-import java.util.ArrayList
 
 
 class GroupFragment : BaseFragment() {
@@ -68,7 +69,13 @@ class GroupFragment : BaseFragment() {
             pttService.registerObserverWithLifecycle(this@GroupFragment, object : PttObserver() {
                 override fun onRecordFinished(messageBean: ChatMessageBean) {
                     super.onRecordFinished(messageBean)
-                    groupViewModel.loadMessages(groupId.toInt(), pttService)
+                    if(messageBean.cid!=null) {
+                        val messageListAdapter = recyclerViewMessages.adapter as MessageListAdapter
+                        messageListAdapter.prependData(arrayListOf(messageBean))
+                        recyclerViewMessages.post {
+                            recyclerViewMessages.scrollToPosition(0)
+                        }
+                    }
                 }
 
                 override fun onPlaybackChanged(channelId: Int, resId: Int, play: Boolean) {
@@ -103,13 +110,12 @@ class GroupFragment : BaseFragment() {
                     ::onUserClicked
                 )
         } else {
-
             val messageListAdapter = recyclerViewMessages.adapter as MessageListAdapter
             val old = messageListAdapter.itemCount
-            messageListAdapter.addData(messages)
-            recyclerViewMessages.postDelayed({
+            messageListAdapter.appendData(messages)
+            recyclerViewMessages.post {
                 recyclerViewMessages.scrollToPosition(old)
-            },0)
+            }
         }
     }
 

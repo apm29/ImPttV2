@@ -13,12 +13,16 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
 import com.imptt.v2.R
 import com.imptt.v2.data.model.message.MessageType
+import com.imptt.v2.utils.clamp
+import com.imptt.v2.utils.gone
 import com.imptt.v2.utils.loadImageData
+import com.imptt.v2.utils.visible
 import com.kylindev.pttlib.db.ChatMessageBean
 import okhttp3.internal.notifyAll
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.math.abs
 
 /**
  *  author : apm29[ciih]
@@ -30,7 +34,7 @@ class MessageListAdapter constructor(
     private val layoutInflater: LayoutInflater,
     private val myId: Int,
     private var currentPlayPosition: Int = -1,
-    private val onMessageClicked: ((ChatMessageBean, View,Int) -> Unit)? = null,
+    private val onMessageClicked: ((ChatMessageBean, View, Int) -> Unit)? = null,
     private val onUserClicked: ((ChatMessageBean, View) -> Unit)? = null,
 ) : RecyclerView.Adapter<MessageListAdapter.VH>() {
     companion object {
@@ -38,8 +42,11 @@ class MessageListAdapter constructor(
         const val EXTRA_ITEM_COUNT = 1
     }
 
+    private val timeAnchors = Stack<Int>()
+
     init {
         setHasStableIds(true)
+        createTimeStampAnchor()
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -106,7 +113,8 @@ class MessageListAdapter constructor(
                 layoutInflater.inflate(R.layout.message_footer_layout, parent, false)
             }
             else -> {
-                throw IllegalArgumentException("未知的消息类型:$viewType")
+                //throw IllegalArgumentException("未知的消息类型:$viewType")
+                View(parent.context)
             }
         }
 
@@ -133,20 +141,49 @@ class MessageListAdapter constructor(
             holder.textViewDuration?.text =
                 "${getVoiceSize(holder, message)} | ${getVoiceDuration(message.voice)}秒"
             holder.layoutMessageBody?.setOnClickListener {
-                onMessageClicked?.invoke(message, it ,position)
+                onMessageClicked?.invoke(message, it, position)
             }
-            if(currentPlayPosition ==  position){
+            if (currentPlayPosition == position) {
                 //播放中
                 holder.imageViewPlay?.setImageResource(R.drawable.anim_voice_play_receiver)
                 val drawable = holder.imageViewPlay?.drawable as? AnimationDrawable
                 drawable?.start()
-            }else{
+            } else {
                 //停止的
                 holder.imageViewPlay?.setImageResource(R.mipmap.volumehigh)
             }
         } else if (contentType == MessageType.TEXT_OTHER.type || contentType == MessageType.TEXT_ME.type) {
             //文本
             holder.textViewContent?.text = message.text
+        }
+
+        //时间
+        val indexOf = timeAnchors.toMutableList().indexOf(position - EXTRA_ITEM_COUNT)
+        if (indexOf < 0) {
+            holder.textViewTime?.gone()
+        } else {
+            holder.textViewTime?.visible()
+        }
+    }
+
+    private fun createTimeStampAnchor() {
+        val times: List<Long> = messages.map { it.time?:0L }
+        timeAnchors.clear()
+        times.forEachIndexed { index: Int, time: Long ->
+            when {
+                timeAnchors.isEmpty() -> {
+                    timeAnchors.push(index)
+                }
+                abs(times[timeAnchors.peek()] - time) > 60 * 1000 -> {
+                    timeAnchors.push(index)
+                }
+                abs(timeAnchors.peek() - index) >= 4->{
+                    timeAnchors.push(index)
+                }
+                index == times.size - 1 -> {
+                    timeAnchors.push(index)
+                }
+            }
         }
     }
 
@@ -163,12 +200,11 @@ class MessageListAdapter constructor(
     }
 
 
-
     //duration, in Seconds.
     private fun getVoiceDuration(data: ByteArray): Int {
         val frames = data.size / 30 //帧数
         val ms = frames * 20 //每帧20ms
-        return ms / 1000 + 1
+        return (ms / 1000).clamp(1.0).toInt()
     }
 
     override fun getItemCount(): Int {
@@ -176,18 +212,23 @@ class MessageListAdapter constructor(
     }
 
     override fun getItemId(position: Int): Long {
-        if(position == 0){
+        if (position == 0) {
             return Long.MIN_VALUE
         }
         return getMessageByPosition(position).hashCode().toLong()
     }
 
-    fun addData(messages: MutableList<ChatMessageBean>) {
+    fun appendData(messages: MutableList<ChatMessageBean>) {
         val oldSize = itemCount
         this.messages.addAll(messages)
-        println(oldSize)
-        println(messages.size)
-        notifyItemRangeInserted(oldSize,messages.size)
+        createTimeStampAnchor()
+        notifyItemRangeInserted(oldSize, messages.size)
+    }
+
+    fun prependData(messages: MutableList<ChatMessageBean>) {
+        this.messages.addAll(0, messages)
+        createTimeStampAnchor()
+        notifyItemRangeInserted(0, messages.size)
     }
 
     fun notifyPlaybackStart(currentPlayPosition: Int) {
