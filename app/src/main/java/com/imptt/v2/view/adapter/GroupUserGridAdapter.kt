@@ -48,7 +48,7 @@ class GroupUserGridAdapter(
             holder.itemView.setOnClickListener {
                 onUserClick?.invoke(user, it)
             }
-            holder.textViewUserName.text = "用户${user.name}"
+            holder.textViewUserName.text = user.name
             holder.textViewUserDesc.text = user.iId.toString()
         }else{
             holder.itemView.setOnClickListener {
