@@ -1,6 +1,14 @@
 package com.imptt.v2.di
 
-import com.google.gson.GsonBuilder
+import com.google.gson.*
+import com.google.gson.internal.JavaVersion
+import com.google.gson.internal.PreJava9DateFormatProvider
+import com.google.gson.internal.bind.DateTypeAdapter
+import com.google.gson.internal.bind.util.ISO8601Utils
+import com.google.gson.reflect.TypeToken
+import com.google.gson.stream.JsonReader
+import com.google.gson.stream.JsonToken
+import com.google.gson.stream.JsonWriter
 import com.imptt.v2.core.websocket.WebSocketConnection
 import com.imptt.v2.data.ImDataBase
 import com.imptt.v2.data.api.SignalServerApi
@@ -18,6 +26,12 @@ import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.io.IOException
+import java.text.DateFormat
+import java.text.ParseException
+import java.text.ParsePosition
+import java.text.SimpleDateFormat
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 /**
@@ -101,7 +115,7 @@ fun provideWebSocketOkHttpClient() = OkHttpClient.Builder()
 fun provideHttpOkHttpClient() = OkHttpClient.Builder()
     .connectTimeout(150000L, TimeUnit.MILLISECONDS)
     .readTimeout(150000L, TimeUnit.MILLISECONDS)
-    .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
+    .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.HEADERS))
     .build()
 
 fun providePttOkHttpClient() = OkHttpClient.Builder()
@@ -123,8 +137,14 @@ fun providePttRetrofit(okHttpClient: OkHttpClient): Retrofit = Retrofit.Builder(
 
 fun provideHttpRetrofit(okHttpClient: OkHttpClient): Retrofit = Retrofit.Builder()
     .client(okHttpClient)
-    .baseUrl("http://192.168.10.181:8080/")
-    .addConverterFactory(GsonConverterFactory.create())
+    .baseUrl("http://jwttest.ciih.net/")
+    .addConverterFactory(
+        GsonConverterFactory.create(
+            GsonBuilder()
+                .registerTypeAdapter(Date::class.java, DateAdapter())
+                .create()
+        )
+    )
     .build()
 
 fun createWebSocket(
@@ -153,6 +173,10 @@ var viewModule = module {
     }
 
     single {
+        get<ImDataBase>().getFileMessageDao()
+    }
+
+    single {
         get<ImDataBase>().getUserDao()
     }
 
@@ -164,12 +188,12 @@ var viewModule = module {
         get<ImDataBase>().getGroupUserDao()
     }
 
-    single{
+    single {
         LocalStorage.getInstance(get())
     }
 
     single {
-        ImRepository(get(), get(), get(),get(),get())
+        ImRepository(get(), get(), get(), get(), get(),get(),get())
     }
 
     viewModel {
@@ -185,7 +209,7 @@ var viewModule = module {
     }
 
     viewModel {
-        GroupViewModel(get())
+        GroupViewModel(get(),get())
     }
 
     viewModel {
@@ -203,4 +227,31 @@ var viewModule = module {
     viewModel {
         EditGroupViewModel(get())
     }
+}
+
+class DateAdapter :TypeAdapter<Date>(){
+
+    @Throws(IOException::class)
+    override fun read(`in`: JsonReader): Date? {
+        if (`in`.peek() == JsonToken.NULL) {
+            `in`.nextNull()
+            return null
+        }
+        return dateFormat.parse(`in`.nextString())
+    }
+
+
+    private val dateFormat:SimpleDateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss",Locale.getDefault())
+
+    @Synchronized
+    @Throws(IOException::class)
+    override fun write(out: JsonWriter, value: Date?) {
+        if (value == null) {
+            out.nullValue()
+            return
+        }
+        val dateFormatAsString = dateFormat.format(value)
+        out.value(dateFormatAsString)
+    }
+
 }

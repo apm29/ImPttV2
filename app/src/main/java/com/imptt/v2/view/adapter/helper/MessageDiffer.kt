@@ -9,8 +9,8 @@ import com.kylindev.pttlib.db.ChatMessageBean
  *  description :
  */
 class MessageDiffer(
-    private val oldItems:List<ChatMessageBean>,
-    private val newItems:List<ChatMessageBean>
+    private val oldItems:List<Any>,
+    private val newItems:List<Any>
 ) :DiffUtil.Callback(){
     /**
      * Returns the size of the old list.
@@ -41,7 +41,7 @@ class MessageDiffer(
      * @return True if the two items represent the same object or false if they are different.
      */
     override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-        return oldItems[oldItemPosition].cid == newItems[newItemPosition].cid
+        return oldItems[oldItemPosition].hashCode() == newItems[newItemPosition].hashCode()
     }
 
     /**

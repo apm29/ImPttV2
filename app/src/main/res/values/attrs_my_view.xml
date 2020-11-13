@@ -2,4 +2,11 @@
     <declare-styleable name="EditableImageView">
         <attr name="editable" format="boolean" />
     </declare-styleable>
+    <declare-styleable name="SendableImageView">
+        <attr name="type" format="enum">
+            <enum name="photo" value="1"/>
+            <enum name="gallery" value="2"/>
+            <enum name="file" value="3"/>
+        </attr>
+    </declare-styleable>
 </resources>

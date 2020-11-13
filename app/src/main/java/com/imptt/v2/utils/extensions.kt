@@ -102,20 +102,23 @@ fun InterpttService.registerObserverWithLifecycle(
     observer: BaseServiceObserver
 ) {
     lifecycleOwner.lifecycle.addObserver(object : LifecycleObserver {
-        @OnLifecycleEvent(Lifecycle.Event.ON_START)
-        fun onStart() {
+
+        @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
+        fun onCreate() {
             Log.e("InterpttService", "$lifecycleOwner 已启动,注册监听")
             registerObserver(observer)
         }
 
+        @OnLifecycleEvent(Lifecycle.Event.ON_START)
+        fun onStart() {}
+
         @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-        fun onStop() {
-            Log.e("InterpttService", "$lifecycleOwner 已停止,反注册监听")
-            unregisterObserver(observer)
-        }
+        fun onStop() {}
 
         @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
         fun onDestroy() {
+            Log.e("InterpttService", "$lifecycleOwner 已停止,反注册监听")
+            unregisterObserver(observer)
             Log.e("InterpttService", "$lifecycleOwner 已停止,反注册LifecycleObserver")
             lifecycleOwner.lifecycle.removeObserver(this)
         }

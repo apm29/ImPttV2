@@ -67,7 +67,8 @@ class EditableImageView @JvmOverloads constructor(
 
     private fun doRequestPermissions(
         permissions: List<String> = arrayListOf(
-            Manifest.permission.WRITE_EXTERNAL_STORAGE
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.CAMERA,
         ),
         callback: (() -> Unit)? = null
     ) {
@@ -78,7 +79,7 @@ class EditableImageView @JvmOverloads constructor(
             .onExplainRequestReason { scope, deniedList ->
                 scope.showRequestReasonDialog(
                     deniedList,
-                    "App运行需要获取手机内部存储权限",
+                    "App运行需要获取手机内部存储权限/相机权限",
                     "好的",
                     "取消"
                 )
@@ -86,7 +87,7 @@ class EditableImageView @JvmOverloads constructor(
             .onForwardToSettings { scope, deniedList ->
                 scope.showForwardToSettingsDialog(
                     deniedList,
-                    "请到设置中心打开存储权限",
+                    "请到设置中心打开存储权限/相机权限",
                     "好的",
                     "取消"
                 )

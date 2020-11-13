@@ -3,6 +3,7 @@ package com.imptt.v2.utils
 import android.content.Context
 import android.content.SharedPreferences
 import com.imptt.v2.AppConst
+import java.util.*
 
 /**
  *  author : apm29[ciih]
@@ -21,6 +22,8 @@ class LocalStorage private constructor(private val context: Context){
         private const val HostKey = "HostKey"
         private const val TokenKey = "TokenKey"
         private const val OfflineReasonKey = "OfflineReasonKey"
+        private const val FirstAccessKey = "FirstAccessKey"
+        private const val LastReadTimeKey = "LastReadTimeKey"
 
         //value
         const val OFFLINE_REASON_KICK = "KICK"
@@ -83,5 +86,34 @@ class LocalStorage private constructor(private val context: Context){
                 .edit().putString(OfflineReasonKey,value)
                 .apply()
         }
+    var firstAccess:Boolean
+        get() {
+            return sharedPreferences.getBoolean(FirstAccessKey,true)
+        }
+        set(value) {
+            sharedPreferences
+                .edit().putBoolean(FirstAccessKey, value)
+                .apply()
+        }
 
+    var lastReadTime:Long
+        get() {
+            return sharedPreferences.getLong(LastReadTimeKey, Date().time )
+        }
+        set(value) {
+            println("lastReadTime SET = ${Date(value).toLocaleString()}")
+            sharedPreferences
+                .edit().putLong(LastReadTimeKey,value)
+                .apply()
+        }
+
+    init {
+        println("firstAccess = $firstAccess")
+        if(firstAccess){
+            lastReadTime = Date().time
+            firstAccess = false
+        }
+        println("firstAccess = $firstAccess")
+        println("lastReadTime = $lastReadTime")
+    }
 }

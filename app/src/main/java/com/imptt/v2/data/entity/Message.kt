@@ -12,7 +12,7 @@ data class Message(
     @field:ColumnInfo
     val id: Long,
     @field:ColumnInfo(name = "group_id")
-    val groupId: String,
+    val groupId: Int,
     @field:ColumnInfo
     val content: String,
     @field:ColumnInfo(name = "create_time")
@@ -23,8 +23,4 @@ data class Message(
     val fromId: String,
     @field:ColumnInfo(name = "from_name")//对应im_user.name
     val fromName: String,
-    @field:ColumnInfo(name = "to_id")//对应im_user.user_id
-    val toId: String,
-    @field:ColumnInfo(name = "to_name")//对应im_user.name
-    val toName: String,
 )

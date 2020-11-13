@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.imptt.v2.widget.FitSystemConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     tools:context=".view.group.GroupFragment">
 
     <include
@@ -16,7 +18,7 @@
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/layoutSwipeRefresh"
         android:layout_width="match_parent"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/bottomLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         android:background="#1333"
@@ -31,48 +33,128 @@
             />
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-    <com.imptt.v2.widget.PttButton
-        android:id="@+id/buttonPtt"
-        android:layout_width="160dp"
-        android:layout_height="160dp"
-        android:background="@drawable/audio_record_ripple_background"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
 
-        <ImageView
-            android:id="@+id/imageRecord"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_gravity="center"
-            app:tint="@color/colorPrimary"
-            android:src="@mipmap/microphoneoutline"
-            android:contentDescription="@string/icon_desc" />
-    </com.imptt.v2.widget.PttButton>
-
-    <ImageButton
-        android:id="@+id/buttonTextChat"
-        android:layout_width="55dp"
-        android:layout_height="55dp"
-        android:background="@drawable/bg_primary"
-        android:src="@mipmap/forum"
-        android:padding="12dp"
-        android:tint="@color/colorPrimary"
-        android:layout_marginHorizontal="12dp"
-        android:layout_marginBottom="16dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:contentDescription="@string/icon_desc" />
-    <ImageButton
-        android:layout_width="55dp"
-        android:layout_height="55dp"
-        android:background="@drawable/bg_primary"
-        android:src="@mipmap/image"
-        android:padding="12dp"
-        android:tint="@color/colorPrimary"
-        android:layout_marginHorizontal="12dp"
-        android:layout_marginBottom="16dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+    <LinearLayout
+        android:id="@+id/bottomLayout"
+        app:layout_constraintBottom_toTopOf="@id/layoutActions"
         app:layout_constraintStart_toStartOf="parent"
-        android:contentDescription="@string/icon_desc" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_width="match_parent"
+        android:paddingVertical="8dp"
+        android:paddingHorizontal="5dp"
+        android:background="@color/white_plain_accent"
+        android:gravity="center"
+        android:layout_height="wrap_content">
+
+        <ToggleButton
+            android:id="@+id/toggleButton"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_margin="5dp"
+            android:background="@drawable/ic_selector_audio_text"
+            android:textOff="@null"
+            android:layout_gravity="center_vertical"
+            android:textOn="@null"
+            android:contentDescription="@string/icon_desc">
+        </ToggleButton>
+
+        <com.imptt.v2.widget.PttButton
+            android:id="@+id/buttonPtt"
+            android:layout_width="0dp"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:layout_height="50dp"
+            tools:visibility="gone"
+            android:background="@drawable/audio_record_ripple_background_wx"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <TextView
+                android:text="按住说话"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </com.imptt.v2.widget.PttButton>
+        <EditText
+            android:layout_weight="1"
+            android:visibility="gone"
+            android:background="@drawable/bg_text_bar"
+            android:hint="发送文字"
+            android:inputType="text"
+            android:maxLines="1"
+            android:layout_gravity="center_vertical"
+            android:paddingHorizontal="12dp"
+            tools:visibility="visible"
+            android:imeOptions="actionSend"
+            android:id="@+id/editTextMessage"
+            android:layout_width="0dp"
+            android:layout_height="50dp">
+        </EditText>
+        <ImageButton
+            android:id="@+id/btnShowActions"
+            android:layout_width="35dp"
+            android:layout_gravity="center_vertical"
+            android:layout_height="35dp"
+            android:background="@mipmap/ic_plus_round"
+            android:tint="@color/black33_icon"
+            android:layout_marginHorizontal="8dp"
+            android:contentDescription="@string/icon_desc" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layoutActions"
+        android:visibility="gone"
+        android:padding="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <com.imptt.v2.widget.SendableImageView
+            android:id="@+id/imageAddGallery"
+            app:type="gallery"
+            android:layout_margin="12dp"
+            android:layout_width="35dp"
+            android:layout_height="35dp"/>
+        <com.imptt.v2.widget.SendableImageView
+            android:id="@+id/imageAddPhoto"
+            app:type="photo"
+            android:layout_width="35dp"
+            android:src="@mipmap/ic_camera"
+            android:layout_margin="12dp"
+            android:layout_height="35dp"/>
+        <com.imptt.v2.widget.SendableImageView
+            android:id="@+id/imageAddFile"
+            app:type="file"
+            android:layout_width="35dp"
+            android:src="@mipmap/ic_file"
+            android:layout_margin="12dp"
+            android:layout_height="35dp"/>
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/progressLoading"
+        android:layout_width="match_parent"
+        tools:visibility="visible"
+        android:visibility="gone"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:background="#5333"
+        android:layout_height="match_parent">
+        <ProgressBar
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_width="60dp"
+            android:layout_height="60dp"/>
+        <TextView
+            android:text="发送中"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+
+</com.imptt.v2.widget.FitSystemConstraintLayout>

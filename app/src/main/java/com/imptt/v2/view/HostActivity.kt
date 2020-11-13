@@ -5,30 +5,36 @@ import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
-import android.media.AudioAttributes
 import android.media.AudioManager
-import android.media.SoundPool
 import android.os.Bundle
 import android.os.PowerManager
 import android.text.format.Formatter
 import android.util.Log
 import android.widget.Toast
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.navigation.findNavController
 import androidx.navigation.navOptions
+import com.imptt.v2.BuildConfig
 import com.imptt.v2.R
 import com.imptt.v2.core.ptt.AppConstants
 import com.imptt.v2.core.ptt.PttObserver
 import com.imptt.v2.core.struct.PttServiceBindActivity
+import com.imptt.v2.data.api.SignalServerApi
+import com.imptt.v2.data.dao.FileMessageDao
+import com.imptt.v2.data.dao.MessageDao
 import com.imptt.v2.utils.*
 import com.itsmartreach.libzm.ZmCmdLink
 import com.kylindev.pttlib.service.InterpttProtocolHandler
 import com.kylindev.pttlib.service.InterpttService
+import com.kylindev.pttlib.service.model.Channel
 import com.kylindev.pttlib.service.model.User
 import com.kylindev.pttlib.utils.ServerProto
 import com.permissionx.guolindev.PermissionX
 import com.tencent.bugly.beta.Beta
 import kotlinx.android.synthetic.main.activity_host.*
 import kotlinx.coroutines.*
+import org.koin.android.ext.android.inject
+import java.util.*
 import kotlin.coroutines.CoroutineContext
 
 /**
@@ -47,12 +53,13 @@ class HostActivity : PttServiceBindActivity(), CoroutineScope {
 
     //SupervisorJob在子协程抛出异常时不会被取消
     private val mJob = SupervisorJob()
-
+    private val mApi: SignalServerApi by inject()
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Main + mJob + mExceptionHandler
 
     companion object {
         const val TAG = "HostActivity"
+        const val ACTION_FILE_MESSAGE = "FILE_MESSAGE_UPDATED"
     }
 
     val localStorage: LocalStorage by lazy {
@@ -61,6 +68,8 @@ class HostActivity : PttServiceBindActivity(), CoroutineScope {
     private val mAudioManager by lazy {
         getSystemService(AUDIO_SERVICE) as AudioManager
     }
+
+    val mFileMessageDao:FileMessageDao by inject()
 
     /**
      * 智咪按键监听
@@ -162,9 +171,13 @@ class HostActivity : PttServiceBindActivity(), CoroutineScope {
         launch {
             val pttService = requirePttService()
             var lastRhythmTime = 0L
-            pttService.alertType =  1
+            pttService.alertType = 1
             pttService.registerObserverWithLifecycle(this@HostActivity,
-                object : PttObserver(this@HostActivity::class.simpleName) {
+                object : PttObserver(this@HostActivity::class.simpleName), CoroutineScope {
+
+                    override val coroutineContext: CoroutineContext
+                        get() = Dispatchers.IO + mJob + mExceptionHandler
+
                     override fun onLocalUserTalkingChanged(user: User?, talking: Boolean) {
                         super.onLocalUserTalkingChanged(user, talking)
                         val fromSelf =
@@ -178,7 +191,7 @@ class HostActivity : PttServiceBindActivity(), CoroutineScope {
                         } else {
                             null
                         }
-                        if (message != null)  textViewCaller.text = message
+                        if (message != null) textViewCaller.text = message
 
                         if (talking) {
                             if (pttService.voiceOn || fromSelf) {
@@ -323,8 +336,44 @@ class HostActivity : PttServiceBindActivity(), CoroutineScope {
                         }
                     }
 
+                    override fun onChannelAdded(channel: Channel) {
+                        super.onChannelAdded(channel)
+                        launch {
+                            val resp = mApi.getHistoryFileMessagesAsync(
+                                1001,
+                                localStorage.lastReadTime,
+                            )
+                            println("lastReadTime = ${Date(localStorage.lastReadTime).toLocaleString()}")
+                            if (resp.success && resp.data?.rows?.isNotEmpty() == true) {
+                                localStorage.lastReadTime = Date().time
+                                mFileMessageDao.insert(resp.data.rows)
+                            }
+                            println("resp = $resp")
+                            val fileMessageCount = mFileMessageDao.getCount(1001)
+                            println("fileMessageCount = $fileMessageCount")
+                            withContext(Dispatchers.Main) {
+                                println(
+                                    "SEND: ${
+                                        LocalBroadcastManager.getInstance(this@HostActivity)
+                                            .sendBroadcast(
+                                                Intent(ACTION_FILE_MESSAGE)
+                                            )
+                                    }"
+                                )
+                            }
+                        }
+                    }
+
                 })
             pttService.recordMode
+            val resp = mApi.getHistoryFileMessagesAsync(
+                1001,
+                localStorage.lastReadTime,
+            )
+            if (resp.success && resp.data?.rows?.isNotEmpty() == true) {
+                localStorage.lastReadTime = Date().time
+                mFileMessageDao.insert(resp.data.rows)
+            }
         }
 
 //        mAudioManager.registerMediaButtonEventReceiver(
@@ -354,11 +403,13 @@ class HostActivity : PttServiceBindActivity(), CoroutineScope {
 //            }
 //        })
 //        mediaSession.isActive = true
+        //startActivity(Intent(this,TestActivity::class.java))
     }
 
     override fun onStart() {
         super.onStart()
-        Beta.checkAppUpgrade(false, false)
+        if (!BuildConfig.DEBUG)
+            Beta.checkAppUpgrade(false, false)
     }
 
     override fun onRestart() {

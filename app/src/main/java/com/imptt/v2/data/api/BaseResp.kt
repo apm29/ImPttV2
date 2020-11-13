@@ -6,12 +6,12 @@ package com.imptt.v2.data.api
  *  description :
  */
 data class BaseResp<T>(
-    val code:Int = 200,
-    val msg:String = "success",
+    val status:Int = 1,
+    val text:String = "success",
     val data:T? = null
 ){
     val success:Boolean
-        get() = code == 200
+        get() = status == 1
 
     val hasData:Boolean
         get() = data != null

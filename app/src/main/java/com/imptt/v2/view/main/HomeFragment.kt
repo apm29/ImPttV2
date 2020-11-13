@@ -92,6 +92,11 @@ class HomeFragment : BaseNestedFragment() {
 
     }
 
+    override fun onResume() {
+        super.onResume()
+        hideIme()
+    }
+
     private fun changeChannel(currentChannel: Channel?) {
         log(currentChannel)
         if (currentChannel != null && recyclerViewGroupList != null) {

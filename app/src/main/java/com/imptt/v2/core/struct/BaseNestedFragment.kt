@@ -8,8 +8,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.BounceInterpolator
+import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.transition.*
@@ -71,6 +73,16 @@ abstract class BaseNestedFragment : Fragment(), CoroutineScope {
 
     abstract fun setupViews(view: View, savedInstanceState: Bundle?)
 
+    protected fun hideIme() {
+        val inputMethodManager: InputMethodManager? =
+            ContextCompat.getSystemService(requireContext(), InputMethodManager::class.java)
+        val windowToken = requireActivity().window?.decorView?.findFocus()?.windowToken
+        if (windowToken != null) {
+            inputMethodManager?.hideSoftInputFromWindow(
+                windowToken, 0
+            )
+        }
+    }
 
     val mService: InterpttService?
         get() {

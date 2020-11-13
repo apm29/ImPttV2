@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/audio_record_shape_selected_wx" android:state_pressed="true"/>
+    <item android:drawable="@drawable/audio_record_shape_disabled_wx" android:state_enabled="false"/>
+    <item android:drawable="@drawable/audio_record_shape_normal_wx"/>
+</selector>

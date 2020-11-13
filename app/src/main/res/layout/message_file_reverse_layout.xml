@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:padding="12dp"
+    android:layout_height="wrap_content">
+    <TextView
+        android:id="@+id/textViewTime"
+        tools:text="2020-10-22 10:20"
+        android:layout_marginTop="12dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <ImageView
+        android:id="@+id/imageViewGroupIcon"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:contentDescription="@string/icon_desc"
+        android:src="@mipmap/default_nor_avatar"
+        app:layout_constraintBottom_toBottomOf="@+id/textViewContent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/textViewUserName" />
+
+    <TextView
+        android:id="@+id/textViewUserName"
+        style="@style/TextAppearance.AppCompat.Subhead"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toStartOf="@id/imageViewGroupIcon"
+        app:layout_constraintTop_toBottomOf="@+id/textViewTime"
+        android:layout_marginEnd="6dp"
+        tools:text="姓名XXX-单位XXX" />
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="6dp"
+        android:background="@drawable/bg_message_body_me"
+        android:gravity="center"
+        android:maxWidth="260dp"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toStartOf="@id/imageViewGroupIcon"
+        app:layout_constraintTop_toBottomOf="@id/textViewUserName"
+        tools:text="123" >
+        <ImageView
+            android:src="@mipmap/ic_file"
+            android:layout_width="100dp"
+            android:layout_height="100dp"/>
+        <TextView
+            android:id="@+id/textViewContent"
+            tools:text="66666.doc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

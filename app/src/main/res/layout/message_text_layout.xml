@@ -18,34 +18,46 @@
 
     <ImageView
         android:id="@+id/imageViewGroupIcon"
-        android:layout_width="65dp"
-        android:layout_height="65dp"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
         android:contentDescription="@string/icon_desc"
-        android:src="@mipmap/accountbox"
+        android:src="@mipmap/default_nor_avatar"
+        app:layout_constraintBottom_toBottomOf="@+id/layoutMessageBody"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textViewTime" />
+        app:layout_constraintTop_toTopOf="@+id/textViewUserName" />
 
     <TextView
         android:id="@+id/textViewUserName"
         style="@style/TextAppearance.AppCompat.Subhead"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="6dp"
         app:layout_constraintStart_toEndOf="@id/imageViewGroupIcon"
-        app:layout_constraintTop_toTopOf="@id/imageViewGroupIcon"
+        app:layout_constraintTop_toBottomOf="@+id/textViewTime"
         tools:text="姓名XXX-单位XXX" />
-    <TextView
-        app:layout_constraintStart_toEndOf="@+id/imageViewGroupIcon"
-        app:layout_constraintTop_toBottomOf="@id/textViewUserName"
-        android:id="@+id/textViewContent"
+
+    <LinearLayout
+        android:id="@+id/layoutMessageBody"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="20sp"
-        android:background="@drawable/bg_chat_other"
-        android:gravity="center_vertical"
-        android:maxWidth="260dp"
-        android:paddingStart="28dp"
-        android:paddingEnd="12dp"
-        tools:text="666666666666666666666666" />
+        android:background="@drawable/bg_message_body_other"
+        app:layout_constraintStart_toEndOf="@+id/imageViewGroupIcon"
+        android:gravity="center"
+        app:layout_constraintTop_toBottomOf="@id/textViewUserName">
+
+        <TextView
+            android:id="@+id/textViewContent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:gravity="center_vertical"
+            android:maxWidth="260dp"
+            android:paddingStart="28dp"
+            android:paddingEnd="12dp"
+            android:textSize="20sp"
+            tools:text="6666666666" />
+    </LinearLayout>
+
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
