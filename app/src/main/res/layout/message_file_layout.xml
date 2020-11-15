@@ -22,7 +22,7 @@
         android:layout_height="45dp"
         android:contentDescription="@string/icon_desc"
         android:src="@mipmap/default_nor_avatar"
-        app:layout_constraintBottom_toBottomOf="@+id/textViewContent"
+        app:layout_constraintBottom_toBottomOf="@+id/layoutMessageBody"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/textViewUserName" />
 
@@ -35,29 +35,50 @@
         app:layout_constraintStart_toEndOf="@id/imageViewGroupIcon"
         app:layout_constraintTop_toBottomOf="@+id/textViewTime"
         tools:text="姓名XXX-单位XXX" />
+
     <LinearLayout
-        android:orientation="vertical"
-        app:layout_constraintStart_toEndOf="@+id/imageViewGroupIcon"
-        app:layout_constraintTop_toBottomOf="@id/textViewUserName"
-        android:layout_width="wrap_content"
+        android:id="@+id/layoutMessageBody"
+        android:layout_width="0dp"
+        android:adjustViewBounds="true"
         android:layout_height="wrap_content"
-        android:textSize="20sp"
         android:layout_marginStart="6dp"
         android:background="@drawable/bg_message_body_other"
         android:gravity="center"
-        android:maxWidth="260dp"
+        android:orientation="vertical"
+        android:paddingTop="5dp"
         android:paddingStart="28dp"
-        android:paddingEnd="12dp">
-        <ImageView
-            android:src="@mipmap/ic_file"
-            android:layout_width="100dp"
-            android:layout_height="100dp"/>
+        android:paddingEnd="12dp"
+        android:textSize="20sp"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintEnd_toStartOf="@+id/viewPadding"
+        app:layout_constraintStart_toEndOf="@+id/imageViewGroupIcon"
+        app:layout_constraintTop_toBottomOf="@id/textViewUserName">
+
+        <com.imptt.v2.widget.FileDownloadImageView
+            android:id="@+id/imageViewFile"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:maxHeight="200dp"
+            android:src="@mipmap/download"/>
+
         <TextView
             android:id="@+id/textViewContent"
-            tools:text="66666.doc"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:ellipsize="marquee"
+            android:maxWidth="220dp"
+            tools:text="666666666666666.doc" />
     </LinearLayout>
+
+    <View
+        android:id="@+id/viewPadding"
+        android:layout_width="60dp"
+        android:layout_height="1dp"
+        app:layout_constraintBottom_toBottomOf="@+id/layoutMessageBody"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/layoutMessageBody"
+        app:layout_constraintTop_toTopOf="@+id/layoutMessageBody" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

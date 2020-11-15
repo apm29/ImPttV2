@@ -256,6 +256,8 @@ class SendableImageView @JvmOverloads constructor(
                 )
                 val uri = Matisse.obtainResult(result)
                 val path = Matisse.obtainPathResult(result)
+                println("uri = ${uri}")
+                println("path = ${path}")
                 onResult(uri, path)
             } else if (requestCode == CALL_FILER_ACTIVITY_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
                 val rawUri = data?.data

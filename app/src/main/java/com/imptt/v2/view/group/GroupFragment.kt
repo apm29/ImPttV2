@@ -33,6 +33,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.io.File
 
 
 class GroupFragment : BaseFragment() {
@@ -235,7 +236,11 @@ class GroupFragment : BaseFragment() {
     ) {
         val currentUser = pttService.currentUser
         groupViewModel.loading.value = true
-        val file = FileUtils.getFile(requireContext(), uri.first())
+        val file = try {
+            FileUtils.getFileOr(requireContext(), uri.first(),path.first())
+        } catch (e: Exception) {
+            File(path.first())
+        }
 
         //userId = currentUser.iId.toString().toRequestBody(),
         //nickname = currentUser.nick.toRequestBody(),
@@ -243,7 +248,7 @@ class GroupFragment : BaseFragment() {
         //contentType = "2".toRequestBody(),
         //file = file.asRequestBody()
         println("currentUser = ${currentUser.iId}")
-
+        println(file.name)
         val response = api.sendFileOrText(
 //            MultipartBody.Builder()
 //                .addFormDataPart(

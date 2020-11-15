@@ -9,4 +9,6 @@
             <enum name="file" value="3"/>
         </attr>
     </declare-styleable>
+    <declare-styleable name="FileDownloadImageView">
+    </declare-styleable>
 </resources>

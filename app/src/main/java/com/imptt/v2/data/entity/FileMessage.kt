@@ -18,25 +18,26 @@ data class FileMessage(
     val id: String,
     @field:ColumnInfo(name = "t_uid")
     @SerializedName("t_uid")
-    val tUserId: String,
+    var tUserId: String,
     @field:ColumnInfo(name = "c_id")
     @SerializedName("c_id")
-    val channelId: String,
+    var channelId: String,
     @field:ColumnInfo(name = "content")
-    val content: String,
+    var content: String,
     @field:ColumnInfo(name = "nick_name")
     @SerializedName("nick_name")
-    val nickName: String,
+    var nickName: String,
     @field:ColumnInfo(name = "avatar")
-    val avatar: String? = null,
+    var avatar: String? = null,
     @field:ColumnInfo(name = "type")
-    val type: Int,
+    var type: Int,
     @field:ColumnInfo(name = "date")
-    val date: Date,
+    var date: Date,
     @field:ColumnInfo(name = "local_path")
-    val localPath: String? = null,
+    var localPath: String? = null,
     @field:ColumnInfo(name = "local_uri")
-    val localUri: String? = null,
+    var localUri: String? = null,
+    @SerializedName("file_name")
     @field:ColumnInfo(name = "file_name")
-    val fileName: String? = null,
+    var fileName: String? = null,
 )

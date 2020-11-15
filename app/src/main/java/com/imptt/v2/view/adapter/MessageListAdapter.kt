@@ -2,6 +2,7 @@ package com.imptt.v2.view.adapter
 
 import android.graphics.drawable.AnimationDrawable
 import android.text.format.Formatter
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,6 +19,7 @@ import com.imptt.v2.utils.gone
 import com.imptt.v2.utils.loadImageData
 import com.imptt.v2.utils.visible
 import com.imptt.v2.view.adapter.helper.MessageDiffer
+import com.imptt.v2.widget.FileDownloadImageView
 import com.kylindev.pttlib.db.ChatMessageBean
 import java.text.SimpleDateFormat
 import java.util.*
@@ -86,12 +88,12 @@ class MessageListAdapter constructor(
         if (message is FileMessage) {
             val fromSelf = myId.toString() != message.tUserId
             when (message.type) {
-                1 -> {
-                    return if (fromSelf)
-                        MessageType.IMAGE_ME.type
-                    else
-                        MessageType.IMAGE_OTHER.type
-                }
+                //1 -> {
+                //    return if (fromSelf)
+                //        MessageType.IMAGE_ME.type
+                //    else
+                //        MessageType.IMAGE_OTHER.type
+                //}
                 5 -> {
                     return if (fromSelf)
                         MessageType.TEXT_ME.type
@@ -192,7 +194,7 @@ class MessageListAdapter constructor(
             holder.imageViewAvatar?.setOnClickListener {
                 onUserClicked?.invoke(messages[position], it)
             }
-            holder.imageViewPlay?.id = position
+            holder.imageViewFile?.missionId = message.id
 
             if (contentType == MessageType.TEXT_OTHER.type || contentType == MessageType.TEXT_ME.type) {
                 //文本
@@ -283,6 +285,7 @@ class MessageListAdapter constructor(
         this.messages.addAll(messages)
         createTimeStampAnchor()
         notifyDataSetChanged()
+        Log.e("LAST-ITEM",this.messages.first().toString())
     }
 
     fun prependData(messages: MutableList<Any>) {
@@ -293,6 +296,7 @@ class MessageListAdapter constructor(
 
     fun notifyPlaybackStart(currentPlayPosition: Int) {
         this.currentPlayPosition = currentPlayPosition
+        println("currentPlayPosition = ${currentPlayPosition}")
         notifyItemChanged(currentPlayPosition)
     }
 
@@ -309,6 +313,7 @@ class MessageListAdapter constructor(
         val textViewTime: TextView? = itemView.findViewById(R.id.textViewTime)
         val imageViewPlay: ImageView? = itemView.findViewById(R.id.imageViewPlay)
         val imageViewAvatar: ImageView? = itemView.findViewById(R.id.imageViewGroupIcon)
+        val imageViewFile: FileDownloadImageView? = itemView.findViewById(R.id.imageViewFile)
         val textViewUserName: TextView? = itemView.findViewById(R.id.textViewUserName)
         val textViewDuration: TextView? = itemView.findViewById(R.id.textViewDuration)
         val layoutMessageBody: LinearLayout? = itemView.findViewById(R.id.layoutMessageBody)

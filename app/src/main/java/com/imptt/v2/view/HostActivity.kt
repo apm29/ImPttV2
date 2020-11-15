@@ -22,6 +22,8 @@ import com.imptt.v2.core.struct.PttServiceBindActivity
 import com.imptt.v2.data.api.SignalServerApi
 import com.imptt.v2.data.dao.FileMessageDao
 import com.imptt.v2.data.dao.MessageDao
+import com.imptt.v2.data.entity.FileMessage
+import com.imptt.v2.data.model.Page
 import com.imptt.v2.utils.*
 import com.itsmartreach.libzm.ZmCmdLink
 import com.kylindev.pttlib.service.InterpttProtocolHandler
@@ -339,8 +341,14 @@ class HostActivity : PttServiceBindActivity(), CoroutineScope {
                     override fun onChannelAdded(channel: Channel) {
                         super.onChannelAdded(channel)
                         launch {
+                            val channelId = when(channel.id){
+                                1007 -> 1001
+                                1008 -> 1002
+                                1009 -> 1004
+                                else -> 0
+                            }
                             val resp = mApi.getHistoryFileMessagesAsync(
-                                1001,
+                                channelId,
                                 localStorage.lastReadTime,
                             )
                             println("lastReadTime = ${Date(localStorage.lastReadTime).toLocaleString()}")
@@ -366,14 +374,11 @@ class HostActivity : PttServiceBindActivity(), CoroutineScope {
 
                 })
             pttService.recordMode
-            val resp = mApi.getHistoryFileMessagesAsync(
-                1001,
-                localStorage.lastReadTime,
-            )
-            if (resp.success && resp.data?.rows?.isNotEmpty() == true) {
-                localStorage.lastReadTime = Date().time
-                mFileMessageDao.insert(resp.data.rows)
-            }
+            loadChannelFileMessages(1001)
+            loadChannelFileMessages(1002)
+            loadChannelFileMessages(1004)
+            localStorage.lastReadTime = Date().time
+
         }
 
 //        mAudioManager.registerMediaButtonEventReceiver(
@@ -404,6 +409,16 @@ class HostActivity : PttServiceBindActivity(), CoroutineScope {
 //        })
 //        mediaSession.isActive = true
         //startActivity(Intent(this,TestActivity::class.java))
+    }
+
+    private suspend fun loadChannelFileMessages(channelId:Int) {
+        val resp = mApi.getHistoryFileMessagesAsync(
+            channelId,
+            localStorage.lastReadTime,
+        )
+        if (resp.success && resp.data?.rows?.isNotEmpty() == true) {
+            mFileMessageDao.insert(resp.data.rows)
+        }
     }
 
     override fun onStart() {

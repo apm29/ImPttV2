@@ -2,7 +2,6 @@ package com.imptt.v2
 
 import android.app.Application
 import android.os.Process
-import com.imptt.v2.data.ImDataBase
 import com.imptt.v2.di.serviceModule
 import com.imptt.v2.di.viewModule
 import com.imptt.v2.utils.LocalStorage

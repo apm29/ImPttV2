@@ -21,7 +21,7 @@
         app:layout_constraintBottom_toTopOf="@id/bottomLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:background="#1333"
+        android:background="#1aaa"
         app:layout_constraintTop_toBottomOf="@+id/layout"
         android:layout_height="0dp">
         <androidx.recyclerview.widget.RecyclerView
@@ -128,7 +128,7 @@
             android:id="@+id/imageAddFile"
             app:type="file"
             android:layout_width="35dp"
-            android:src="@mipmap/ic_file"
+            android:src="@mipmap/ic_document"
             android:layout_margin="12dp"
             android:layout_height="35dp"/>
     </LinearLayout>
@@ -137,7 +137,6 @@
     <LinearLayout
         android:id="@+id/progressLoading"
         android:layout_width="match_parent"
-        tools:visibility="visible"
         android:visibility="gone"
         android:gravity="center"
         android:orientation="vertical"

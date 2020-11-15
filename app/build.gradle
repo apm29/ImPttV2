@@ -161,4 +161,11 @@ dependencies {
     //bugly
     implementation 'com.tencent.bugly:crashreport_upgrade:1.4.5'
     implementation 'com.tencent.bugly:nativecrashreport:3.7.3'
+
+    //downloader
+    implementation 'com.liulishuo.okdownload:okdownload:1.0.7'
+    implementation 'com.liulishuo.okdownload:sqlite:1.0.7'
+    implementation 'com.liulishuo.okdownload:okhttp:1.0.7'
+    implementation 'com.liulishuo.okdownload:filedownloader:1.0.7'
+    implementation 'com.liulishuo.okdownload:ktx:1.0.7'
 }

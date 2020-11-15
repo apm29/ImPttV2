@@ -106,11 +106,16 @@ class HomeFragment : BaseNestedFragment() {
 
     private fun initialList(groups: ArrayList<Channel>?, listenChannels: MutableList<Int>?) {
         if (groups != null && recyclerViewGroupList != null) {
+            val filteredGroups = ArrayList(
+                groups.filter {
+                    it.id != 1007 && it.id!=1008 && it.id!=1009
+                }
+            )
             recyclerViewGroupList.layoutManager = LinearLayoutManager(requireContext())
             if (recyclerViewGroupList.adapter == null) {
                 recyclerViewGroupList.adapter =
                     GroupListAdapter(
-                        groups,
+                        filteredGroups,
                         layoutInflater,
                         ::onGroupRoute,
                         ::onCurrentChannelListenChange,
@@ -118,7 +123,7 @@ class HomeFragment : BaseNestedFragment() {
                         listenChannels
                     )
             } else {
-                (recyclerViewGroupList.adapter as GroupListAdapter).newList(groups, listenChannels)
+                (recyclerViewGroupList.adapter as GroupListAdapter).newList(filteredGroups, listenChannels)
             }
         }
     }

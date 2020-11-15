@@ -56,7 +56,7 @@ public class FileUtils {
      * TAG for log messages.
      */
     static final String TAG = "FileUtils";
-    private static final boolean DEBUG = false; // Set to true to enable logging
+    private static final boolean DEBUG = true; // Set to true to enable logging
     /**
      * File and folder comparator. TODO Expose sorting option method
      */
@@ -423,6 +423,16 @@ public class FileUtils {
             String path = getPath(context, uri);
             if (path != null && isLocal(path)) {
                 return new File(path);
+            }
+        }
+        return null;
+    }
+
+    public static File getFileOr(Context context, Uri uri,String localPath) {
+        if (uri != null) {
+            String path = getPath(context, uri);
+            if (localPath != null && isLocal(localPath)) {
+                return new File(localPath);
             }
         }
         return null;

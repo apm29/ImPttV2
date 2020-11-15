@@ -12,7 +12,7 @@ import com.imptt.v2.utils.IContextSingleton
 
 @Database(
     entities = [Message::class, User::class, Group::class, GroupUserCrossRef::class,HiddenChannelUser::class,FileMessage::class],
-    version = 16,
+    version = 18,
     exportSchema = false,
 )
 @TypeConverters(Converters::class)

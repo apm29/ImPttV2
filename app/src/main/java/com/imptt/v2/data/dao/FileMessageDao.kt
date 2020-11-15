@@ -1,9 +1,6 @@
 package com.imptt.v2.data.dao
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import com.imptt.v2.data.entity.FileMessage
 
 /**
@@ -24,4 +21,11 @@ interface FileMessageDao {
 
     @Query("select COUNT(*) FROM t_file_message WHERE c_id = :channelId")
     fun getCount(channelId: Int):Int
+
+    @Query("SELECT * FROM t_file_message WHERE id = :id LIMIT 1")
+    fun getFileMessageById(id:String):FileMessage
+
+    @Update(entity = FileMessage::class)
+    fun updateMessageById(message: FileMessage)
+
 }

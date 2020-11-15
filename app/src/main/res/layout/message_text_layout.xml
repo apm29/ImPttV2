@@ -23,6 +23,8 @@
         android:contentDescription="@string/icon_desc"
         android:src="@mipmap/default_nor_avatar"
         app:layout_constraintBottom_toBottomOf="@+id/layoutMessageBody"
+        app:layout_constraintEnd_toStartOf="@id/layoutMessageBody"
+        app:layout_constraintHorizontal_chainStyle="spread"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/textViewUserName" />
 
@@ -38,26 +40,38 @@
 
     <LinearLayout
         android:id="@+id/layoutMessageBody"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@drawable/bg_message_body_other"
-        app:layout_constraintStart_toEndOf="@+id/imageViewGroupIcon"
+        android:background="@drawable/bg_chat_other"
         android:gravity="center"
-        app:layout_constraintTop_toBottomOf="@id/textViewUserName">
+        android:maxWidth="260dp"
+        app:layout_constraintEnd_toStartOf="@+id/viewPadding"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintStart_toEndOf="@+id/imageViewGroupIcon"
+        app:layout_constraintTop_toTopOf="@id/imageViewGroupIcon">
 
         <TextView
             android:id="@+id/textViewContent"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="6dp"
             android:gravity="center_vertical"
             android:maxWidth="260dp"
+            android:paddingBottom="6dp"
             android:paddingStart="28dp"
             android:paddingEnd="12dp"
             android:textSize="20sp"
             tools:text="6666666666" />
     </LinearLayout>
 
+    <View
+        android:id="@+id/viewPadding"
+        android:layout_width="120dp"
+        android:layout_height="5dp"
+        app:layout_constraintBottom_toBottomOf="@id/layoutMessageBody"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/layoutMessageBody"
+        app:layout_constraintTop_toTopOf="@id/layoutMessageBody" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

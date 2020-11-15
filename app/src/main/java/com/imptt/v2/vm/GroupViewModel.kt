@@ -46,7 +46,7 @@ class GroupViewModel(
         //本次加载的语音消息，
         val voiceMessage = service.loadDBRecords(groupId, voiceMessages.size, pageSize)
         //按时间戳范围获取文件
-        val now = Date().time
+        val now = Date().time + 60*1000*60*12
         println("fileMessages.time = ${fileMessages.map { it.date.toLocaleString() }}")
         val timeEnd = if (refresh) now else {
             val voiceFirst = voiceMessages.firstOr(now) { it.time }
