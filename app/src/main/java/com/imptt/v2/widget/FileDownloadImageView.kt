@@ -4,7 +4,6 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.util.AttributeSet
 import android.widget.Toast
 import androidx.appcompat.widget.AppCompatImageView
@@ -22,6 +21,7 @@ import com.liulishuo.okdownload.core.cause.EndCause
 import com.liulishuo.okdownload.core.cause.ResumeFailedCause
 import com.permissionx.guolindev.PermissionX
 import java.io.File
+import java.util.*
 
 
 class FileDownloadImageView @JvmOverloads constructor(
@@ -139,7 +139,11 @@ class FileDownloadImageView @JvmOverloads constructor(
                         .into(this)
                 }
                 setOnClickListener {
-                    openFileByPath(context, fileMessage.localPath)
+                    openFileByPath(context, fileMessage.localPath, Intent.ACTION_VIEW)
+                }
+                setOnLongClickListener {
+                    openFileByPath(context, fileMessage.localPath,Intent.ACTION_SEND)
+                    true
                 }
                 return
             } else {
@@ -328,17 +332,17 @@ class FileDownloadImageView @JvmOverloads constructor(
      * @param path 文件路径
      */
     @SuppressLint("ShowToast")
-    fun openFileByPath(context: Context?, path: String?) {
+    fun openFileByPath(context: Context?, path: String?, action: String?) {
         if (context == null || path == null) return
         val intent = Intent()
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         //设置intent的Action属性
-        intent.action = Intent.ACTION_VIEW
+        intent.action = action ?:Intent.ACTION_VIEW
         //文件的类型
         var type = ""
         for (i in MATCH_ARRAY.indices) {
             //判断文件的格式
-            if (path.toString().contains(MATCH_ARRAY[i][0])) {
+            if (path.toString().toLowerCase(Locale.getDefault()).contains(MATCH_ARRAY[i][0])) {
                 type = MATCH_ARRAY[i][1]
                 break
             }
@@ -349,6 +353,7 @@ class FileDownloadImageView @JvmOverloads constructor(
             //设置intent的data和Type属性
             intent.setDataAndType(uri, type)
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
             //跳转
             context.startActivity(intent)
         } catch (e: java.lang.Exception) { //当系统没有携带文件打开软件，提示

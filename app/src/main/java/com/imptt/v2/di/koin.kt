@@ -213,11 +213,11 @@ var viewModule = module {
     }
 
     viewModel {
-        GroupSettingsViewModel()
+        GroupSettingsViewModel(get(),get())
     }
 
     viewModel {
-        GroupUsersViewModel()
+        GroupUsersViewModel(get(),get())
     }
 
     viewModel {

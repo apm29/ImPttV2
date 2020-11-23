@@ -6,7 +6,10 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.net.Uri
 import android.os.Bundle
-import android.view.*
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
 import android.widget.Toast
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -16,6 +19,7 @@ import com.imptt.v2.core.ptt.PttObserver
 import com.imptt.v2.core.struct.BaseFragment
 import com.imptt.v2.data.api.BaseResp
 import com.imptt.v2.data.api.SignalServerApi
+import com.imptt.v2.data.entity.FileMessage
 import com.imptt.v2.utils.*
 import com.imptt.v2.view.HostActivity
 import com.imptt.v2.view.adapter.MessageListAdapter
@@ -28,6 +32,9 @@ import kotlinx.android.synthetic.main.fragment_group.*
 import kotlinx.coroutines.launch
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import retrofit2.Call
@@ -134,7 +141,7 @@ class GroupFragment : BaseFragment() {
                 }
             }
             editTextMessage.setOnEditorActionListener { v, actionId, event ->
-                sendTextMessage(pttService,v.text)
+                sendTextMessage(pttService, v.text)
                 true
             }
             imageAddGallery.callback = { uri: MutableList<Uri>, path: MutableList<String> ->
@@ -198,10 +205,29 @@ class GroupFragment : BaseFragment() {
             LocalBroadcastManager.getInstance(requireContext())
                 .registerReceiver(receiver, IntentFilter(HostActivity.ACTION_FILE_MESSAGE))
         }
+
+        EventBus.getDefault().register(this)
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onMessageEvent(event:String) {
+        launch {
+            if (recyclerViewMessages != null) {
+                groupViewModel.loadMoreMessages(
+                    groupId.toInt(), requirePttService(), true,
+                    recyclerViewMessages.adapter as MessageListAdapter,
+                    recyclerViewMessages.layoutManager as RecyclerView.LayoutManager,
+                    mHandler
+                )
+            } else {
+                Toast.makeText(requireContext(), "收到消息", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        EventBus.getDefault().unregister(this)
         LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(receiver)
     }
 
@@ -237,7 +263,7 @@ class GroupFragment : BaseFragment() {
         val currentUser = pttService.currentUser
         groupViewModel.loading.value = true
         val file = try {
-            FileUtils.getFileOr(requireContext(), uri.first(),path.first())
+            FileUtils.getFileOr(requireContext(), uri.first(), path.first())
         } catch (e: Exception) {
             File(path.first())
         }
@@ -331,6 +357,12 @@ class GroupFragment : BaseFragment() {
             navigate(
                 R.id.userInfoFragment,
                 UserInfoFragmentArgs.Builder(message.uid.toString()).build().toBundle()
+            )
+        }
+        if (message is FileMessage) {
+            navigate(
+                R.id.userInfoFragment,
+                UserInfoFragmentArgs.Builder(message.tUserId).build().toBundle()
             )
         }
     }

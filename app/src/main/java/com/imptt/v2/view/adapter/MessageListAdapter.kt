@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.imptt.v2.R
 import com.imptt.v2.data.entity.FileMessage
 import com.imptt.v2.data.model.message.MessageType
+import com.imptt.v2.di.GlideApp
 import com.imptt.v2.utils.clamp
 import com.imptt.v2.utils.gone
 import com.imptt.v2.utils.loadImageData
@@ -190,7 +191,13 @@ class MessageListAdapter constructor(
         if (message is FileMessage) {
             holder.textViewUserName?.text = message.nickName
             holder.textViewTime?.text = simpleDateFormat.format(message.date)
-            //holder.imageViewAvatar?.loadImageData(message.avatar)
+            holder.imageViewAvatar?.let {
+                message.avatar?.let {
+                    GlideApp.with(holder.imageViewAvatar)
+                        .load(message.avatar)
+                        .into( holder.imageViewAvatar)
+                }
+            }
             holder.imageViewAvatar?.setOnClickListener {
                 onUserClicked?.invoke(messages[position], it)
             }

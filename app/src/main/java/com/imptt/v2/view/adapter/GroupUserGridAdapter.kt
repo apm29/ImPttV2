@@ -7,12 +7,13 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.imptt.v2.R
+import com.imptt.v2.data.model.v2.ChannelUser
 import com.kylindev.pttlib.service.model.User
 
 class GroupUserGridAdapter(
-    private var users: MutableList<User>,
+    private var users: List<ChannelUser>,
     private val layoutInflater: LayoutInflater,
-    private val onUserClick: ((User, View)->Unit)?=null,
+    private val onUserClick: ((ChannelUser, View)->Unit)?=null,
     private val onAddClick: ((View)->Unit)?=null
 ) : RecyclerView.Adapter<GroupUserGridAdapter.VH>() {
 
@@ -48,8 +49,8 @@ class GroupUserGridAdapter(
             holder.itemView.setOnClickListener {
                 onUserClick?.invoke(user, it)
             }
-            holder.textViewUserName.text = user.name
-            holder.textViewUserDesc.text = user.iId.toString()
+            holder.textViewUserName.text = user.nickName
+            holder.textViewUserDesc.text = user.userId
         }else{
             holder.itemView.setOnClickListener {
                 onAddClick?.invoke(it)
@@ -62,7 +63,7 @@ class GroupUserGridAdapter(
         return users.size + 1
     }
 
-    fun newList(users: MutableList<User>) {
+    fun newList(users: List<ChannelUser>) {
         this.users = users
         notifyDataSetChanged()
     }

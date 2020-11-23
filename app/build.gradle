@@ -24,8 +24,8 @@ android {
         applicationId "com.imptt.v2"
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 21
-        versionName "0.2.1"
+        versionCode 22
+        versionName "0.2.2"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
@@ -80,7 +80,7 @@ dependencies {
     implementation "androidx.navigation:navigation-ui:$rootProject.navigationVersion"
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'androidx.annotation:annotation:1.1.0'
-    implementation files('libs/libzm_v1.3.jar')
+    implementation files('libs/libzm_v1.4.jar')
     testImplementation "junit:junit:$rootProject.junitVersion"
     androidTestImplementation "androidx.test.ext:junit:$rootProject.testExtJunit"
     androidTestImplementation "androidx.test.espresso:espresso-core:$rootProject.espressoVersion"
@@ -168,4 +168,7 @@ dependencies {
     implementation 'com.liulishuo.okdownload:okhttp:1.0.7'
     implementation 'com.liulishuo.okdownload:filedownloader:1.0.7'
     implementation 'com.liulishuo.okdownload:ktx:1.0.7'
+
+    //eventbus
+    implementation 'org.greenrobot:eventbus:3.2.0'
 }

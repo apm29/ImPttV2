@@ -108,7 +108,7 @@ class HomeFragment : BaseNestedFragment() {
         if (groups != null && recyclerViewGroupList != null) {
             val filteredGroups = ArrayList(
                 groups.filter {
-                    it.id != 1007 && it.id!=1008 && it.id!=1009
+                    it.id != 1007 && it.id!=1008 && it.id!=1009 && it.id!=1005
                 }
             )
             recyclerViewGroupList.layoutManager = LinearLayoutManager(requireContext())

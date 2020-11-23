@@ -3,6 +3,7 @@ package com.imptt.v2.view
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.AlertDialog
+import android.bluetooth.BluetoothDevice
 import android.content.Context
 import android.content.Intent
 import android.media.AudioManager
@@ -35,6 +36,7 @@ import com.permissionx.guolindev.PermissionX
 import com.tencent.bugly.beta.Beta
 import kotlinx.android.synthetic.main.activity_host.*
 import kotlinx.coroutines.*
+import org.greenrobot.eventbus.EventBus
 import org.koin.android.ext.android.inject
 import java.util.*
 import kotlin.coroutines.CoroutineContext
@@ -83,11 +85,6 @@ class HostActivity : PttServiceBindActivity(), CoroutineScope {
             //sco
             override fun onScoStateChanged(sco: Boolean) {
                 println("AudioRecord.onScoStateChanged sco = [${sco}]")
-//                if(sco){
-//                    zmLink.enterSppMode()
-//                }else{
-//                    zmLink.enterSppStandbyMode()
-//                }
             }
 
             //spp
@@ -98,9 +95,6 @@ class HostActivity : PttServiceBindActivity(), CoroutineScope {
                     if (spp) "连接蓝牙肩咪成功" else "外放模式",
                     Toast.LENGTH_SHORT
                 ).show()
-//                if(!spp){
-//                    zmLink.enterSpeakMode()
-//                }
             }
 
             //用户按键
@@ -110,14 +104,12 @@ class HostActivity : PttServiceBindActivity(), CoroutineScope {
                 if (event == ZmCmdLink.ZmUserEvent.zmEventPttPressed) {
                     launch {
                         val pttService = requirePttService()
-                        mAudioManager.startBluetoothSco()
                         pttService.userPressDown()
                     }
                 } else if (event == ZmCmdLink.ZmUserEvent.zmEventPttReleased) {
                     launch {
                         val pttService = requirePttService()
                         pttService.userPressUp()
-                        mAudioManager.stopBluetoothSco()
                     }
                 }
             }
@@ -126,6 +118,10 @@ class HostActivity : PttServiceBindActivity(), CoroutineScope {
             }
 
             override fun onVolumeChanged(p0: Boolean) {
+            }
+
+            override fun onMuted() {
+
             }
         }, true)
     }
@@ -174,6 +170,7 @@ class HostActivity : PttServiceBindActivity(), CoroutineScope {
             val pttService = requirePttService()
             var lastRhythmTime = 0L
             pttService.alertType = 1
+            pttService.scanLeDevice(false)
             pttService.registerObserverWithLifecycle(this@HostActivity,
                 object : PttObserver(this@HostActivity::class.simpleName), CoroutineScope {
 
@@ -211,6 +208,16 @@ class HostActivity : PttServiceBindActivity(), CoroutineScope {
                             rhythmView.setPerHeight((volume.clamp() / 5000f).toFloat())
                             lastRhythmTime = currentTimeMillis
                         }
+                    }
+
+                    override fun onLeDeviceScanStarted(p0: Boolean) {
+                        super.onLeDeviceScanStarted(p0)
+                        pttService.scanLeDevice(false)
+                    }
+
+                    override fun onLeDeviceFound(device: BluetoothDevice) {
+                        super.onLeDeviceFound(device)
+                        pttService.scanLeDevice(false)
                     }
 
                     override fun onTalkingTimerCanceled() {
@@ -345,6 +352,7 @@ class HostActivity : PttServiceBindActivity(), CoroutineScope {
                                 1007 -> 1001
                                 1008 -> 1002
                                 1009 -> 1004
+                                1005 -> 1003
                                 else -> 0
                             }
                             val resp = mApi.getHistoryFileMessagesAsync(
@@ -360,13 +368,16 @@ class HostActivity : PttServiceBindActivity(), CoroutineScope {
                             val fileMessageCount = mFileMessageDao.getCount(1001)
                             println("fileMessageCount = $fileMessageCount")
                             withContext(Dispatchers.Main) {
-                                println(
-                                    "SEND: ${
-                                        LocalBroadcastManager.getInstance(this@HostActivity)
-                                            .sendBroadcast(
-                                                Intent(ACTION_FILE_MESSAGE)
-                                            )
-                                    }"
+//                                println(
+//                                    "SEND: ${
+//                                        LocalBroadcastManager.getInstance(this@HostActivity)
+//                                            .sendBroadcast(
+//                                                Intent(ACTION_FILE_MESSAGE)
+//                                            )
+//                                    }"
+//                                )
+                                EventBus.getDefault().postSticky(
+                                    ACTION_FILE_MESSAGE
                                 )
                             }
                         }
@@ -377,6 +388,7 @@ class HostActivity : PttServiceBindActivity(), CoroutineScope {
             loadChannelFileMessages(1001)
             loadChannelFileMessages(1002)
             loadChannelFileMessages(1004)
+            loadChannelFileMessages(1003)
             localStorage.lastReadTime = Date().time
 
         }

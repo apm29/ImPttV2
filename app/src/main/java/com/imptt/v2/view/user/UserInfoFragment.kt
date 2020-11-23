@@ -4,8 +4,12 @@ import android.os.Bundle
 import android.view.View
 import com.imptt.v2.R
 import com.imptt.v2.core.struct.BaseFragment
+import com.imptt.v2.di.GlideApp
+import com.imptt.v2.utils.requirePttService
 import com.imptt.v2.view.group.GroupFragmentArgs
 import com.imptt.v2.vm.UserInfoViewModel
+import kotlinx.android.synthetic.main.fragment_user_info.*
+import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.lang.IllegalArgumentException
 
@@ -23,5 +27,16 @@ class UserInfoFragment : BaseFragment() {
 
     override fun setupViews(view: View, savedInstanceState: Bundle?) {
         setToolbarTitle(userId)
+        launch {
+            val user = requirePttService().getUser(userId.toInt())
+            println(user)
+            user?.apply {
+                setToolbarTitle(user.name)
+                editTextUserCallNumber.setText(user.iId.toString())
+                GlideApp.with(requireContext())
+                    .load(user.avatar)
+                    .into(imageViewUserAvatar)
+            }
+        }
     }
 }

@@ -11,6 +11,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.imptt.v2.R
+import com.imptt.v2.data.model.v2.ChannelUser
 import com.kylindev.pttlib.service.model.Channel
 import com.kylindev.pttlib.service.model.User
 import kotlin.collections.ArrayList
@@ -21,9 +22,9 @@ import kotlin.collections.ArrayList
  *  description :
  */
 class PickListAdapter(
-    private var list: MutableList<User>,
+    private var list: List<ChannelUser>,
     private val layoutInflater: LayoutInflater,
-    private val onItemRoute: ((User, View) -> Unit)? = null,
+    private val onItemRoute: ((ChannelUser, View) -> Unit)? = null,
 ) : RecyclerView.Adapter<PickListAdapter.VH>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
@@ -35,8 +36,8 @@ class PickListAdapter(
     @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: VH, position: Int) {
         val user = list[position]
-        holder.textViewUserName.text = user.name
-        holder.textViewUserDesc.text = user.iId.toString()
+        holder.textViewUserName.text = user.nickName
+        holder.textViewUserDesc.text = user.userId
         holder.itemView.setOnClickListener {
             onItemRoute?.invoke(user,holder.itemView)
         }
